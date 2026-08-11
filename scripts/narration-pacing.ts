@@ -48,10 +48,10 @@ export function narrationCharacterPacingBounds(spokenText: string): NarrationCha
     : characterCount < 160
       ? 6 + (4 * (characterCount - 40)) / 120
       : 10
-  const maximumCharactersPerSecond = characterCount <= 80
+  const maximumCharactersPerSecond = characterCount <= 100
     ? 20
     : characterCount < 160
-      ? 20 - (2 * (characterCount - 80)) / 80
+      ? 20 - (2 * (characterCount - 100)) / 60
       : 18
   return {
     minimumCharactersPerSecond,

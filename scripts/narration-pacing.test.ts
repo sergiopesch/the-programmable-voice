@@ -10,9 +10,9 @@ describe('narration pacing contract', () => {
   it.each([
     [40, 6, 20],
     [80, 7.333333333333333, 20],
-    [100, 8, 19.5],
-    [120, 8.666666666666666, 19],
-    [159, 9.966666666666667, 18.025],
+    [100, 8, 20],
+    [120, 8.666666666666666, 19.333333333333332],
+    [159, 9.966666666666667, 18.033333333333335],
     [160, 10, 18],
     [200, 10, 18],
   ])('sets reproducible bounds for %i characters', (characterCount, minimum, maximum) => {
@@ -31,6 +31,16 @@ describe('narration pacing contract', () => {
     expect(Number(pace.toFixed(1))).toBe(expectedPace)
     expect(pace).toBeGreaterThanOrEqual(bounds.minimumCharactersPerSecond)
     expect(pace).toBeLessThanOrEqual(bounds.maximumCharactersPerSecond)
+  })
+
+  it('accepts the measured 99-character list item without weakening the long-form ceiling', () => {
+    const text = 'A written account can name a practice while filtering it through the writer’s language and purpose.'
+    const pace = narrationCharactersPerSecond(text, 5.037)
+    const bounds = narrationCharacterPacingBounds(text)
+    expect(narrationCharacterCount(text)).toBe(99)
+    expect(Number(pace.toFixed(1))).toBe(19.7)
+    expect(pace).toBeLessThanOrEqual(bounds.maximumCharactersPerSecond)
+    expect(narrationCharacterPacingBounds('x'.repeat(160)).maximumCharactersPerSecond).toBe(18)
   })
 
   it('retains meaningful hard limits for long-form speech', () => {
