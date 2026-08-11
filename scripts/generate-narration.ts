@@ -5,20 +5,17 @@ import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 import {
-  narrationApprovalChecklistVersion,
   narrationDisclosure,
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
   narrationGenerationProvenance,
   narrationPassageHashMaterial,
-  narrationPilotApprovalConfirmations,
   narrationPilotPassageIds,
+  narrationSpokenTextFor,
   narrationVoiceSelectionReceipt,
 } from '../src/data/narrationEdition'
 import { bookNarrationPassages, type NarrationPassage } from '../src/lib/narration'
 import {
-  narrationPilotApprovalIsComplete,
-  narrationPilotProfileMaterial,
   narrationReleaseId,
   narrationReleaseIdentityMaterial,
   narrationReleaseManifestUrl,
@@ -28,6 +25,10 @@ import {
   type NarrationPilotManifest,
   type NarrationTechnicalQc,
 } from '../src/lib/narrationRelease'
+import {
+  narrationApprovedPilotParityProblems,
+  narrationPilotApprovalProblems,
+} from './narration-pilot-contract'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -378,9 +379,9 @@ function concatenateSamples(chunks: readonly Float32Array[]) {
   return output
 }
 
-function assertExactSegmentText(passageText: string, spokenSegments: readonly string[], passageId = 'passage') {
-  if (spokenSegments.length === 0 || spokenSegments.join(' ') !== passageText) {
-    throw new Error(`${passageId} could not be segmented without changing its exact manuscript text.`)
+function assertExactSegmentText(spokenText: string, spokenSegments: readonly string[], passageId = 'passage') {
+  if (spokenSegments.length === 0 || spokenSegments.join(' ') !== spokenText) {
+    throw new Error(`${passageId} could not be segmented without changing its exact synthesiser input.`)
   }
 }
 
@@ -389,13 +390,14 @@ async function synthesisePassage(
   passage: NarrationPassage,
 ) {
   const { engine } = runtime
-  if (passage.text.length <= 320) {
-    const audio = await engine.generate(passage.text, { voice: configuration.voice, speed: configuration.speed })
+  const spokenText = narrationSpokenTextFor(passage.id, passage.text)
+  if (spokenText.length <= 320) {
+    const audio = await engine.generate(spokenText, { voice: configuration.voice, speed: configuration.speed })
     return float32Wave(audio.audio, audio.sampling_rate)
   }
 
   const splitter = new runtime.TextSplitterStream()
-  splitter.push(passage.text)
+  splitter.push(spokenText)
   splitter.close()
   const chunks: Float32Array[] = []
   const spokenSegments: string[] = []
@@ -405,7 +407,7 @@ async function synthesisePassage(
     chunks.push(segment.audio.audio)
     sampleRateHz ||= segment.audio.sampling_rate
   }
-  assertExactSegmentText(passage.text, spokenSegments, passage.id)
+  assertExactSegmentText(spokenText, spokenSegments, passage.id)
   if (chunks.length === 0 || sampleRateHz <= 0) throw new Error(`${passage.id} produced no audio samples.`)
   return float32Wave(concatenateSamples(chunks), sampleRateHz)
 }
@@ -440,10 +442,11 @@ function technicalQcMatches(stored: NarrationTechnicalQc, measured: NarrationTec
 
 async function verifyStoredEntry(entry: NarrationManifestEntry, passage: NarrationPassage) {
   if (!entry.url.startsWith(`/audio/narration/${narrationEditionAssetDirectory}/`)) return false
-  const filePath = path.join(projectRoot, 'public', entry.url.replace(/^\//, ''))
+  const filePath = path.resolve(projectRoot, 'public', entry.url.replace(/^\//, ''))
+  if (!filePath.startsWith(`${assetRoot}${path.sep}`)) return false
   const bytes = new Uint8Array(await fs.readFile(filePath))
   if (sha256(bytes) !== entry.sha256 || !path.basename(filePath).includes(entry.sha256)) return false
-  const qc = await technicalQc(filePath, passage.text)
+  const qc = await technicalQc(filePath, narrationSpokenTextFor(passage.id, passage.text))
   return Math.abs(qc.durationMeasuredSeconds - entry.durationSeconds) <= 0.02
     && technicalQcMatches(entry.technicalQc, qc)
 }
@@ -467,25 +470,40 @@ async function requireApprovedPilot(configurationHash: string, manuscriptHash: s
   } catch {
     throw new Error('Full narration generation is locked. Run narration:pilot, listen to every sample, then run narration:approve-pilot first.')
   }
-  const pilotProfileHash = sha256(narrationPilotProfileMaterial(manifest))
-  const expectedIds = [...narrationPilotPassageIds]
-  if (
-    !manifest.complete
-    || manifest.configurationHash !== configurationHash
-    || manifest.manuscriptHash !== manuscriptHash
-    || manifest.passageCount !== expectedIds.length
-    || manifest.passages.map(({ id }) => id).join('\n') !== expectedIds.join('\n')
-    || approval.configurationHash !== configurationHash
-    || approval.manuscriptHash !== manuscriptHash
-    || approval.pilotProfileHash !== pilotProfileHash
-    || approval.passageIds.join('\n') !== expectedIds.join('\n')
-    || approval.checklistVersion !== narrationApprovalChecklistVersion
-    || !narrationPilotApprovalIsComplete(approval)
-    || narrationPilotApprovalConfirmations.some(({ label }, index) => approval.confirmations[index] !== label)
-  ) {
+  const passageById = new Map(bookNarrationPassages.map((passage) => [passage.id, passage]))
+  const expectedPilot = narrationPilotPassageIds.map((id) => passageById.get(id)).filter((passage): passage is NarrationPassage => Boolean(passage))
+  const { pilotProfileHash, problems } = narrationPilotApprovalProblems(manifest, approval, {
+    configurationHash,
+    manuscriptHash,
+    passages: expectedPilot.map((passage) => ({
+      id: passage.id,
+      sectionId: passage.sectionId,
+      targetId: passage.targetId,
+      textHash: passageTextHash(configurationHash, passage),
+    })),
+  })
+  if (expectedPilot.length !== narrationPilotPassageIds.length || problems.length > 0) {
     throw new Error('The approved voice pilot does not match this model, direction or manuscript. Regenerate and approve the pilot before continuing.')
   }
-  return pilotProfileHash
+  return { manifest, approval, pilotProfileHash }
+}
+
+async function requireApprovedPilotState(
+  manifest: NarrationPilotManifest,
+  state: GenerationState,
+) {
+  const problems = narrationApprovedPilotParityProblems(manifest, Object.values(state.entries))
+  const passageById = new Map(bookNarrationPassages.map((passage) => [passage.id, passage]))
+  for (const approved of manifest.passages) {
+    const passage = passageById.get(approved.id)
+    const stored = state.entries[approved.id]
+    if (!passage || !stored || !await verifyStoredEntry(stored, passage).catch(() => false)) {
+      problems.push(`approved pilot audio is unavailable or invalid ${approved.id}`)
+    }
+  }
+  if (problems.length > 0) {
+    throw new Error('Full narration generation is locked because its state no longer retains every exact approved pilot asset. Restore the approved pilot state instead of regenerating those clips.')
+  }
 }
 
 function numberArgument(prefix: string, fallback: number) {
@@ -518,8 +536,7 @@ async function main() {
   if (selected.length === 0) throw new Error('No narration passages matched the requested scope.')
   const configurationHash = sha256(JSON.stringify(configuration))
   const { manuscriptHash } = manuscriptIdentity(configurationHash)
-  const pilotProfileHash = pilot ? '' : await requireApprovedPilot(configurationHash, manuscriptHash)
-  const speechRuntime = await loadSpeechEngine()
+  const approvedPilot = pilot ? null : await requireApprovedPilot(configurationHash, manuscriptHash)
 
   await fs.mkdir(assetRoot, { recursive: true })
   await fs.mkdir(workRoot, { recursive: true })
@@ -528,6 +545,8 @@ async function main() {
     state.configurationHash = configurationHash
     state.entries = {}
   }
+  if (approvedPilot) await requireApprovedPilotState(approvedPilot.manifest, state)
+  const speechRuntime = await loadSpeechEngine()
 
   let stateWriteQueue = Promise.resolve()
   const persistState = () => {
@@ -548,6 +567,9 @@ async function main() {
       process.stdout.write(`reuse ${completed}/${selected.length} ${passage.id}\n`)
       return
     }
+    if (approvedPilot?.manifest.passages.some(({ id }) => id === passage.id)) {
+      throw new Error(`Refusing to regenerate approved pilot audio ${passage.id}. Restore its checksum-pinned asset and generation-state entry.`)
+    }
 
     const rawBytes = await synthesisePassage(speechRuntime, passage)
     const bytes = await normaliseAudio(rawBytes, passage.id)
@@ -555,7 +577,7 @@ async function main() {
     const filename = safeFilename(globalIndex, passage.id, audioHash)
     const filePath = path.join(assetRoot, filename)
     await writeImmutable(filePath, bytes)
-    const qc = await technicalQc(filePath, passage.text)
+    const qc = await technicalQc(filePath, narrationSpokenTextFor(passage.id, passage.text))
     const entry: NarrationManifestEntry = {
       id: passage.id,
       sectionId: passage.sectionId,
@@ -604,6 +626,7 @@ async function main() {
     process.stdout.write(`pilot ready · ${pilotPassages.length} samples · listen and run narration:approve-pilot before full generation\n`)
     return
   }
+  if (!approvedPilot) throw new Error('Full narration generation requires an approved pilot receipt.')
 
   const currentEntries: NarrationManifestEntry[] = []
   for (const passage of bookNarrationPassages) {
@@ -613,6 +636,10 @@ async function main() {
     currentEntries.push(entry)
   }
   const complete = fullRun && currentEntries.length === bookNarrationPassages.length
+  const parityProblems = narrationApprovedPilotParityProblems(approvedPilot.manifest, currentEntries)
+  if (parityProblems.length > 0) {
+    throw new Error(`Full narration candidate does not retain the exact approved pilot: ${parityProblems.join('; ')}.`)
+  }
   const candidateBase = {
     schemaVersion: 1 as const,
     edition: configuration.edition,
@@ -622,7 +649,11 @@ async function main() {
     disclosure: narrationDisclosure,
     configurationHash,
     manuscriptHash,
-    pilotProfileHash,
+    pilotProfileHash: approvedPilot.pilotProfileHash,
+    pilotReceipt: {
+      manifest: approvedPilot.manifest,
+      approval: approvedPilot.approval,
+    },
     generatedAt: new Date().toISOString(),
     generationScope: { mode: fullRun ? 'full' as const : 'subset' as const, requestedPassageCount: selected.length },
     complete,

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import {
   narrationApprovalChecklistVersion,
@@ -11,6 +12,7 @@ import {
   narrationComparisonApprovalIsComplete,
   narrationComparisonProfileMaterial,
   narrationPilotApprovalIsComplete,
+  narrationPilotProfileMaterial,
   narrationReleaseApprovalIsComplete,
   narrationReleaseId,
   narrationReleaseIdentityMaterial,
@@ -68,6 +70,43 @@ function comparisonManifest(): NarrationComparisonManifest {
 }
 
 function identityFields(): Omit<NarrationManifest, 'releaseId' | 'releaseManifestUrl' | 'approved' | 'approval'> {
+  const passage = {
+    id: 'passage:opening:section-title',
+    sectionId: 'opening',
+    targetId: 'narration-opening-header',
+    textHash: 'd'.repeat(64),
+    url: `/audio/narration/edition-2026-1/0001-${'e'.repeat(64)}.mp3`,
+    sha256: 'e'.repeat(64),
+    durationSeconds: 10,
+    generatedAt: '2026-08-11T00:00:00.000Z',
+    qcStatus: 'technical-qc-passed' as const,
+    technicalQc: {
+      durationExpectedSeconds: 10,
+      durationMeasuredSeconds: 10,
+      wordsPerMinute: 145,
+      integratedLoudnessLufs: -18,
+      loudnessRangeLu: 3,
+      truePeakDbtp: -2,
+      leadingSilenceSeconds: 0.08,
+      trailingSilenceSeconds: 0.18,
+      normalisationVersion: 'loudnorm-2026.1',
+      fullDecodePassed: true as const,
+    },
+  }
+  const pilotManifest = {
+    schemaVersion: 1 as const,
+    edition: '2026.1',
+    model: 'pinned-model',
+    voice: 'fixed-voice',
+    provenance: narrationGenerationProvenance,
+    configurationHash: 'a'.repeat(64),
+    manuscriptHash: 'b'.repeat(64),
+    generatedAt: '2026-08-11T00:00:00.000Z',
+    complete: true,
+    passageCount: 1,
+    passages: [passage],
+  }
+  const pilotProfileHash = createHash('sha256').update(narrationPilotProfileMaterial(pilotManifest)).digest('hex')
   return {
     schemaVersion: 1,
     edition: '2026.1',
@@ -77,35 +116,27 @@ function identityFields(): Omit<NarrationManifest, 'releaseId' | 'releaseManifes
     disclosure: 'AI-generated.',
     configurationHash: 'a'.repeat(64),
     manuscriptHash: 'b'.repeat(64),
-    pilotProfileHash: 'c'.repeat(64),
+    pilotProfileHash,
+    pilotReceipt: {
+      manifest: pilotManifest,
+      approval: {
+        schemaVersion: 1,
+        approvedAt: '2026-08-11T00:00:00.000Z',
+        approvedBy: 'Editorial QA',
+        checklistVersion: narrationApprovalChecklistVersion,
+        configurationHash: 'a'.repeat(64),
+        manuscriptHash: 'b'.repeat(64),
+        pilotProfileHash,
+        passageIds: [passage.id],
+        confirmations: narrationPilotApprovalConfirmations.map(({ label }) => label),
+      },
+    },
     generatedAt: '2026-08-11T00:00:00.000Z',
     generationScope: { mode: 'full', requestedPassageCount: 1 },
     complete: true,
     passageCount: 1,
     totalDurationSeconds: 10,
-    passages: [{
-      id: 'passage:opening:section-title',
-      sectionId: 'opening',
-      targetId: 'narration-opening-header',
-      textHash: 'd'.repeat(64),
-      url: `/audio/narration/edition-2026-1/0001-${'e'.repeat(64)}.mp3`,
-      sha256: 'e'.repeat(64),
-      durationSeconds: 10,
-      generatedAt: '2026-08-11T00:00:00.000Z',
-      qcStatus: 'technical-qc-passed',
-      technicalQc: {
-        durationExpectedSeconds: 10,
-        durationMeasuredSeconds: 10,
-        wordsPerMinute: 145,
-        integratedLoudnessLufs: -18,
-        loudnessRangeLu: 3,
-        truePeakDbtp: -2,
-        leadingSilenceSeconds: 0.08,
-        trailingSilenceSeconds: 0.18,
-        normalisationVersion: 'loudnorm-2026.1',
-        fullDecodePassed: true,
-      },
-    }],
+    passages: [passage],
   }
 }
 
@@ -131,6 +162,13 @@ describe('narration release contracts', () => {
       provenance: { ...narrationGenerationProvenance, modelRevision: '0'.repeat(40) },
     }
     expect(narrationReleaseIdentityMaterial(changedProvenance)).not.toBe(narrationReleaseIdentityMaterial(first))
+
+    const changedPilotReceipt = identityFields()
+    changedPilotReceipt.pilotReceipt.approval = {
+      ...changedPilotReceipt.pilotReceipt.approval,
+      approvedBy: 'Another editor',
+    }
+    expect(narrationReleaseIdentityMaterial(changedPilotReceipt)).not.toBe(narrationReleaseIdentityMaterial(first))
   })
 
   it('binds comparison approval to the voice profile and ordered audio, not the provisional voice or unrelated manuscript', () => {

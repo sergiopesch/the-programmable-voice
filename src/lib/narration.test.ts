@@ -3,8 +3,10 @@ import { sections } from '../data/book'
 import {
   narrationPassageHashMaterial,
   narrationPassageReadingNotes,
+  narrationPassageSpokenReplacements,
   narrationPilotPassageIds,
   narrationReadingNoteFor,
+  narrationSpokenTextFor,
 } from '../data/narrationEdition'
 import type { BookBlock, BookSection } from '../types'
 import {
@@ -143,15 +145,72 @@ describe('book narration units', () => {
     const passageIds = new Set(bookNarrationPassages.map(({ id }) => id))
     for (const passageId of Object.keys(narrationPassageReadingNotes)) {
       expect(passageIds.has(passageId), passageId).toBe(true)
-      expect(narrationPassageHashMaterial('configuration', passageId, 'Same text')).toBe(
-        `configuration\n${narrationReadingNoteFor(passageId)}\nSame text`,
-      )
+    }
+    for (const passageId of Object.keys(narrationPassageSpokenReplacements)) {
+      expect(passageIds.has(passageId), passageId).toBe(true)
     }
 
-    const unnotedPassage = bookNarrationPassages.find(({ id }) => !narrationPassageReadingNotes[id])!
+    expect(narrationReadingNoteFor('passage:fdn-string-tension:block-5-paragraph')).not.toContain('Mersenne')
+    expect(narrationReadingNoteFor('passage:fdn-string-tension:block-6-paragraph')).toContain('Marin Mersenne')
+    expect(narrationReadingNoteFor('passage:fdn-string-tension:block-7-paragraph')).toContain('Mersenne')
+    expect(narrationReadingNoteFor('passage:chronology:block-0-timeline-item-2-year')).not.toContain('Mersenne')
+    expect(narrationReadingNoteFor('passage:chronology:block-0-timeline-item-4-year')).toContain('Mersenne')
+    expect(narrationReadingNoteFor('passage:chronology:block-0-timeline-item-8-year')).not.toContain('Poulsen')
+    expect(narrationReadingNoteFor('passage:chronology:block-0-timeline-item-10-year')).toContain('Poulsen')
+
+    const unnotedPassage = bookNarrationPassages.find(({ id }) => (
+      !narrationPassageReadingNotes[id] && !narrationPassageSpokenReplacements[id]
+    ))!
     expect(narrationPassageHashMaterial('configuration', unnotedPassage.id, 'Same text')).toBe('configuration\n\nSame text')
     expect(new Set(narrationPilotPassageIds).size).toBe(narrationPilotPassageIds.length)
     expect(narrationPilotPassageIds.every((id) => passageIds.has(id))).toBe(true)
+    expect(narrationPilotPassageIds.filter((id) => narrationPassageSpokenReplacements[id])).toEqual([])
     expect(new Set(narrationPilotPassageIds.map((id) => bookNarrationPassages.find((passage) => passage.id === id)!.sectionId)).size).toBeGreaterThanOrEqual(5)
+  })
+
+  it('applies exact passage-scoped spoken normalisation and binds it into the passage digest', () => {
+    const passageById = new Map(bookNarrationPassages.map((passage) => [passage.id, passage]))
+
+    for (const [passageId, replacements] of Object.entries(narrationPassageSpokenReplacements)) {
+      const passage = passageById.get(passageId)!
+      const visibleText = passage.text
+      const spokenText = narrationSpokenTextFor(passageId, visibleText)
+      expect(spokenText, passageId).not.toBe(visibleText)
+      expect(passage.text, passageId).toBe(visibleText)
+      expect(narrationPassageHashMaterial('configuration', passageId, visibleText)).toBe([
+        'configuration',
+        narrationReadingNoteFor(passageId),
+        visibleText,
+        'spoken-normalisation-v1',
+        JSON.stringify(replacements),
+        spokenText,
+      ].join('\n'))
+    }
+
+    const examples = [
+      ['passage:fdn-disturbance-world:block-4-list-item-1', 'vee equals eff lambda'],
+      ['passage:media-disc-shellac:block-3-figure-title', 'to'],
+      ['passage:templates-to-probabilities:block-5-timeline-item-3-year', 'H-M-M'],
+      ['passage:whose-voice-in-data:block-9-paragraph', 'S-P eight hundred dash sixty-three B dash four'],
+      ['passage:voice-becomes-tokens:block-6-paragraph', 'Valley'],
+      ['passage:consent-provenance-synthetic-self:block-6-paragraph', 'C-two-P-A'],
+      ['passage:access-restoration-agency:block-10-paragraph', 'Article four, paragraph three'],
+      ['passage:chronology:block-0-timeline-item-0-year', 'more than thirty-five thousand years ago'],
+    ] as const
+    for (const [passageId, expectedSpeech] of examples) {
+      const passage = passageById.get(passageId)!
+      expect(narrationSpokenTextFor(passageId, passage.text)).toContain(expectedSpeech)
+    }
+  })
+
+  it('fails closed when exact spoken-normalisation source text drifts or becomes ambiguous', () => {
+    const passageId = 'passage:fdn-disturbance-world:block-4-list-item-1'
+    const passage = bookNarrationPassages.find(({ id }) => id === passageId)!
+    expect(() => narrationSpokenTextFor(passageId, passage.text.replace('v = fλ', 'v equals f lambda'))).toThrow(
+      /expected 1 occurrence\(s\).*found 0/,
+    )
+    expect(() => narrationSpokenTextFor(passageId, `${passage.text} v = fλ`)).toThrow(
+      /expected 1 occurrence\(s\).*found 2/,
+    )
   })
 })

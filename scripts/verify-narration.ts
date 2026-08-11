@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { execFile } from 'node:child_process'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import { promisify } from 'node:util'
+import { isDeepStrictEqual, promisify } from 'node:util'
 import {
   narrationApprovalChecklistVersion,
   narrationDisclosure,
@@ -13,6 +13,7 @@ import {
   narrationPilotApprovalConfirmations,
   narrationPilotPassageIds,
   narrationReleaseApprovalConfirmations,
+  narrationSpokenTextFor,
 } from '../src/data/narrationEdition'
 import { bookNarrationPassages, type NarrationPassage } from '../src/lib/narration'
 import {
@@ -26,7 +27,15 @@ import {
   type NarrationManifestEntry,
   type NarrationPilotApproval,
   type NarrationPilotManifest,
+  type NarrationPilotReceipt,
 } from '../src/lib/narrationRelease'
+import {
+  narrationPilotApprovalProblems,
+  narrationPilotManifestProblems,
+  narrationPilotReceiptProblems,
+  narrationPilotVerificationMessage,
+  type CurrentNarrationPilotIdentity,
+} from './narration-pilot-contract'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -98,7 +107,8 @@ function expectedManuscript() {
 
 function assertTechnicalQcShape(entry: NarrationManifestEntry, passage: NarrationPassage) {
   const qc = entry.technicalQc
-  const words = passage.text.trim().split(/\s+/).filter(Boolean).length
+  const spokenText = narrationSpokenTextFor(passage.id, passage.text)
+  const words = spokenText.trim().split(/\s+/).filter(Boolean).length
   const expectedDurationSeconds = Number(((words / narrationEditionConfiguration.targetWordsPerMinute) * 60).toFixed(3))
   const expectedWordsPerMinute = (words / entry.durationSeconds) * 60
   const [minimumWordsPerMinute, maximumWordsPerMinute] = words < 6
@@ -197,7 +207,8 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
     '-af', 'silencedetect=noise=-50dB:d=0.05', '-f', 'null', '-',
   ], { maxBuffer: 2_000_000 })
   const silence = boundarySilence(silenceStderr, duration)
-  const words = passage.text.trim().split(/\s+/).filter(Boolean).length
+  const spokenText = narrationSpokenTextFor(passage.id, passage.text)
+  const words = spokenText.trim().split(/\s+/).filter(Boolean).length
   const measuredWordsPerMinute = (words / duration) * 60
   const qc = entry.technicalQc
   if (
@@ -233,6 +244,67 @@ function assertEntrySequence(entries: readonly NarrationManifestEntry[], expecte
   }
 }
 
+function expectedPilotScope(expected: ReturnType<typeof expectedManuscript>) {
+  const passages = narrationPilotPassageIds
+    .map((id) => expected.passages.find(({ passage }) => passage.id === id))
+    .filter((item): item is { passage: NarrationPassage; textHash: string } => Boolean(item))
+  const current: CurrentNarrationPilotIdentity = {
+    configurationHash: expected.configurationHash,
+    manuscriptHash: expected.manuscriptHash,
+    passages: passages.map(({ passage, textHash }) => ({
+      id: passage.id,
+      sectionId: passage.sectionId,
+      targetId: passage.targetId,
+      textHash,
+    })),
+  }
+  return { current, passages }
+}
+
+function assertPilotReceiptCore(
+  receipt: NarrationPilotReceipt | null | undefined,
+  declaredPilotProfileHash: string,
+  entries: readonly NarrationManifestEntry[],
+  expected: ReturnType<typeof expectedManuscript>,
+  label: string,
+) {
+  if (!receipt?.manifest || !receipt.approval || !Array.isArray(receipt.manifest.passages)) {
+    throw new Error(`${label} does not contain a complete approved-pilot receipt.`)
+  }
+  const { current, passages } = expectedPilotScope(expected)
+  const { pilotProfileHash, problems } = narrationPilotReceiptProblems(
+    receipt,
+    current,
+    declaredPilotProfileHash,
+    entries,
+  )
+  if (
+    passages.length !== narrationPilotPassageIds.length
+    || receipt.manifest.edition !== narrationEditionConfiguration.edition
+    || receipt.manifest.model !== narrationEditionConfiguration.model
+    || receipt.manifest.voice !== narrationEditionConfiguration.voice
+    || JSON.stringify(receipt.manifest.provenance) !== JSON.stringify(narrationGenerationProvenance)
+  ) problems.push('approved pilot receipt metadata does not match the pinned narration edition')
+  if (problems.length > 0) throw new Error(`${label} failed its approved-pilot contract: ${problems.join('; ')}.`)
+  assertEntrySequence(receipt.manifest.passages, passages)
+  return pilotProfileHash
+}
+
+async function requirePrivatePilotReceipt(
+  manifest: CandidateManifest,
+  expected: ReturnType<typeof expectedManuscript>,
+) {
+  const [pilot, approval] = await Promise.all([
+    readJson<NarrationPilotManifest>(pilotManifestPath, 'Narration voice pilot'),
+    readJson<NarrationPilotApproval>(pilotApprovalPath, 'Narration voice-pilot approval'),
+  ])
+  const receipt: NarrationPilotReceipt = { manifest: pilot, approval }
+  assertPilotReceiptCore(receipt, manifest.pilotProfileHash, manifest.passages, expected, 'Private approved pilot')
+  if (!isDeepStrictEqual(receipt, manifest.pilotReceipt)) {
+    throw new Error('Narration candidate does not embed the exact current private approved-pilot receipt.')
+  }
+}
+
 function assertReleaseCore(manifest: CandidateManifest | NarrationManifest) {
   const expected = expectedManuscript()
   if (
@@ -240,6 +312,7 @@ function assertReleaseCore(manifest: CandidateManifest | NarrationManifest) {
     || manifest.schemaVersion !== 1
     || !manifest.generationScope
     || !Array.isArray(manifest.passages)
+    || !manifest.pilotReceipt
     || typeof manifest.releaseId !== 'string'
     || typeof manifest.releaseManifestUrl !== 'string'
   ) throw new Error('Narration manifest schema is unsupported.')
@@ -264,6 +337,7 @@ function assertReleaseCore(manifest: CandidateManifest | NarrationManifest) {
   }
   if (manifest.disclosure !== narrationDisclosure) throw new Error('Narration disclosure is missing or altered.')
   if (!/^[a-f0-9]{64}$/.test(manifest.pilotProfileHash)) throw new Error('Narration release is not tied to an approved voice pilot.')
+  assertPilotReceiptCore(manifest.pilotReceipt, manifest.pilotProfileHash, manifest.passages, expected, 'Narration release')
   assertEntrySequence(manifest.passages, expected.passages)
   const measuredTotal = Number(manifest.passages.reduce((total, entry) => total + entry.durationSeconds, 0).toFixed(3))
   if (Math.abs(measuredTotal - manifest.totalDurationSeconds) > 0.01) throw new Error('Narration total duration is inconsistent.')
@@ -309,11 +383,21 @@ async function verifyPilot() {
   const manifest = await readJson<NarrationPilotManifest>(pilotManifestPath, 'Narration voice pilot')
   const expected = expectedManuscript()
   const expectedPilot = narrationPilotPassageIds.map((id) => expected.passages.find(({ passage }) => passage.id === id)).filter((item): item is { passage: NarrationPassage; textHash: string } => Boolean(item))
+  const currentPilot: CurrentNarrationPilotIdentity = {
+    configurationHash: expected.configurationHash,
+    manuscriptHash: expected.manuscriptHash,
+    passages: expectedPilot.map(({ passage, textHash }) => ({
+      id: passage.id,
+      sectionId: passage.sectionId,
+      targetId: passage.targetId,
+      textHash,
+    })),
+  }
+  const pilotProblems = narrationPilotManifestProblems(manifest, currentPilot)
   if (
     manifest.schemaVersion !== 1
     || !manifest.complete
     || manifest.configurationHash !== expected.configurationHash
-    || manifest.manuscriptHash !== expected.manuscriptHash
     || manifest.edition !== narrationEditionConfiguration.edition
     || manifest.model !== narrationEditionConfiguration.model
     || manifest.voice !== narrationEditionConfiguration.voice
@@ -321,12 +405,22 @@ async function verifyPilot() {
     || expectedPilot.length !== narrationPilotPassageIds.length
     || manifest.passageCount !== expectedPilot.length
     || manifest.passages.length !== expectedPilot.length
+    || pilotProblems.length > 0
   ) {
     throw new Error('The voice pilot is incomplete or does not match this narration edition.')
   }
   assertEntrySequence(manifest.passages, expectedPilot)
   await verifyEntries(manifest.passages, expectedPilot, false)
-  process.stdout.write(`Verified pending voice pilot: ${manifest.passageCount} technically valid samples; no human approval was recorded.\n`)
+  let validApproval: NarrationPilotApproval | null = null
+  if (await pathExists(pilotApprovalPath)) {
+    try {
+      const approval = await readJson<NarrationPilotApproval>(pilotApprovalPath, 'Narration voice-pilot approval')
+      if (narrationPilotApprovalProblems(manifest, approval, currentPilot).problems.length === 0) validApproval = approval
+    } catch {
+      // Pilot verification remains a technical check; invalid approval is reported as pending.
+    }
+  }
+  process.stdout.write(narrationPilotVerificationMessage(manifest.passageCount, validApproval))
   return { manifest, expected }
 }
 
@@ -340,7 +434,8 @@ async function approvePilot() {
     approvedBy: approver,
     checklistVersion: narrationApprovalChecklistVersion,
     configurationHash: expected.configurationHash,
-    manuscriptHash: expected.manuscriptHash,
+    // Retain the whole-book snapshot attached to the exact pilot that was heard.
+    manuscriptHash: manifest.manuscriptHash,
     pilotProfileHash,
     passageIds: [...narrationPilotPassageIds],
     confirmations: narrationPilotApprovalConfirmations.map(({ label }) => label),
@@ -354,6 +449,7 @@ async function approveRelease() {
   const approver = requireApprovalFlags(narrationReleaseApprovalConfirmations)
   const candidate = await readJson<CandidateManifest>(candidatePath, 'Narration candidate')
   const expected = assertReleaseCore(candidate)
+  await requirePrivatePilotReceipt(candidate, expected)
   await verifyEntries(candidate.passages, expected.passages, false)
   if (!candidate.releaseId || !candidate.releaseManifestUrl) throw new Error('The complete candidate has no immutable release identity.')
 

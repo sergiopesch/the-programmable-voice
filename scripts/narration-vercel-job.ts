@@ -5,8 +5,8 @@ import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { isDeepStrictEqual } from 'node:util'
 import {
-  narrationApprovalChecklistVersion,
   narrationBritishVoiceComparison,
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
@@ -15,12 +15,11 @@ import {
 } from '../src/data/narrationEdition'
 import { bookNarrationPassages } from '../src/lib/narration'
 import {
-  narrationPilotApprovalIsComplete,
-  narrationPilotProfileMaterial,
   type NarrationComparisonManifest,
   type NarrationManifestEntry,
   type NarrationPilotApproval,
   type NarrationPilotManifest,
+  type NarrationPilotReceipt,
 } from '../src/lib/narrationRelease'
 import {
   assertNarrationComparisonManifestMatchesCurrent,
@@ -47,6 +46,10 @@ import {
   type NarrationExportManifest,
   type NarrationJobMode,
 } from './narration-job-lib'
+import {
+  narrationPilotApprovalProblems,
+  narrationPilotReceiptProblems,
+} from './narration-pilot-contract'
 
 const projectRoot = path.resolve(import.meta.dirname, '..')
 const canonicalLinkPath = path.join(projectRoot, '.vercel/project.json')
@@ -337,14 +340,20 @@ async function fullPrerequisiteProblems(root = projectRoot) {
       readJson<NarrationPilotApproval>(path.join(workRoot, 'pilot-approval.json')),
       currentManuscriptIdentity(),
     ])
-    const pilotProfileHash = sha256(narrationPilotProfileMaterial(manifest))
+    const textHashes = new Map(identity.expected.map(({ id, textHash }) => [id, textHash]))
+    const expectedPilot = narrationPilotPassageIds.map((id) => {
+      const passage = bookNarrationPassages.find((candidate) => candidate.id === id)
+      const textHash = textHashes.get(id)
+      return passage && textHash ? { id, sectionId: passage.sectionId, targetId: passage.targetId, textHash } : undefined
+    }).filter((passage): passage is { id: string; sectionId: string; targetId: string; textHash: string } => Boolean(passage))
+    const { problems: approvalProblems } = narrationPilotApprovalProblems(manifest, approval, {
+      configurationHash: identity.configurationHash,
+      manuscriptHash: identity.manuscriptHash,
+      passages: expectedPilot,
+    })
     if (state.configurationHash !== identity.configurationHash || !state.entries || typeof state.entries !== 'object') problems.push('generation state does not match this workspace')
-    if (!manifest.complete) problems.push('pilot manifest is incomplete')
-    if (manifest.configurationHash !== identity.configurationHash || approval.configurationHash !== identity.configurationHash) problems.push('pilot configuration does not match this workspace')
-    if (manifest.manuscriptHash !== identity.manuscriptHash || approval.manuscriptHash !== identity.manuscriptHash) problems.push('pilot manuscript does not match this workspace')
-    if (approval.pilotProfileHash !== pilotProfileHash) problems.push('pilot approval digest does not match the pilot manifest')
-    if (approval.checklistVersion !== narrationApprovalChecklistVersion || !narrationPilotApprovalIsComplete(approval)) problems.push('pilot listening approval is incomplete or obsolete')
-    if (manifest.passages.map(({ id }) => id).join('\n') !== narrationPilotPassageIds.join('\n')) problems.push('pilot passage set does not match this workspace')
+    if (expectedPilot.length !== narrationPilotPassageIds.length) problems.push('pilot passage set does not match this workspace')
+    problems.push(...approvalProblems)
     for (const entry of manifest.passages) {
       const stateEntry = state.entries?.[entry.id]
       if (!stateEntry || stateEntry.textHash !== entry.textHash || stateEntry.url !== entry.url || stateEntry.sha256 !== entry.sha256) {
@@ -543,6 +552,7 @@ interface ExportPassageManifest {
   configurationHash?: string
   manuscriptHash?: string
   pilotProfileHash?: string
+  pilotReceipt?: NarrationPilotReceipt
   approved?: boolean
   complete: boolean
   passageCount: number
@@ -928,26 +938,33 @@ async function validateDownloadedNarrationMetadata(
       readValidatedJson<NarrationPilotManifest>(validated, '.narration-work/pilot-manifest.json'),
       readValidatedJson<NarrationPilotApproval>(validated, '.narration-work/pilot-approval.json'),
     ])
-    const pilotProfileHash = sha256(narrationPilotProfileMaterial(pilot))
-    if (
-      !pilot.complete
-      || pilot.configurationHash !== identity.configurationHash
-      || pilot.manuscriptHash !== identity.manuscriptHash
-      || pilot.passages.map(({ id }) => id).join('\n') !== narrationPilotPassageIds.join('\n')
-      || approval.configurationHash !== identity.configurationHash
-      || approval.manuscriptHash !== identity.manuscriptHash
-      || approval.pilotProfileHash !== pilotProfileHash
-      || approval.checklistVersion !== narrationApprovalChecklistVersion
-      || !narrationPilotApprovalIsComplete(approval)
-      || primary.pilotProfileHash !== pilotProfileHash
-    ) throw new Error('Downloaded full narration is not bound to the approved local voice pilot.')
-    const primaryById = new Map(primary.passages.map((entry) => [entry.id, entry]))
-    for (const pilotEntry of pilot.passages) {
-      const fullEntry = primaryById.get(pilotEntry.id)
-      if (!fullEntry || fullEntry.textHash !== pilotEntry.textHash || fullEntry.url !== pilotEntry.url || fullEntry.sha256 !== pilotEntry.sha256) {
-        throw new Error(`Full narration changed approved pilot audio ${pilotEntry.id}.`)
-      }
+    const expectedPilot = narrationPilotPassageIds.map((id) => {
+      const passage = bookNarrationPassages.find((candidate) => candidate.id === id)
+      const textHash = identity.expected.find((candidate) => candidate.id === id)?.textHash
+      return passage && textHash ? { id, sectionId: passage.sectionId, targetId: passage.targetId, textHash } : undefined
+    }).filter((passage): passage is { id: string; sectionId: string; targetId: string; textHash: string } => Boolean(passage))
+    const currentPilot = {
+      configurationHash: identity.configurationHash,
+      manuscriptHash: identity.manuscriptHash,
+      passages: expectedPilot,
     }
+    const fullPilotEntries = primary.passages.map(({ id, textHash, url, sha256 }) => ({
+      id,
+      textHash: textHash ?? '',
+      url,
+      sha256,
+    }))
+    const { problems: receiptProblems } = narrationPilotReceiptProblems(
+      primary.pilotReceipt,
+      currentPilot,
+      primary.pilotProfileHash ?? '',
+      fullPilotEntries,
+    )
+    if (
+      expectedPilot.length !== narrationPilotPassageIds.length
+      || !isDeepStrictEqual(primary.pilotReceipt, { manifest: pilot, approval })
+      || receiptProblems.length > 0
+    ) throw new Error('Downloaded full narration is not bound to the approved local voice pilot.')
   }
 }
 

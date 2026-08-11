@@ -77,11 +77,11 @@ describe('local Emma narration contract', () => {
     }
   })
 
-  it('refuses sentence segmentation that drops or changes manuscript text', () => {
+  it('refuses sentence segmentation that drops or changes the exact synthesiser input', () => {
     const text = 'One sentence. A second sentence.'
     expect(() => assertExactSegmentText(text, ['One sentence.', 'A second sentence.'])).not.toThrow()
-    expect(() => assertExactSegmentText(text, ['One sentence.'])).toThrow(/without changing its exact manuscript text/)
-    expect(() => assertExactSegmentText(text, ['One sentence.', 'A changed sentence.'])).toThrow(/without changing its exact manuscript text/)
+    expect(() => assertExactSegmentText(text, ['One sentence.'])).toThrow(/without changing its exact synthesiser input/)
+    expect(() => assertExactSegmentText(text, ['One sentence.', 'A changed sentence.'])).toThrow(/without changing its exact synthesiser input/)
   })
 
   it('concatenates samples in order and emits a valid mono float WAV header', () => {

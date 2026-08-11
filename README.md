@@ -53,7 +53,7 @@ The command writes 14 checksum-addressed 24 kHz / 48 kbps files under `public/au
 npm run narration:approve-pilot -- --approver="Editor name" --confirm-pilot-listened --confirm-same-woman --confirm-british-accent --confirm-warmth --confirm-cadence --confirm-level --confirm-pronunciations
 ```
 
-Only then will complete generation run. It refuses to start unless the pilot manifest, approval digest, configuration, manuscript and pilot files all still match:
+Only then will complete generation run. It refuses to start unless the pilot manifest, approval digest, configuration, current pilot-passage digests and checksum-pinned pilot files all still match. Unrelated non-pilot manuscript edits do not erase an exact listening receipt:
 
 ```bash
 npm run narration:generate
@@ -68,7 +68,7 @@ npm run narration:approve -- --approver="Editor name" --confirm-listened --confi
 npm run narration:verify
 ```
 
-Only that approval step writes `public/audio/narration/manifest.json` and its content-addressed twin under `public/audio/narration/releases/`. A released edition cannot be replaced under the same edition number. Commit the approved manifests and immutable audio assets, then deploy them as ordinary static files. A manuscript, voice, model, runtime, speed or encoding change invalidates the matching release.
+Only that approval step writes `public/audio/narration/manifest.json` and its content-addressed twin under `public/audio/narration/releases/`. Each release embeds the exact representative-pilot manifest and human approval, binds that receipt into the release identity and proves that the full edition retains those same audio bytes. A released edition cannot be replaced under the same edition number. Commit the approved manifests and immutable audio assets, then deploy them as ordinary static files. A manuscript, voice, model, runtime, speed or encoding change invalidates the matching release.
 
 Passage-sized files preserve exact paragraph highlighting and fine-grained saved-position recovery. The player reuses one audio element, prefetches the next passage and has automated ended-chain coverage. This design still requires the release checklist’s real-device Safari, iOS and background-playback continuity pass; it does not claim the sample files are intrinsically gapless section masters.
 

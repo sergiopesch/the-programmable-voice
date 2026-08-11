@@ -139,6 +139,7 @@ export interface NarrationManifest {
   configurationHash: string
   manuscriptHash: string
   pilotProfileHash: string
+  pilotReceipt: NarrationPilotReceipt
   generatedAt: string
   generationScope: { mode: 'full'; requestedPassageCount: number }
   complete: boolean
@@ -156,6 +157,7 @@ export interface NarrationPilotManifest {
   voice: string
   provenance: NarrationGenerationProvenance
   configurationHash: string
+  /** Whole-book digest at generation time; current pilot validity is passage-scoped. */
   manuscriptHash: string
   generatedAt: string
   complete: boolean
@@ -169,10 +171,17 @@ export interface NarrationPilotApproval {
   approvedBy: string
   checklistVersion: string
   configurationHash: string
+  /** Historical snapshot copied from the exact pilot manifest that was heard. */
   manuscriptHash: string
   pilotProfileHash: string
   passageIds: string[]
   confirmations: string[]
+}
+
+/** Self-contained proof of the exact representative pilot approved by a human. */
+export interface NarrationPilotReceipt {
+  manifest: NarrationPilotManifest
+  approval: NarrationPilotApproval
 }
 
 function narrationTechnicalQcIdentity(qc: NarrationTechnicalQc) {
@@ -276,6 +285,7 @@ export function narrationReleaseIdentityMaterial(manifest: Omit<NarrationManifes
     configurationHash: manifest.configurationHash,
     manuscriptHash: manifest.manuscriptHash,
     pilotProfileHash: manifest.pilotProfileHash,
+    pilotReceipt: manifest.pilotReceipt,
     generationScope: manifest.generationScope,
     complete: manifest.complete,
     passageCount: manifest.passageCount,

@@ -134,6 +134,9 @@ async function loadManifest(passages: readonly NarrationPassage[], signal?: Abor
     || typeof manifest.releaseId !== 'string'
     || typeof manifest.releaseManifestUrl !== 'string'
     || !manifest.generationScope
+    || !manifest.pilotReceipt?.manifest
+    || !manifest.pilotReceipt.approval
+    || !Array.isArray(manifest.pilotReceipt.manifest.passages)
     || !Array.isArray(manifest.passages)
     || manifest.passages.some((entry) => !entry || !entry.technicalQc)
   ) {

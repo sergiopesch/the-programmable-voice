@@ -9,11 +9,14 @@ import {
   narrationEditionConfiguration,
   narrationGenerationProvenance,
   narrationPassageHashMaterial,
+  narrationPilotApprovalConfirmations,
+  narrationPilotPassageIds,
   narrationReleaseApprovalConfirmations,
 } from '../src/data/narrationEdition'
 import { sources } from '../src/data/sources'
 import { bookNarrationPassages, bookNarrationUnits } from '../src/lib/narration'
 import {
+  narrationPilotProfileMaterial,
   narrationReleaseId,
   narrationReleaseIdentityMaterial,
   narrationReleaseManifestUrl,
@@ -80,6 +83,21 @@ function approvedNarrationManifest() {
     }
   })
   const manuscriptHash = sha256(JSON.stringify(passages.map(({ id, textHash }) => ({ id, textHash }))))
+  const pilotPassages = narrationPilotPassageIds.map((id) => passages.find((passage) => passage.id === id)!)
+  const pilotManifest = {
+    schemaVersion: 1 as const,
+    edition: narrationEditionConfiguration.edition,
+    model: narrationEditionConfiguration.model,
+    voice: narrationEditionConfiguration.voice,
+    provenance: narrationGenerationProvenance,
+    configurationHash,
+    manuscriptHash,
+    generatedAt: '2026-08-11T00:00:00.000Z',
+    complete: true,
+    passageCount: pilotPassages.length,
+    passages: pilotPassages,
+  }
+  const pilotProfileHash = sha256(narrationPilotProfileMaterial(pilotManifest))
   const identity = {
     schemaVersion: 1 as const,
     edition: narrationEditionConfiguration.edition,
@@ -89,7 +107,21 @@ function approvedNarrationManifest() {
     disclosure: narrationDisclosure,
     configurationHash,
     manuscriptHash,
-    pilotProfileHash: sha256('approved-test-pilot'),
+    pilotProfileHash,
+    pilotReceipt: {
+      manifest: pilotManifest,
+      approval: {
+        schemaVersion: 1 as const,
+        approvedAt: '2026-08-11T00:00:00.000Z',
+        approvedBy: 'Editorial QA',
+        checklistVersion: narrationApprovalChecklistVersion,
+        configurationHash,
+        manuscriptHash,
+        pilotProfileHash,
+        passageIds: [...narrationPilotPassageIds],
+        confirmations: narrationPilotApprovalConfirmations.map(({ label }) => label),
+      },
+    },
     generatedAt: '2026-08-11T00:00:00.000Z',
     generationScope: { mode: 'full' as const, requestedPassageCount: passages.length },
     complete: true,
