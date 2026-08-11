@@ -29,7 +29,7 @@ export interface NarrationUnit {
 }
 
 export interface NarrationPassage {
-  /** Stable identity for one Realtime response and one visible reading target. */
+  /** Stable identity for one recorded file and one visible reading target. */
   id: string
   sectionId: string
   targetId: string
@@ -144,7 +144,7 @@ export function extractSectionNarrationUnits(section: BookSection): NarrationUni
   return [
     createNarrationUnit(section.id, 'section-title', headerTargetId, 'section-title', section.title),
     createNarrationUnit(section.id, 'section-deck', headerTargetId, 'section-deck', section.deck),
-    ...(section.kind === 'opening' ? [] : section.blocks).flatMap((block, blockIndex) =>
+    ...section.blocks.flatMap((block, blockIndex) =>
       blockNarrationUnits(section.id, block, blockIndex),
     ),
   ]
@@ -193,5 +193,5 @@ export function groupNarrationPassages(units: readonly NarrationUnit[]): Narrati
 /** Ordered narration units for the complete current manuscript. */
 export const bookNarrationUnits = extractNarrationUnits(sections)
 
-/** Ordered, target-aligned Realtime responses for the complete book. */
+/** Ordered, target-aligned recorded passages for the complete book. */
 export const bookNarrationPassages = groupNarrationPassages(bookNarrationUnits)

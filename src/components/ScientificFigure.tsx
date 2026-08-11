@@ -6,11 +6,82 @@ interface ScientificFigureProps {
   title: string
 }
 
+const figureDescriptions: Record<FigureKind, string> = {
+  pressure: 'A sine-like pressure curve runs above a row of particles that bunch together at compressions and spread apart at rarefactions.',
+  harmonics: 'Four horizontal curves compare a fundamental, its second and third harmonics, and the more complex waveform formed by their sum.',
+  chladni: 'A vibrating rectangular plate is crossed by symmetrical nodal lines, with grains gathering along the places that remain still.',
+  trace: 'An airborne pressure wave drives a stylus, which turns changing pressure through time into a visible line on a surface.',
+  groove: 'One continuous spiral groove winds towards a spindle, showing elapsed time stored as distance and recovered by stylus motion.',
+  transduction: 'Pressure moves a diaphragm, a transducer converts that movement into an electrical signal, and the voltage follows the original wave.',
+  broadcast: 'A slow voice waveform modulates a faster carrier waveform so that the message can travel to a distant receiver.',
+  sampling: 'A continuous curve is measured at evenly spaced instants; stems and dots mark those samples and a joined line suggests reconstruction.',
+  filter: 'A waveform containing wanted and unwanted frequencies enters a filter and emerges with the selected structure emphasised.',
+  codec: 'A waveform becomes a compact block of discrete values and binary digits, then returns as an approximation rather than an identical copy.',
+  recognition: 'A speech waveform becomes a grid of acoustic features, then a probability process proposes speech sounds and the word VOICE.',
+  synthesis: 'Written text is converted into an acoustic plan and then into a moving speech waveform.',
+  tokens: 'A continuous waveform is divided into a sequence of numbered learned acoustic symbols; the symbols are useful but are not meaning itself.',
+  beamforming: 'A source reaches four microphones at different times; compensating delays align the arrivals so they can be summed.',
+  duplex: 'Separate human-to-model and model-to-human paths remain open at once, allowing a person to interrupt the model mid-turn.',
+  stack: 'Six stacked layers connect room air, microphones, signal processing, a neural model, tools and memory, and a loudspeaker in listening and speaking paths.',
+  architecture: 'A continuous listening and speaking loop connects to frontier reasoning, tools and memory through documented and asynchronous paths.',
+  clocks: 'Four timelines show audio, interaction, reasoning and memory operating at progressively slower intervals inside one experience.',
+}
+
 function wavePath(amplitude: number, cycles: number, phase = 0, y = 110) {
   const points: string[] = []
   for (let x = 0; x <= 720; x += 6) {
     const value = y + Math.sin((x / 720) * Math.PI * 2 * cycles + phase) * amplitude
     points.push(`${x === 0 ? 'M' : 'L'}${x.toFixed(1)},${value.toFixed(1)}`)
+  }
+  return points.join(' ')
+}
+
+function harmonicSumPath(y = 205) {
+  const points: string[] = []
+  for (let x = 0; x <= 720; x += 4) {
+    const angle = (x / 720) * Math.PI * 2
+    const value = y
+      + Math.sin(angle) * 21
+      + Math.sin(angle * 2) * 12
+      + Math.sin(angle * 3) * 8
+    points.push(`${x === 0 ? 'M' : 'L'}${x.toFixed(1)},${value.toFixed(1)}`)
+  }
+  return points.join(' ')
+}
+
+function amplitudeModulatedPath(y = 178) {
+  const points: string[] = []
+  for (let x = 0; x <= 720; x += 2) {
+    const message = Math.sin((x / 720) * Math.PI * 4)
+    const envelope = 12 + ((message + 1) / 2) * 32
+    const value = y + Math.sin((x / 720) * Math.PI * 36) * envelope
+    points.push(`${x === 0 ? 'M' : 'L'}${x.toFixed(1)},${value.toFixed(1)}`)
+  }
+  return points.join(' ')
+}
+
+function amplitudeEnvelopePath(sign: 1 | -1, y = 178) {
+  const points: string[] = []
+  for (let x = 0; x <= 720; x += 6) {
+    const message = Math.sin((x / 720) * Math.PI * 4)
+    const envelope = 12 + ((message + 1) / 2) * 32
+    points.push(`${x === 0 ? 'M' : 'L'}${x.toFixed(1)},${(y + sign * envelope).toFixed(1)}`)
+  }
+  return points.join(' ')
+}
+
+function spiralGroovePath() {
+  const points: string[] = []
+  const turns = 11
+  const maxAngle = turns * Math.PI * 2
+  for (let step = 0; step <= 880; step += 1) {
+    const angle = (step / 880) * maxAngle
+    const baseRadius = 310 - (step / 880) * 278
+    const lateralTrace = Math.sin(angle * 7.25) * 1.7
+    const radius = baseRadius + lateralTrace
+    const x = 360 + Math.cos(angle) * radius
+    const y = 112 + Math.sin(angle) * radius * 0.31
+    points.push(`${step === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`)
   }
   return points.join(' ')
 }
@@ -60,7 +131,7 @@ function HarmonicsFigure() {
       <path d={wavePath(28, 1, 0, 42)} />
       <path d={wavePath(18, 2, 0, 100)} />
       <path d={wavePath(12, 3, 0, 150)} />
-      <path d={wavePath(36, 1, 0, 205)} className="diagram-heavy" />
+      <path d={harmonicSumPath()} className="diagram-heavy" />
       <text x="16" y="25">fundamental</text>
       <text x="16" y="88">2×</text>
       <text x="16" y="140">3×</text>
@@ -106,11 +177,9 @@ function TraceFigure({ markerId }: { markerId: string }) {
 function GrooveFigure() {
   return (
     <>
-      {Array.from({ length: 9 }, (_, index) => (
-        <ellipse key={index} cx="360" cy="112" rx={308 - index * 29} ry={98 - index * 8} />
-      ))}
-      <path d={wavePath(9, 18, 0, 112)} className="diagram-heavy" />
+      <path d={spiralGroovePath()} className="diagram-heavy" />
       <circle cx="360" cy="112" r="10" fill="currentColor" />
+      <path d="M665 72 635 103 617 82" className="diagram-wave--moving" />
       <text x="22" y="26">time becomes distance</text>
       <text x="534" y="214">distance becomes time again</text>
     </>
@@ -140,8 +209,9 @@ function BroadcastFigure({ markerId }: { markerId: string }) {
       <text x="18" y="22">voice</text>
       <path d={wavePath(18, 18, 0, 106)} />
       <text x="18" y="83">carrier</text>
-      <path d={wavePath(44, 18, 0, 178)} className="diagram-heavy" />
-      <path d={wavePath(28, 2, 0, 178)} className="diagram-dashed" />
+      <path d={amplitudeModulatedPath()} className="diagram-heavy" />
+      <path d={amplitudeEnvelopePath(-1)} className="diagram-dashed" />
+      <path d={amplitudeEnvelopePath(1)} className="diagram-dashed" />
       <g transform="translate(610 28)"><Arrow markerId={markerId} /></g>
       <text x="620" y="19">distance</text>
       <text x="18" y="222">amplitude follows the message</text>
@@ -329,10 +399,29 @@ export function ScientificFigure({ kind, title }: ScientificFigureProps) {
   })()
 
   return (
-    <div className="scientific-figure__viewport" tabIndex={0} aria-label={`${title}. Scroll horizontally if needed.`}>
+    <div
+      className="scientific-figure__viewport horizontal-scroll-region"
+      data-page-keys="ignore"
+      role="group"
+      tabIndex={0}
+      aria-label={`${title} diagram`}
+      aria-describedby={`${markerId}-scroll-help`}
+      aria-keyshortcuts="ArrowLeft ArrowRight"
+      onKeyDown={(event) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+        const viewport = event.currentTarget
+        if (viewport.scrollWidth <= viewport.clientWidth) return
+        event.preventDefault()
+        viewport.scrollBy({
+          left: event.key === 'ArrowRight' ? Math.max(72, viewport.clientWidth * 0.24) : -Math.max(72, viewport.clientWidth * 0.24),
+          behavior: 'auto',
+        })
+      }}
+    >
+      <span id={`${markerId}-scroll-help`} className="sr-only">Use the Left and Right Arrow keys to pan when this diagram is wider than the page.</span>
       <svg className="scientific-figure__svg" viewBox="0 0 720 240" role="img" aria-labelledby={`${markerId}-title ${markerId}-desc`}>
         <title id={`${markerId}-title`}>{title}</title>
-        <desc id={`${markerId}-desc`}>A simplified, idealised scientific diagram. Its meaning is explained in the caption and surrounding text.</desc>
+        <desc id={`${markerId}-desc`}>{figureDescriptions[kind]}</desc>
         <DiagramDefs markerId={markerId} />
         {content}
       </svg>

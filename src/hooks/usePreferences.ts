@@ -63,7 +63,7 @@ export function usePreferences() {
     document.documentElement.dataset.theme = theme
     document.querySelector('meta[name="theme-color"]')?.setAttribute(
       'content',
-      theme === 'dark' ? '#000000' : '#ffffff',
+      theme === 'dark' ? '#161412' : '#f4efe5',
     )
     try {
       localStorage.setItem('pv:theme', theme)

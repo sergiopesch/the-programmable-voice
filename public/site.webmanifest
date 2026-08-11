@@ -1,0 +1,13 @@
+{
+  "name": "The Programmable Voice",
+  "short_name": "Voice",
+  "description": "An evidence-led history of sound, music, machines and the human voice.",
+  "start_url": "/#opening",
+  "display": "standalone",
+  "background_color": "#161412",
+  "theme_color": "#161412",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

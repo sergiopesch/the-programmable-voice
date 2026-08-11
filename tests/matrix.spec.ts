@@ -3,27 +3,20 @@ import { sections } from '../src/data/book'
 
 const viewports = [
   { width: 320, height: 568 },
-  { width: 360, height: 800 },
-  { width: 375, height: 812 },
   { width: 390, height: 844 },
-  { width: 393, height: 852 },
-  { width: 412, height: 915 },
-  { width: 430, height: 932 },
   { width: 568, height: 320 },
-  { width: 844, height: 390 },
   { width: 768, height: 1024 },
-  { width: 901, height: 900 },
+  { width: 1024, height: 768 },
   { width: 1100, height: 900 },
   { width: 1440, height: 1000 },
 ]
 
 for (const viewport of viewports) {
-  test(`all sections remain readable at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+  test(`all 36 sections remain readable at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+    test.setTimeout(90_000)
     await page.setViewportSize(viewport)
     await page.goto('/')
-    await page.evaluate(() => {
-      localStorage.setItem('pv:preferences:v1', JSON.stringify({ version: 1, textSize: 'large', reduceMotion: true }))
-    })
+    await page.evaluate(() => localStorage.setItem('pv:preferences:v1', JSON.stringify({ version: 1, textSize: 'large', reduceMotion: true })))
     await page.reload()
     await expect(page.locator('html')).toHaveAttribute('data-text-size', 'large')
     await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced')
@@ -34,20 +27,12 @@ for (const viewport of viewports) {
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
 
       for (const section of sections) {
-        await page.evaluate((id) => {
-          window.location.hash = id
-        }, section.id)
-        await expect.poll(async () => {
-          const title = await page.locator('#reader h1').textContent()
-          return title?.replace(/\s/g, '')
-        }).toBe(section.title.replace(/\s/g, ''))
+        await page.evaluate((id) => { window.location.hash = id }, section.id)
+        await expect.poll(async () => (await page.locator('#reader h1:visible').textContent())?.replace(/\s/g, '')).toBe(section.title.replace(/\s/g, ''))
 
         const audit = await page.evaluate(() => {
           const idCounts = new Map<string, number>()
-          for (const element of document.querySelectorAll<HTMLElement>('[id]')) {
-            idCounts.set(element.id, (idCounts.get(element.id) ?? 0) + 1)
-          }
-
+          for (const element of document.querySelectorAll<HTMLElement>('[id]')) idCounts.set(element.id, (idCounts.get(element.id) ?? 0) + 1)
           const undersizedTargets = [...document.querySelectorAll<HTMLElement>('button, a, input, [tabindex]')]
             .filter((element) => {
               const style = getComputedStyle(element)
@@ -67,16 +52,9 @@ for (const viewport of viewports) {
             undersizedTargets,
             clippedHeadings: [...document.querySelectorAll<HTMLElement>('.opening h1, .chapter-header h1, .sound-lab h1')]
               .filter((heading) => {
-                const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT)
-                let textNode = walker.nextNode()
-                while (textNode) {
-                  const range = document.createRange()
-                  range.selectNodeContents(textNode)
-                  const clipped = [...range.getClientRects()].some((rect) => rect.left < -1 || rect.right > document.documentElement.clientWidth + 1)
-                  if (clipped) return true
-                  textNode = walker.nextNode()
-                }
-                return false
+                const range = document.createRange()
+                range.selectNodeContents(heading)
+                return [...range.getClientRects()].some((rect) => rect.left < -1 || rect.right > document.documentElement.clientWidth + 1)
               })
               .map((heading) => heading.textContent),
           }

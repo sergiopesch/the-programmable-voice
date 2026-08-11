@@ -1,10 +1,11 @@
 import type { CSSProperties } from 'react'
 import type { BookBlock, BookSection } from '../types'
-import { sectionSourceIds } from '../lib/book'
+import { sectionMarker, sectionPosition, sectionSourceIds } from '../lib/book'
 import { narrationTargetId } from '../lib/narration'
 import { sourceNumberById } from '../data/sources'
-import type { NarrationStatus } from '../hooks/useRealtimeNarration'
+import type { NarrationCatalogueStatus, NarrationStatus } from '../hooks/useNarrationPlayer'
 import { CitationGroup } from './Citations'
+import { ArtefactTimeline } from './ArtefactTimeline'
 import { SectionListenButton } from './NarrationControls'
 import { ScientificFigure } from './ScientificFigure'
 
@@ -14,6 +15,8 @@ interface ChapterViewProps {
   onCitation: (sourceId: string) => void
   activeNarrationTargetId: string | null
   narrationStatus: NarrationStatus
+  catalogueStatus: NarrationCatalogueStatus
+  catalogueError: string | null
   narrationActive: boolean
   evidenceOpen: boolean
   onStartNarration: () => void
@@ -117,6 +120,8 @@ export function ChapterView({
   onCitation,
   activeNarrationTargetId,
   narrationStatus,
+  catalogueStatus,
+  catalogueError,
   narrationActive,
   evidenceOpen,
   onStartNarration,
@@ -125,14 +130,14 @@ export function ChapterView({
   onRetryNarration,
   onOpenEvidence,
 }: ChapterViewProps) {
-  const sectionLabel = String(section.number + 1).padStart(2, '0')
-  const progress = `${(section.number / Math.max(1, total - 1)) * 100}%`
+  const sectionLabel = sectionMarker(section)
+  const progress = `${section.kind === 'chapter' ? (section.number / Math.max(1, total)) * 100 : 100}%`
   const headerTargetId = narrationTargetId(section.id)
   const sourceCount = sectionSourceIds(section).length
   return (
-    <div className="chapter-layout">
-      <aside className="chapter-progress" aria-label={`Section ${section.number + 1} of ${total}`}>
-        <span>{sectionLabel} / {String(total).padStart(2, '0')}</span>
+    <div className={`chapter-layout${section.id === 'representation-ladder' ? ' chapter-layout--atlas' : ''}`}>
+      <aside className="chapter-progress" aria-label={sectionPosition(section, total)}>
+        <span>{section.kind === 'chapter' ? `${sectionLabel} / ${String(total).padStart(2, '0')}` : sectionLabel}</span>
         <div className="chapter-progress__rail">
           <span style={{ top: progress, '--mobile-progress': progress } as CSSProperties} />
         </div>
@@ -141,9 +146,9 @@ export function ChapterView({
       <article className="chapter-article">
         <header id={headerTargetId} className={narrationClass('chapter-header', headerTargetId, activeNarrationTargetId)}>
           <div className="chapter-header__meta">
-            <span>{section.kind === 'appendix' ? 'Appendix' : `Chapter ${String(section.number).padStart(2, '0')}`}</span>
+            <span>{sectionPosition(section, total)}</span>
             {section.era ? <span>{section.era}</span> : null}
-            {section.readingMinutes ? <span>{section.readingMinutes} min</span> : null}
+            {section.readingMinutes ? <span title="Estimated guided reading time, including diagrams">{section.readingMinutes} min guided</span> : null}
           </div>
           <h1>{section.title}</h1>
           <p>{section.deck}</p>
@@ -151,6 +156,8 @@ export function ChapterView({
             <SectionListenButton
               id={`listen-${section.id}`}
               status={narrationStatus}
+              catalogueStatus={catalogueStatus}
+              catalogueError={catalogueError}
               active={narrationActive}
               onStart={onStartNarration}
               onPause={onPauseNarration}
@@ -171,7 +178,7 @@ export function ChapterView({
           </div>
         </header>
         <div className="chapter-body">
-          {section.blocks.map((block, index) => (
+          {section.id === 'representation-ladder' ? <ArtefactTimeline onCitation={onCitation} activeNarrationTargetId={activeNarrationTargetId} /> : section.blocks.map((block, index) => (
             <BlockRenderer
               key={`${section.id}-${index}`}
               block={block}

@@ -1,7 +1,8 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { BookSection } from '../types'
 import type { TextSize } from '../hooks/usePreferences'
-import { sectionSearchText } from '../lib/book'
+import { searchBookSections, sectionMarker, type SectionSearchResult } from '../lib/book'
+import { narrationTargetId } from '../lib/narration'
 import { Modal } from './Modal'
 
 interface ContentsDialogProps {
@@ -17,6 +18,7 @@ interface ContentsDialogProps {
 }
 
 export function ContentsDialog(props: ContentsDialogProps) {
+  const activeEntryRef = useRef<HTMLButtonElement>(null)
   const groups = useMemo(() => {
     const grouped = new Map<string, BookSection[]>()
     for (const section of props.sections) {
@@ -24,6 +26,14 @@ export function ContentsDialog(props: ContentsDialogProps) {
     }
     return [...grouped.entries()]
   }, [props.sections])
+
+  useEffect(() => {
+    if (!props.open) return
+    const frame = requestAnimationFrame(() => {
+      activeEntryRef.current?.scrollIntoView({ block: 'center', inline: 'nearest' })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [props.activeId, props.open])
 
   return (
     <Modal open={props.open} title="Contents" onClose={props.onClose} className="contents-modal">
@@ -39,7 +49,22 @@ export function ContentsDialog(props: ContentsDialogProps) {
           <section key={part}>
             <h3>{part}</h3>
             <ol>
-              {sections.map((section) => <li key={section.id}><button type="button" aria-current={section.id === props.activeId ? 'page' : undefined} onClick={() => { props.onClose(); props.onNavigate(section.id) }}><span>{String(section.number + 1).padStart(2, '0')}</span><strong>{section.title}</strong></button></li>)}
+              {sections.map((section) => {
+                const active = section.id === props.activeId
+                return (
+                  <li key={section.id}>
+                    <button
+                      ref={active ? activeEntryRef : undefined}
+                      type="button"
+                      aria-current={active ? 'page' : undefined}
+                      onClick={() => { props.onClose(); props.onNavigate(section.id) }}
+                    >
+                      <span>{sectionMarker(section)}</span>
+                      <strong>{section.title}</strong>
+                    </button>
+                  </li>
+                )
+              })}
             </ol>
           </section>
         ))}
@@ -59,9 +84,16 @@ export function SearchDialog({ open, sections, onClose, onNavigate }: SearchDial
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const deferredQuery = useDeferredValue(query)
-  const results = deferredQuery.trim().length > 1
-    ? sections.filter((section) => sectionSearchText(section).includes(deferredQuery.trim().toLocaleLowerCase())).slice(0, 12)
-    : sections.slice(0, 6)
+  const searching = deferredQuery.trim().length > 1
+  const matches = searching ? searchBookSections(sections, deferredQuery) : []
+  const results: SectionSearchResult[] = searching
+    ? matches.slice(0, 12)
+    : sections.slice(0, 6).map((section) => ({ section, excerpt: section.deck }))
+  const resultSummary = searching
+    ? matches.length === 0
+      ? 'No sections found'
+      : `${matches.length} ${matches.length === 1 ? 'section' : 'sections'} found${matches.length > results.length ? `; showing the first ${results.length}` : ''}`
+    : 'Suggested sections'
 
   useEffect(() => {
     if (!open) return
@@ -69,15 +101,49 @@ export function SearchDialog({ open, sections, onClose, onNavigate }: SearchDial
     return () => cancelAnimationFrame(frame)
   }, [open])
 
+  const navigateToResult = (result: SectionSearchResult) => {
+    onClose()
+    onNavigate(result.section.id)
+
+    const requestedTargetId = narrationTargetId(
+      result.section.id,
+      result.blockIndex,
+      result.itemIndex,
+    )
+    const fallbackTargetId = narrationTargetId(result.section.id)
+    let attemptsRemaining = 4
+    const revealMatch = () => {
+      const requestedTarget = document.getElementById(requestedTargetId)
+      const visibleTarget = requestedTarget?.getClientRects().length ? requestedTarget : null
+      const target = visibleTarget ?? document.getElementById(fallbackTargetId)
+      if (target) {
+        target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' })
+        return
+      }
+      attemptsRemaining -= 1
+      if (attemptsRemaining > 0) requestAnimationFrame(revealMatch)
+    }
+    requestAnimationFrame(revealMatch)
+  }
+
   return (
     <Modal open={open} title="Search the book" onClose={onClose} className="search-modal">
       <label className="search-field">
         <span className="sr-only">Search terms</span>
         <input ref={inputRef} value={query} type="search" placeholder="Sound, sampling, memory…" onChange={(event) => setQuery(event.currentTarget.value)} />
       </label>
-      <div className="search-results" aria-live="polite">
-        {results.map((section) => <button key={section.id} type="button" onClick={() => { onClose(); onNavigate(section.id) }}><span>{String(section.number + 1).padStart(2, '0')}</span><span><strong>{section.title}</strong><small>{section.deck}</small></span></button>)}
-        {results.length === 0 ? <p className="search-empty">No sections match “{query.trim()}”.</p> : null}
+      <p className="search-result-count" role="status" aria-live="polite" aria-atomic="true">{resultSummary}</p>
+      <div className="search-results">
+        {results.map((result) => (
+          <button key={result.section.id} type="button" onClick={() => navigateToResult(result)}>
+            <span>{sectionMarker(result.section)}</span>
+            <span>
+              <strong>{result.section.title}</strong>
+              <small>{result.excerpt}</small>
+            </span>
+          </button>
+        ))}
+        {searching && results.length === 0 ? <p className="search-empty">No sections match “{query.trim()}”.</p> : null}
       </div>
     </Modal>
   )

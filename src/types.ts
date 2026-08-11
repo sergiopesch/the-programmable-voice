@@ -10,6 +10,9 @@ export type SourceType =
 export type EpistemicLabel =
   | 'Established science'
   | 'Primary document'
+  | 'Scholarly history'
+  | 'Standard'
+  | 'Official documentation'
   | 'Documented architecture'
   | 'Vendor disclosure'
   | 'Research preprint'

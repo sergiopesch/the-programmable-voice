@@ -2,7 +2,7 @@
   "name": "the-programmable-voice",
   "private": true,
   "version": "1.0.0",
-  "description": "An interactive, evidence-led history of sound, computation, and AI-native voice.",
+  "description": "An interactive, evidence-led history of sound, music and the human voice.",
   "homepage": "https://the-programmable-voice.vercel.app",
   "license": "UNLICENSED",
   "engines": {
@@ -15,12 +15,22 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "tsc -b && vite build",
+    "build": "npm run narration:verify-build && npm run build:app",
+    "build:app": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run && npm run test:narration-job",
+    "test:narration-job": "vitest run --config scripts/vitest.narration-job.config.ts",
     "test:e2e": "playwright test",
-    "check": "npm run lint && npm run test && npm run build"
+    "narration:compare-british-voices": "tsx scripts/generate-british-voice-comparison.ts",
+    "narration:pilot": "tsx scripts/generate-narration.ts --pilot",
+    "narration:approve-pilot": "tsx scripts/verify-narration.ts --approve-pilot",
+    "narration:generate": "tsx scripts/generate-narration.ts",
+    "narration:vercel-job": "tsx scripts/narration-vercel-job.ts",
+    "narration:approve": "tsx scripts/verify-narration.ts --approve",
+    "narration:verify": "tsx scripts/verify-narration.ts",
+    "narration:verify-build": "tsx scripts/verify-narration.ts --lightweight",
+    "check": "npm run lint && npm run test && npm run narration:verify && npm run build:app"
   },
   "dependencies": {
     "@fontsource-variable/newsreader": "^5.3.0",
@@ -45,6 +55,7 @@
     "globals": "^16.3.0",
     "jsdom": "^26.1.0",
     "pngjs": "^7.0.0",
+    "tsx": "^4.23.5",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^7.0.6",

@@ -4,6 +4,7 @@ dist
 playwright-report
 test-results
 coverage
+.narration-work
 *.log
 .vercel
 .env*

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { sections } from '../data/book'
+import {
+  narrationPassageHashMaterial,
+  narrationPassageReadingNotes,
+  narrationPilotPassageIds,
+  narrationReadingNoteFor,
+} from '../data/narrationEdition'
 import type { BookBlock, BookSection } from '../types'
 import {
   bookNarrationPassages,
@@ -32,19 +38,19 @@ function manuscriptStringsForSection(section: BookSection): string[] {
   return [
     section.title,
     section.deck,
-    ...(section.kind === 'opening' ? [] : section.blocks.flatMap(manuscriptStringsForBlock)),
+    ...section.blocks.flatMap(manuscriptStringsForBlock),
   ]
 }
 
 describe('book narration units', () => {
-  it('preserves the 26-section manuscript order', () => {
+  it('preserves the complete manuscript order', () => {
     const encounteredSectionIds = bookNarrationUnits.reduce<string[]>((ids, unit) => {
       if (ids.at(-1) !== unit.sectionId) ids.push(unit.sectionId)
       return ids
     }, [])
 
     expect(encounteredSectionIds).toEqual(sections.map((section) => section.id))
-    expect(encounteredSectionIds).toHaveLength(26)
+    expect(encounteredSectionIds).toHaveLength(36)
 
     for (const section of sections) {
       expect(bookNarrationUnits.filter((unit) => unit.sectionId === section.id)).toEqual(
@@ -74,11 +80,11 @@ describe('book narration units', () => {
       text: 'The Programmable Voice',
     })
     expect(bookNarrationUnits.at(-1)).toEqual({
-      id: 'narration:shipping-contract:block-2-callout-text',
-      sectionId: 'shipping-contract',
-      targetId: 'narration-shipping-contract-block-2',
+      id: 'narration:trust-after-voice:block-4-callout-text',
+      sectionId: 'trust-after-voice',
+      targetId: 'narration-trust-after-voice-block-4',
       kind: 'callout-text',
-      text: 'This rebuilt edition does not claim to recover the unavailable prior 165-source registry. Its evidence register is newly assembled from the sources visible here, with explicit caveats and access dates for living documentation.',
+      text: 'Voice is an interface, not authority. Warmth can invite; it cannot authenticate. Fluency can clarify; it cannot consent. Memory can assist; it cannot own. A system worthy of trust makes it easy to know which of those things is happening now.',
     })
 
     for (const unit of bookNarrationUnits) {
@@ -98,22 +104,12 @@ describe('book narration units', () => {
     expect(bookNarrationUnits.map((unit) => unit.text)).toEqual(manuscriptStrings)
   })
 
-  it('narrates only visible opening copy and retains the authored lab demonstration', () => {
-    expect(extractSectionNarrationUnits(sections[0]!)).toEqual([
-      {
-        id: 'narration:opening:section-title',
-        sectionId: 'opening',
-        targetId: 'narration-opening-header',
-        kind: 'section-title',
-        text: sections[0]!.title,
-      },
-      {
-        id: 'narration:opening:section-deck',
-        sectionId: 'opening',
-        targetId: 'narration-opening-header',
-        kind: 'section-deck',
-        text: sections[0]!.deck,
-      },
+  it('narrates the visible prologue and retains the authored lab demonstration', () => {
+    const opening = sections[0]!
+    expect(extractSectionNarrationUnits(opening).map((unit) => unit.text)).toEqual([
+      opening.title,
+      opening.deck,
+      ...opening.blocks.flatMap(manuscriptStringsForBlock),
     ])
 
     const lab = sections.find((section) => section.kind === 'lab')!
@@ -141,5 +137,21 @@ describe('book narration units', () => {
     }
 
     expect(groupNarrationPassages(bookNarrationUnits)).toEqual(bookNarrationPassages)
+  })
+
+  it('keeps pronunciation direction passage-scoped and covers the configured pilot', () => {
+    const passageIds = new Set(bookNarrationPassages.map(({ id }) => id))
+    for (const passageId of Object.keys(narrationPassageReadingNotes)) {
+      expect(passageIds.has(passageId), passageId).toBe(true)
+      expect(narrationPassageHashMaterial('configuration', passageId, 'Same text')).toBe(
+        `configuration\n${narrationReadingNoteFor(passageId)}\nSame text`,
+      )
+    }
+
+    const unnotedPassage = bookNarrationPassages.find(({ id }) => !narrationPassageReadingNotes[id])!
+    expect(narrationPassageHashMaterial('configuration', unnotedPassage.id, 'Same text')).toBe('configuration\n\nSame text')
+    expect(new Set(narrationPilotPassageIds).size).toBe(narrationPilotPassageIds.length)
+    expect(narrationPilotPassageIds.every((id) => passageIds.has(id))).toBe(true)
+    expect(new Set(narrationPilotPassageIds.map((id) => bookNarrationPassages.find((passage) => passage.id === id)!.sectionId)).size).toBeGreaterThanOrEqual(5)
   })
 })
