@@ -36,7 +36,11 @@ import {
   narrationPilotVerificationMessage,
   type CurrentNarrationPilotIdentity,
 } from './narration-pilot-contract'
-import { narrationPacingBounds, narrationReportedWordsPerMinute } from './narration-pacing'
+import {
+  narrationCharacterPacingBounds,
+  narrationCharactersPerSecond,
+  narrationReportedWordsPerMinute,
+} from './narration-pacing'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -112,7 +116,8 @@ function assertTechnicalQcShape(entry: NarrationManifestEntry, passage: Narratio
   const words = spokenText.trim().split(/\s+/).filter(Boolean).length
   const expectedDurationSeconds = Number(((words / narrationEditionConfiguration.targetWordsPerMinute) * 60).toFixed(3))
   const expectedWordsPerMinute = narrationReportedWordsPerMinute((words / entry.durationSeconds) * 60)
-  const { minimumWordsPerMinute, maximumWordsPerMinute } = narrationPacingBounds(words)
+  const expectedCharactersPerSecond = narrationCharactersPerSecond(spokenText, entry.durationSeconds)
+  const { minimumCharactersPerSecond, maximumCharactersPerSecond } = narrationCharacterPacingBounds(spokenText)
   const finite = [
     entry.durationSeconds,
     qc.durationExpectedSeconds,
@@ -130,8 +135,8 @@ function assertTechnicalQcShape(entry: NarrationManifestEntry, passage: Narratio
     || Math.abs(entry.durationSeconds - qc.durationMeasuredSeconds) > 0.02
     || Math.abs(qc.durationExpectedSeconds - expectedDurationSeconds) > 0.01
     || Math.abs(qc.wordsPerMinute - expectedWordsPerMinute) > 0.15
-    || qc.wordsPerMinute < minimumWordsPerMinute
-    || qc.wordsPerMinute > maximumWordsPerMinute
+    || expectedCharactersPerSecond < minimumCharactersPerSecond
+    || expectedCharactersPerSecond > maximumCharactersPerSecond
     || qc.integratedLoudnessLufs < -20.5
     || qc.integratedLoudnessLufs > -15.5
     || qc.loudnessRangeLu < 0
@@ -206,7 +211,10 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
   const silence = boundarySilence(silenceStderr, duration)
   const spokenText = narrationSpokenTextFor(passage.id, passage.text)
   const words = spokenText.trim().split(/\s+/).filter(Boolean).length
-  const measuredWordsPerMinute = narrationReportedWordsPerMinute((words / duration) * 60)
+  const recordedDurationSeconds = Number(duration.toFixed(3))
+  const measuredWordsPerMinute = narrationReportedWordsPerMinute((words / recordedDurationSeconds) * 60)
+  const measuredCharactersPerSecond = narrationCharactersPerSecond(spokenText, recordedDurationSeconds)
+  const { minimumCharactersPerSecond, maximumCharactersPerSecond } = narrationCharacterPacingBounds(spokenText)
   const qc = entry.technicalQc
   if (
     !Number.isFinite(measuredLoudness)
@@ -216,6 +224,8 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
     || Math.abs(silence.leading - qc.leadingSilenceSeconds) > 0.06
     || Math.abs(silence.trailing - qc.trailingSilenceSeconds) > 0.06
     || measuredWordsPerMinute !== qc.wordsPerMinute
+    || measuredCharactersPerSecond < minimumCharactersPerSecond
+    || measuredCharactersPerSecond > maximumCharactersPerSecond
   ) {
     throw new Error(`${entry.id} failed full media-QC verification.`)
   }

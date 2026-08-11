@@ -29,7 +29,11 @@ import {
   narrationApprovedPilotParityProblems,
   narrationPilotApprovalProblems,
 } from './narration-pilot-contract'
-import { narrationPacingBounds, narrationReportedWordsPerMinute } from './narration-pacing'
+import {
+  narrationCharacterPacingBounds,
+  narrationCharactersPerSecond,
+  narrationReportedWordsPerMinute,
+} from './narration-pacing'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -165,18 +169,21 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
     filePath,
   ])
   const durationMeasuredSeconds = Number(stdout.trim())
+  if (!Number.isFinite(durationMeasuredSeconds) || durationMeasuredSeconds < 0.35) {
+    throw new Error(`Pacing QC failed for ${path.basename(filePath)}: invalid media duration.`)
+  }
+  const recordedDurationSeconds = Number(durationMeasuredSeconds.toFixed(3))
   const durationExpectedSeconds = expectedDurationSeconds(text)
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length
-  const wordsPerMinute = narrationReportedWordsPerMinute((wordCount / durationMeasuredSeconds) * 60)
-  const { minimumWordsPerMinute, maximumWordsPerMinute } = narrationPacingBounds(wordCount)
+  const wordsPerMinute = narrationReportedWordsPerMinute((wordCount / recordedDurationSeconds) * 60)
+  const charactersPerSecond = narrationCharactersPerSecond(text, recordedDurationSeconds)
+  const { minimumCharactersPerSecond, maximumCharactersPerSecond } = narrationCharacterPacingBounds(text)
   if (
-    !Number.isFinite(durationMeasuredSeconds)
-    || durationMeasuredSeconds < 0.35
-    || !Number.isFinite(wordsPerMinute)
-    || wordsPerMinute < minimumWordsPerMinute
-    || wordsPerMinute > maximumWordsPerMinute
+    !Number.isFinite(wordsPerMinute)
+    || charactersPerSecond < minimumCharactersPerSecond
+    || charactersPerSecond > maximumCharactersPerSecond
   ) {
-    throw new Error(`Pacing QC failed for ${path.basename(filePath)}: ${wordsPerMinute.toFixed(1)} words per minute.`)
+    throw new Error(`Pacing QC failed for ${path.basename(filePath)}: ${wordsPerMinute.toFixed(1)} words per minute, ${charactersPerSecond.toFixed(1)} characters per second.`)
   }
 
   const normalisation = configuration.normalisation
@@ -215,7 +222,7 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
   await execFileAsync(ffmpegBinary, ['-v', 'error', '-i', filePath, '-f', 'null', '-'], { maxBuffer: 1_000_000 })
   return {
     durationExpectedSeconds,
-    durationMeasuredSeconds: Number(durationMeasuredSeconds.toFixed(3)),
+    durationMeasuredSeconds: recordedDurationSeconds,
     wordsPerMinute,
     integratedLoudnessLufs: Number(integratedLoudnessLufs.toFixed(1)),
     loudnessRangeLu: Number(loudnessRangeLu.toFixed(1)),

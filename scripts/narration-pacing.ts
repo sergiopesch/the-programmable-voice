@@ -1,6 +1,12 @@
-export interface NarrationPacingBounds {
-  minimumWordsPerMinute: number
-  maximumWordsPerMinute: number
+export interface NarrationCharacterPacingBounds {
+  minimumCharactersPerSecond: number
+  maximumCharactersPerSecond: number
+}
+
+export function narrationCanonicalPacingText(spokenText: string) {
+  const canonical = spokenText.normalize('NFC').trim().replace(/\s+/gu, ' ')
+  if (!canonical) throw new RangeError('Narration pacing requires non-empty spoken text.')
+  return canonical
 }
 
 /** The manifest records and verifies pace to one decimal place. */
@@ -12,31 +18,43 @@ export function narrationReportedWordsPerMinute(wordsPerMinute: number) {
 }
 
 /**
- * Hard technical pacing bounds for a recorded passage. Short passages have
- * greater whole-word variance, so their upper limit tapers smoothly into the
- * settled long-form ceiling instead of dropping at a single word boundary.
- *
- * The upper limit is rounded to the same one-decimal precision stored in the
- * narration manifest. This keeps generation and later verification identical
- * at the boundary.
+ * Counts the exact synthesiser input after NFC normalisation. Unicode code
+ * points, including spaces and punctuation, are used because they represent
+ * phrase length without making the gate depend on whether a language or
+ * sentence happens to use many short words.
  */
-export function narrationPacingBounds(wordCount: number): NarrationPacingBounds {
-  if (!Number.isSafeInteger(wordCount) || wordCount < 1) {
-    throw new RangeError('Narration pacing requires a positive whole-word count.')
-  }
+export function narrationCharacterCount(spokenText: string) {
+  return [...narrationCanonicalPacingText(spokenText)].length
+}
 
-  if (wordCount < 6) {
-    return { minimumWordsPerMinute: 45, maximumWordsPerMinute: 240 }
+/** Exact derived pace used by the technical gate; it is not stored in the manifest. */
+export function narrationCharactersPerSecond(spokenText: string, durationSeconds: number) {
+  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    throw new RangeError('Narration character pace requires a positive finite duration.')
   }
-  if (wordCount < 20) {
-    return { minimumWordsPerMinute: 90, maximumWordsPerMinute: 195 }
+  return narrationCharacterCount(spokenText) / durationSeconds
+}
+
+/**
+ * Hard technical pacing bounds derived from exact spoken-text length. Brief
+ * headings tolerate wider variance; the range tapers into a stricter
+ * long-form band. WPM remains useful reader-facing metadata, but it is not a
+ * fair accept/reject metric for passages with unusually short or long words.
+ */
+export function narrationCharacterPacingBounds(spokenText: string): NarrationCharacterPacingBounds {
+  const characterCount = narrationCharacterCount(spokenText)
+  const minimumCharactersPerSecond = characterCount <= 40
+    ? 6
+    : characterCount < 160
+      ? 6 + (4 * (characterCount - 40)) / 120
+      : 10
+  const maximumCharactersPerSecond = characterCount <= 80
+    ? 20
+    : characterCount < 160
+      ? 20 - (2 * (characterCount - 80)) / 80
+      : 18
+  return {
+    minimumCharactersPerSecond,
+    maximumCharactersPerSecond,
   }
-  if (wordCount <= 30) {
-    const taperedMaximum = 180 + (15 * (30 - wordCount)) / 11
-    return {
-      minimumWordsPerMinute: 100,
-      maximumWordsPerMinute: Number(taperedMaximum.toFixed(1)),
-    }
-  }
-  return { minimumWordsPerMinute: 100, maximumWordsPerMinute: 180 }
 }
