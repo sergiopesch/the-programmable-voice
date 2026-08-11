@@ -34,6 +34,7 @@ import {
   narrationCharactersPerSecond,
   narrationReportedWordsPerMinute,
 } from './narration-pacing'
+import { narrationLoudnessIsWithinBounds } from './narration-loudness'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -197,14 +198,17 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
   const integratedLoudnessLufs = Number(loudness.input_i)
   const loudnessRangeLu = Number(loudness.input_lra)
   const truePeakDbtp = Number(loudness.input_tp)
+  const reportedIntegratedLoudnessLufs = Number(integratedLoudnessLufs.toFixed(1))
+  const reportedLoudnessRangeLu = Number(loudnessRangeLu.toFixed(1))
+  const reportedTruePeakDbtp = Number(truePeakDbtp.toFixed(1))
   if (
-    !Number.isFinite(integratedLoudnessLufs)
-    || integratedLoudnessLufs < -20.5
-    || integratedLoudnessLufs > -15.5
-    || !Number.isFinite(loudnessRangeLu)
-    || loudnessRangeLu > 12
-    || !Number.isFinite(truePeakDbtp)
-    || truePeakDbtp > -1
+    !narrationLoudnessIsWithinBounds({
+      durationSeconds: recordedDurationSeconds,
+      integratedLoudnessLufs: reportedIntegratedLoudnessLufs,
+      loudnessRangeLu: reportedLoudnessRangeLu,
+      truePeakDbtp: reportedTruePeakDbtp,
+      targetTruePeakDbtp: normalisation.truePeakDbtp,
+    })
   ) {
     throw new Error(`Loudness QC failed for ${path.basename(filePath)}: ${integratedLoudnessLufs.toFixed(1)} LUFS, ${truePeakDbtp.toFixed(1)} dBTP.`)
   }
@@ -224,9 +228,9 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
     durationExpectedSeconds,
     durationMeasuredSeconds: recordedDurationSeconds,
     wordsPerMinute,
-    integratedLoudnessLufs: Number(integratedLoudnessLufs.toFixed(1)),
-    loudnessRangeLu: Number(loudnessRangeLu.toFixed(1)),
-    truePeakDbtp: Number(truePeakDbtp.toFixed(1)),
+    integratedLoudnessLufs: reportedIntegratedLoudnessLufs,
+    loudnessRangeLu: reportedLoudnessRangeLu,
+    truePeakDbtp: reportedTruePeakDbtp,
     ...silence,
     normalisationVersion: normalisation.version,
     fullDecodePassed: true,

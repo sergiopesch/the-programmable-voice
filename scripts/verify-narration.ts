@@ -41,6 +41,7 @@ import {
   narrationCharactersPerSecond,
   narrationReportedWordsPerMinute,
 } from './narration-pacing'
+import { narrationLoudnessIsWithinBounds } from './narration-loudness'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -137,11 +138,13 @@ function assertTechnicalQcShape(entry: NarrationManifestEntry, passage: Narratio
     || Math.abs(qc.wordsPerMinute - expectedWordsPerMinute) > 0.15
     || expectedCharactersPerSecond < minimumCharactersPerSecond
     || expectedCharactersPerSecond > maximumCharactersPerSecond
-    || qc.integratedLoudnessLufs < -20.5
-    || qc.integratedLoudnessLufs > -15.5
-    || qc.loudnessRangeLu < 0
-    || qc.loudnessRangeLu > 12
-    || qc.truePeakDbtp > -1
+    || !narrationLoudnessIsWithinBounds({
+      durationSeconds: qc.durationMeasuredSeconds,
+      integratedLoudnessLufs: qc.integratedLoudnessLufs,
+      loudnessRangeLu: qc.loudnessRangeLu,
+      truePeakDbtp: qc.truePeakDbtp,
+      targetTruePeakDbtp: narrationEditionConfiguration.normalisation.truePeakDbtp,
+    })
     || qc.leadingSilenceSeconds < 0
     || qc.leadingSilenceSeconds > 0.35
     || qc.trailingSilenceSeconds < 0
@@ -203,6 +206,9 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
   const measuredLoudness = Number(loudness.input_i)
   const measuredRange = Number(loudness.input_lra)
   const measuredPeak = Number(loudness.input_tp)
+  const reportedMeasuredLoudness = Number(measuredLoudness.toFixed(1))
+  const reportedMeasuredRange = Number(measuredRange.toFixed(1))
+  const reportedMeasuredPeak = Number(measuredPeak.toFixed(1))
 
   const { stderr: silenceStderr } = await execFileAsync(ffmpegBinary, [
     '-hide_banner', '-nostats', '-i', filePath,
@@ -226,6 +232,13 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
     || measuredWordsPerMinute !== qc.wordsPerMinute
     || measuredCharactersPerSecond < minimumCharactersPerSecond
     || measuredCharactersPerSecond > maximumCharactersPerSecond
+    || !narrationLoudnessIsWithinBounds({
+      durationSeconds: recordedDurationSeconds,
+      integratedLoudnessLufs: reportedMeasuredLoudness,
+      loudnessRangeLu: reportedMeasuredRange,
+      truePeakDbtp: reportedMeasuredPeak,
+      targetTruePeakDbtp: normalisation.truePeakDbtp,
+    })
   ) {
     throw new Error(`${entry.id} failed full media-QC verification.`)
   }
