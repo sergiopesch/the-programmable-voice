@@ -420,6 +420,17 @@ export const foundationSources: Source[] = [
       'Priority: Lord’s near-contemporary account of hearing Avdo Međedović perform and of the team’s experimental collection methods. Caveat: it is an observer’s account, uses period terminology, and should not turn one exceptional singer into a model for all oral traditions.',
   },
   {
+    id: 'fdn-kratzenstein2011',
+    author: 'John J. Ohala',
+    year: '2011',
+    title: 'Christian Gottlieb Kratzenstein: Pioneer in Speech Synthesis',
+    publication: 'Proceedings of the 17th International Congress of Phonetic Sciences',
+    type: 'peer-reviewed research',
+    url: 'https://www.internationalphoneticassociation.org/icphs-proceedings/ICPhS2011/OnlineProceedings/SpecialSession/Session7/Ohala/Ohala.pdf',
+    note:
+      'Specialist history locating the St Petersburg Academy prize question in 1780 and Kratzenstein’s published Tentamen in 1781. It treats him as the first to publish a detailed account, not necessarily the first person ever to demonstrate mechanically synthesised speech.',
+  },
+  {
     id: 'fdn-kempelen-machine',
     author: 'Wolfgang von Kempelen',
     year: '1791',
@@ -495,5 +506,126 @@ export const foundationSources: Source[] = [
     url: 'https://www.loc.gov/collections/ancestral-voices/about-this-collection/',
     note:
       'Priority: collaborative account naming Peter Selmore and Noel Josephs, the cylinder limits, preservation chain and present-day community interpretation. Caveat: the recordings arose from colonial-era ethnographic collecting; access, description and cultural authority require more than technical preservation.',
+  },
+  {
+    id: 'fdn-allen-ancient-india',
+    author: 'W. Sidney Allen',
+    year: '1953',
+    title: 'Phonetics in Ancient India',
+    publication: 'Oxford University Press',
+    type: 'scholarly history',
+    url: 'https://archive.org/details/in.gov.ignca.7855',
+    note:
+      'Specialist study of the Prātiśākhya and Śikṣā traditions. Pages 4–7 and 17–18 support their practical relation to Vedic recitation, detailed sound categories and distinction between active articulator and place of articulation; differences among texts should not be flattened into one timeless system.',
+  },
+  {
+    id: 'fdn-bakalla-arab-phonetics',
+    author: 'Muhammad Hasan Bakalla',
+    year: '1981',
+    title: 'The Treatment of Nasal Elements by Early Arab and Muslim Phoneticians',
+    publication: 'Historiographia Linguistica 8(2–3), 285–305',
+    type: 'peer-reviewed research',
+    url: 'https://doi.org/10.1075/hl.8.2-3.05bak',
+    note:
+      'Focused scholarly history of early Arabic analysis of nasal elements and articulatory categories. It supports a cumulative technical tradition, not a claim that one grammarian originated Arabic phonetics or that modern categories map onto it without remainder.',
+  },
+  {
+    id: 'fdn-owens-arabic-grammar',
+    author: 'Jonathan Owens',
+    year: '1988',
+    title: 'The Foundations of Grammar: An Introduction to Medieval Arabic Grammatical Theory',
+    publication: 'John Benjamins',
+    type: 'scholarly history',
+    url: 'https://doi.org/10.1075/sihols.45',
+    note:
+      'Pages 16–17, 89 and 95 situate phonetic description inside medieval Arabic grammatical theory and its transmission. The book cautions against treating the tradition as a single author’s closed system or as a preliminary version of modern Western linguistics.',
+  },
+  {
+    id: 'fdn-tam-chinese-language',
+    author: 'Gina Anne Tam',
+    year: '2020',
+    title: 'A Chinese Language: Fangyan before the Twentieth Century',
+    publication: 'Dialect and Nationalism in China, 1860–1960, Cambridge University Press, 35–71',
+    type: 'scholarly history',
+    url: 'https://doi.org/10.1017/9781108776400.002',
+    note:
+      'Pages 37–38 outline fanqie, the Qieyun and later rhyme-table analysis. Tam supports the relative—not absolute—pronunciation supplied by fanqie and the organisation of characters by tone and rhyme; the source does not itself establish the stronger composite-standard claim.',
+  },
+  {
+    id: 'fdn-shen-chinese-phonology',
+    author: 'Zhongwei Shen',
+    year: '2020',
+    title: 'A Phonological History of Chinese',
+    publication: 'Cambridge University Press',
+    type: 'scholarly history',
+    url: 'https://doi.org/10.1017/9781316476925',
+    note:
+      'Chapter 3, pages 107–151, examines the Qieyun-derived phonological system as an ideal or composite standard rather than a transparent record of one local spoken dialect. Use this claim with Tam and Branner, not as evidence of recoverable recorded sound.',
+  },
+  {
+    id: 'fdn-branner-rime-tables',
+    author: 'David Prager Branner',
+    year: '2006',
+    title: 'Introduction: What Are Rime Tables and What Do They Mean?',
+    publication: 'The Chinese Rime Tables, John Benjamins, 1–34',
+    type: 'scholarly history',
+    url: 'https://doi.org/10.1075/cilt.271.01bra',
+    note:
+      'Pages 1–7 define fanqie and explain the rime-table matrix of initial columns, final rows and tone categories. The tables encode analytical relations; they are not acoustic recordings or direct measurements of speech.',
+  },
+  {
+    id: 'fdn-versteegh-arabic-tradition',
+    author: 'Kees Versteegh',
+    year: '2023',
+    title: 'The Arabic Linguistic Tradition',
+    publication: 'The Cambridge History of Linguistics, Cambridge University Press, 195–212',
+    type: 'scholarly history',
+    url: 'https://doi.org/10.1017/9780511842788.013',
+    note:
+      'Pages 195–212 situate Arabic linguistic analysis within grammar, lexicography and Qurʾānic interpretation. It supports the cumulative institutional context; Bakalla and Owens supply the more specific articulatory and grammatical detail.',
+  },
+  {
+    id: 'fdn-bulwer-philocophus',
+    author: 'John Bulwer',
+    year: '1648',
+    title: 'Philocophus, or, The Deafe and Dumbe Mans Friend',
+    publication: 'London: Humphrey Moseley',
+    type: 'primary document',
+    url: 'https://archive.org/details/gu_philocophusde00bulw',
+    note:
+      'Pages 14–15 treat visible articulatory motion; pages 47–49 speculate about a speaking engine or puppet. The latter passage draws on Bacon and legendary talking heads, so it documents an analytical and mechanical ambition, not a completed speech machine.',
+  },
+  {
+    id: 'fdn-wallis-loquela',
+    author: 'John Wallis',
+    year: '1653; 1674 edition',
+    title: 'De loquela, sive de sonorum omnium loquelarium formatione',
+    publication: 'Preface to Grammatica linguae anglicanae',
+    type: 'primary document',
+    url: 'https://archive.org/details/bub_gb_SNL34NHnkQ4C',
+    note:
+      'Pages 1–5 of the 1674 edition analyse formation of speech sounds through breath and articulatory organs. The Latin primary text records Wallis’s scheme; later comparison is needed before translating its categories into modern phonetics.',
+  },
+  {
+    id: 'fdn-holder-elements-speech',
+    author: 'William Holder',
+    year: '1669',
+    title: 'Elements of Speech: An Essay of Inquiry into the Natural Production of Letters',
+    publication: 'London: T. N. for J. Martyn',
+    type: 'primary document',
+    url: 'https://archive.org/details/holderspeech',
+    note:
+      'Pages 22–24 and 35–36 describe the lungs, larynx and oral and nasal passages, then distinguish contact from approach in articulation. It is a primary early-modern scheme, not evidence that its categories were universally accepted or mechanically realised.',
+  },
+  {
+    id: 'fdn-oates-speaking-hands',
+    author: 'Rosamund Oates',
+    year: '2022',
+    title: 'Speaking in Hands: Early Modern Preaching and Signed Languages for the Deaf',
+    publication: 'Past & Present 256(1), 49–85',
+    type: 'peer-reviewed research',
+    url: 'https://doi.org/10.1093/pastj/gtab019',
+    note:
+      'Section VII, pages 72–78, places Bulwer within existing signed practices and deaf communication rather than crediting him with inventing sign language, and contextualises later contested oralist projects. Period terminology and assumptions in the primary texts should not be reproduced as neutral modern language.',
   },
 ]

@@ -84,6 +84,14 @@ export function PauseIcon(props: IconProps) {
   )
 }
 
+export function StopIcon(props: IconProps) {
+  return (
+    <svg {...defaults} {...props}>
+      <rect x="6" y="6" width="12" height="12" />
+    </svg>
+  )
+}
+
 export function PlayIcon(props: IconProps) {
   return (
     <svg {...defaults} {...props}>

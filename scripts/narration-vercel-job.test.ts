@@ -3,13 +3,31 @@ import { EventEmitter } from 'node:events'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { narrationEditionAssetDirectory, narrationPilotPassageIds } from '../src/data/narrationEdition'
+import {
+  narrationBritishVoiceComparison,
+  narrationComparisonApprovalChecklistVersion,
+  narrationComparisonApprovalConfirmations,
+  narrationDisclosure,
+  narrationEditionAssetDirectory,
+  narrationEditionConfiguration,
+  narrationInstructionsFor,
+  narrationPilotPassageIds,
+} from '../src/data/narrationEdition'
+import { bookNarrationPassages } from '../src/lib/narration'
+import type { NarrationComparisonApproval, NarrationComparisonManifest } from '../src/lib/narrationRelease'
+import {
+  narrationComparisonApprovalName,
+  narrationComparisonDirectory,
+  narrationComparisonManifestName,
+  narrationComparisonProfileHash,
+} from './narration-comparison-contract'
 import { sha256 } from './narration-job-lib'
 import {
   assertNonSecretStagingPath,
   assertNoLiveSecretInFile,
   canonicalProject,
   cleanupDisposableDeployments,
+  comparisonPrerequisiteProblems,
   copyFileIntoStage,
   copyNarrationInputs,
   deploymentArguments,
@@ -34,6 +52,73 @@ async function temporaryRoot() {
 afterEach(async () => {
   await Promise.all(temporaryRoots.splice(0).map((root) => fs.rm(root, { recursive: true, force: true })))
 })
+
+async function writeComparisonApproval(root: string, selectedVoice = narrationEditionConfiguration.voice) {
+  const passage = bookNarrationPassages.find(({ id }) => id === narrationBritishVoiceComparison.passageId)!
+  const comparisonRoot = path.join(root, narrationComparisonDirectory)
+  const technicalQc = {
+    durationSeconds: 40,
+    wordsPerMinute: 140,
+    integratedLoudnessLufs: -18,
+    loudnessRangeLu: 4,
+    truePeakDbtp: -2,
+    sampleRateHz: narrationEditionConfiguration.normalisation.sampleRateHz,
+    channels: narrationEditionConfiguration.normalisation.channels,
+    bitrateKbps: narrationEditionConfiguration.normalisation.bitrateKbps,
+    fullDecodePassed: true as const,
+  }
+  const candidateFiles = narrationBritishVoiceComparison.candidates.map((candidate) => {
+    const bytes = Buffer.from(`comparison-${candidate.label}`)
+    const digest = sha256(bytes)
+    return {
+      metadata: {
+        ...candidate,
+        filename: `candidate-${candidate.label.toLowerCase()}-${digest}.mp3`,
+        sha256: digest,
+        technicalQc: { ...technicalQc },
+      },
+      bytes,
+    }
+  })
+  const manifest: NarrationComparisonManifest = {
+    schemaVersion: 2,
+    comparisonId: 'british-voice-comparison-2026-08-11-aaaaaaaaaa',
+    generatedAt: '2026-08-11T00:00:00.000Z',
+    disclosure: narrationDisclosure,
+    edition: narrationEditionConfiguration.edition,
+    model: narrationEditionConfiguration.model,
+    configurationHash: 'a'.repeat(64),
+    manuscriptHash: 'b'.repeat(64),
+    provisionalProductionVoice: 'placeholder',
+    voiceProfile: narrationEditionConfiguration.voiceProfile,
+    instructions: narrationInstructionsFor(passage.id),
+    responseFormat: narrationEditionConfiguration.responseFormat,
+    speechSpeed: 1,
+    normalisation: { ...narrationEditionConfiguration.normalisation },
+    passage: { id: passage.id, text: passage.text, sha256: sha256(passage.text) },
+    candidates: candidateFiles.map(({ metadata }) => metadata),
+    comparisonProfileHash: '',
+    humanApprovalRequired: true,
+    approvalCriteria: ['human listening required'],
+  }
+  manifest.comparisonProfileHash = narrationComparisonProfileHash(manifest)
+  const selected = manifest.candidates.find(({ voice }) => voice === selectedVoice) ?? manifest.candidates[0]!
+  const approval: NarrationComparisonApproval = {
+    schemaVersion: 1,
+    decidedAt: '2026-08-11T00:00:00.000Z',
+    decidedBy: 'Narration editor',
+    checklistVersion: narrationComparisonApprovalChecklistVersion,
+    comparisonId: manifest.comparisonId,
+    comparisonProfileHash: manifest.comparisonProfileHash,
+    decision: { kind: 'selected', candidateLabel: selected.label, voice: selected.voice },
+    confirmations: narrationComparisonApprovalConfirmations.map(({ label }) => label),
+  }
+  await fs.mkdir(comparisonRoot, { recursive: true })
+  await fs.writeFile(path.join(comparisonRoot, narrationComparisonManifestName), JSON.stringify(manifest))
+  await fs.writeFile(path.join(comparisonRoot, narrationComparisonApprovalName), JSON.stringify(approval))
+  for (const candidate of candidateFiles) await fs.writeFile(path.join(comparisonRoot, candidate.metadata.filename), candidate.bytes)
+  return { manifest, approval }
+}
 
 describe('disposable Vercel narration staging', () => {
   it('honours working-tree deletions instead of failing on missing tracked files', async () => {
@@ -60,15 +145,30 @@ describe('disposable Vercel narration staging', () => {
       passages: [{ url: audioUrl, sha256: audioHash }],
     }))
     await fs.writeFile(path.join(source, '.narration-work/pilot-approval.json'), '{}')
+    const comparison = await writeComparisonApproval(source)
 
-    await copyNarrationInputs(source, stage)
+    await copyNarrationInputs(source, stage, true)
     await expect(fs.access(path.join(stage, 'public/audio/narration', narrationEditionAssetDirectory, audioName))).resolves.toBeUndefined()
     await expect(fs.access(path.join(stage, '.narration-work/generation-state.json'))).resolves.toBeUndefined()
     await expect(fs.access(path.join(stage, '.narration-work/pilot-manifest.json'))).resolves.toBeUndefined()
     await expect(fs.access(path.join(stage, '.narration-work/pilot-approval.json'))).resolves.toBeUndefined()
+    await expect(fs.access(path.join(stage, narrationComparisonDirectory, narrationComparisonManifestName))).resolves.toBeUndefined()
+    await expect(fs.access(path.join(stage, narrationComparisonDirectory, narrationComparisonApprovalName))).resolves.toBeUndefined()
+    for (const candidate of comparison.manifest.candidates) {
+      await expect(fs.access(path.join(stage, narrationComparisonDirectory, candidate.filename))).resolves.toBeUndefined()
+    }
     await expect(fs.access(path.join(stage, 'public/audio/narration', narrationEditionAssetDirectory, `9999-orphan-${'a'.repeat(64)}.mp3`))).rejects.toMatchObject({ code: 'ENOENT' })
     expect(temporaryVercelIgnoreEntries).toContain('.vercel')
     expect(temporaryVercelIgnoreEntries.some((entry) => entry.includes('.narration-work') || entry.includes('public/audio/narration'))).toBe(false)
+  })
+
+  it('blocks a remote pilot locally when the selected comparison voice differs from configuration', async () => {
+    const root = await temporaryRoot()
+    const anotherVoice = narrationBritishVoiceComparison.candidates.find(({ voice }) => voice !== narrationEditionConfiguration.voice)!.voice
+    await writeComparisonApproval(root, anotherVoice)
+    await expect(comparisonPrerequisiteProblems(root)).resolves.toEqual([
+      expect.stringMatching(/approved comparison selected candidate/),
+    ])
   })
 
   it('exports only audio referenced by the completed pilot manifest', async () => {

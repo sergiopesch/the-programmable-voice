@@ -58,6 +58,7 @@ describe('disposable narration-job archive', () => {
     expect(() => assertSafeImportPath('public/audio/narration/manifest.json')).toThrow(/allowlist/)
     expect(assertSafeImportPath(`.narration-work/british-voice-comparison/candidate-a-${'a'.repeat(64)}.mp3`)).toMatch(/candidate-a/)
     expect(assertSafeImportPath('.narration-work/british-voice-comparison/manifest.json')).toMatch(/manifest/)
+    expect(assertSafeImportPath('.narration-work/british-voice-comparison/approval.json')).toMatch(/approval/)
     expect(() => assertSafeImportPath('.narration-work/british-voice-comparison/notes.txt')).toThrow(/allowlist/)
     expect(() => assertArchivePath('files/../../escape.mp3')).toThrow(/Unsafe/)
   })

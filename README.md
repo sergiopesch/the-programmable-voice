@@ -7,8 +7,8 @@ An interactive, evidence-led digital book about the material history of sound, m
 ## The edition
 
 - A prologue, 30 long-form chapters, a six-mode Sound Laboratory and four companion leaves.
-- More than 25,000 authored words, organised in layers for first-time readers, students and audio specialists.
-- 205 unique primary records, scholarly works, standards, archives and explicitly dated vendor documents, cited at claim level.
+- More than 25,000 authored words, written for first-time readers, students and audio specialists, with technical detail kept beside its evidence.
+- More than 200 unique primary records, scholarly works, standards, archives and explicitly dated vendor documents, cited beside the evidential passage they support.
 - A code-drawn artefact atlas and scientific figures with text alternatives; generated concept art is never used as historical evidence.
 - A hardback-inspired cover, warm-paper reading spreads, keyboard page turns, contents, search, adjustable text, reduced motion and a complete no-JavaScript manuscript.
 
@@ -16,7 +16,7 @@ An interactive, evidence-led digital book about the material history of sound, m
 
 Narration is a fixed audio edition, not a live voice session. The generation script sends each approved manuscript passage to the OpenAI Speech API once, trims only boundary silence, normalises it to the edition’s pinned loudness target, writes an MP3 addressed by the checksum of its final audio bytes, and performs pacing, loudness, true-peak, silence, checksum and full-decode checks. Playback fetches approved static files; it never asks a model to recreate the voice.
 
-The provisional configuration uses pinned `gpt-4o-mini-tts-2025-12-15` output with the `shimmer` voice and detailed direction for one mature, warm modern Southern British woman’s reading. Because a model and voice name alone cannot establish gender presentation, accent or identity consistency, an equal-text candidate comparison and then a representative listening pilot are hard gates before full generation. The interface clearly discloses that the recording is AI-generated. A partial or subset-run manifest is rejected, so readers cannot accidentally hear a mixture of approved and missing passages.
+The production configuration uses pinned `gpt-4o-mini-tts-2025-12-15` output with the `coral` voice and detailed direction for one mature, warm modern Southern British woman’s reading. `coral` is the current editorial choice from the equal-text candidate comparison; because a model and voice name alone cannot establish gender presentation, accent or identity consistency, human comparison approval and then a representative listening pilot remain hard gates before full generation. The interface clearly discloses that the recording is AI-generated. A partial or subset-run manifest is rejected, so readers cannot accidentally hear a mixture of approved and missing passages.
 
 The production key is required only while producing an edition and is never bundled, deployed to the browser or needed during playback.
 
@@ -49,7 +49,17 @@ If the provisional speaker has not yet been accepted, generate the three-voice, 
 npm run narration:vercel-job -- --comparison
 ```
 
-Set the selected built-in voice in `src/data/narrationEdition.ts` before generating the representative pilot. Reject all three and revise the comparison if none meets the brief; technical checks cannot certify accent or gender presentation.
+Record the human decision. Both outcomes require a complete comparison on headphones and a phone speaker. Selecting a candidate additionally requires every accent, speaker and delivery confirmation; rejecting all candidates makes none of those claims:
+
+```bash
+npm run narration:approve-comparison -- --approver="Editor name" --select=B --confirm-listened --confirm-device-check --confirm-british-accent --confirm-adult-woman --confirm-warmth --confirm-cadence
+# Or, if none is acceptable:
+npm run narration:approve-comparison -- --approver="Editor name" --reject-all --confirm-listened --confirm-device-check
+```
+
+The receipt at `.narration-work/british-voice-comparison/approval.json` binds the pinned model, exact instructions and voice profile, output format, normalisation, exact comparison passage, and the ordered candidate audio checksums and technical QC. It deliberately excludes the provisional production voice and the rest of the manuscript: selecting B or C remains valid while `narrationEditionConfiguration.voice` is changed to that selected voice, and an unrelated manuscript edit does not manufacture a new listening decision. A changed comparison passage, voice direction, model, candidate file or QC record does invalidate it. The approval command upgrades the original schema-one comparison manifest in place after verifying its original configuration and every audio checksum, so the existing candidates do not need to be regenerated merely to add the gate. Generating a new comparison removes the older receipt.
+
+Set the selected built-in voice in `src/data/narrationEdition.ts` before generating the representative pilot. Both the local disposable-job preflight and the remote generator require the receipt to select that exact current voice before any Speech API request. If all three were rejected, revise and regenerate the comparison; technical checks cannot certify accent or gender presentation.
 
 First generate the representative voice pilot:
 
@@ -93,12 +103,13 @@ Passage-sized files preserve exact paragraph highlighting and fine-grained saved
 ## Verify
 
 ```bash
+npm run check:app
 npm run check
 npx playwright install chromium
 npm run test:e2e
 ```
 
-`npm run check` runs linting, unit tests, full local FFmpeg media verification, TypeScript and the application build. Vercel’s ordinary `npm run build` uses `narration:verify-build`, which rechecks the approved release identity and every static-file checksum without assuming FFmpeg exists in the remote build image. Before narration production, `npm run build:app` is available for application-only QA. The browser suite covers the cover and page flow, static narration lifecycle, responsive layouts, accessibility, themes, evidence dialogs, laboratory controls and the no-JavaScript edition.
+`npm run check:app` is the complete pre-narration gate: linting, unit and job tests, TypeScript and the application build. `npm run check` adds full local FFmpeg verification of a complete human-approved recorded edition and is therefore the release gate. Vercel’s ordinary `npm run build` uses `narration:verify-build`, which rechecks the approved release identity and every static-file checksum without assuming FFmpeg exists in the remote build image. `npm run build:app` remains available for a faster application-only build. The browser suite covers the cover and page flow, static narration lifecycle, responsive layouts, accessibility, themes, evidence dialogs, laboratory controls and the no-JavaScript edition.
 
 ## Deploy to Vercel
 

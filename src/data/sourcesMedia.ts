@@ -146,14 +146,14 @@ export const mediaSources: Source[] = [
   },
   {
     id: 'med-hooke-acoustic',
-    author: 'Robert Hooke; cited in Robert Willis',
-    year: '1667; discussed 1830',
-    title: 'On the Vowel Sounds, and on Reed-Organ Pipes',
-    publication: 'Transactions of the Cambridge Philosophical Society 3',
+    author: 'Robert Hooke',
+    year: '1665',
+    title: 'Micrographia — The Preface',
+    publication: 'London: Jo. Martyn and Ja. Allestry; EEBO transcription, University of Michigan Library Digital Collections',
     type: 'primary document',
-    url: 'https://archive.org/details/transactionsofca03camb',
+    url: 'https://quod.lib.umich.edu/e/eebo/A44323.0001.001/1:6?rgn=div1&view=fulltext',
     note:
-      'Willis quotes Hooke’s seventeenth-century report of conveying sound along a distended wire. It is evidence for mechanical sound transmission, not an electrical telephone.',
+      'Primary text in which Hooke reports propagating sound over a considerable distance through a distended wire, including a wire bent through many angles. It supports solid-borne sound transmission and hearing-extension ideas, not a cup-and-string telephone, electrical transmission, recording or a clearly documented demonstration of intelligible speech.',
   },
   {
     id: 'med-morse-patent',
@@ -873,13 +873,24 @@ export const mediaSources: Source[] = [
   {
     id: 'med-reeves-pcm-patent',
     author: 'Alec Harley Reeves',
-    year: '1942; filed 1938',
+    year: 'French priority 1938; US filing 1939; grant 1942',
     title: 'Electric Signaling System, US Patent 2,272,070',
     publication: 'United States Patent Office',
     type: 'primary document',
     url: 'https://patents.google.com/patent/US2272070A/en',
     note:
-      'Primary patent describing pulse-code modulation. The US grant and filing dates should not be collapsed, and later digital audio required separate advances in conversion, storage and coding.',
+      'Primary patent describing pulse-code modulation. It claims French priority dated 3 October 1938, records a US filing on 22 November 1939 and was granted on 3 February 1942. Later digital audio required separate advances in conversion, storage and coding.',
+  },
+  {
+    id: 'med-luke-sampling-history',
+    author: 'Hans Dieter Lüke',
+    year: '1999',
+    title: 'The Origins of the Sampling Theorem',
+    publication: 'IEEE Communications Magazine 37(4)',
+    type: 'peer-reviewed research',
+    url: 'https://doi.org/10.1109/35.755459',
+    note:
+      'Historical review tracing the reconstruction theorem through contributors including Whittaker, Kotelnikov and Shannon. It guards against naming one universal inventor while leaving the theorem’s engineering conditions to the cited technical sources.',
   },
   {
     id: 'med-nyquist-telegraphy',
@@ -915,6 +926,17 @@ export const mediaSources: Source[] = [
       'Foundational analysis of quantisation error spectra. Treating error as simple white noise is a model with signal and converter conditions, not a universal physical truth.',
   },
   {
+    id: 'med-stuart-craven-dither',
+    author: 'J. Robert Stuart and Peter G. Craven',
+    year: '2019',
+    title: 'The Gentle Art of Dithering',
+    publication: 'Journal of the Audio Engineering Society 67(5)',
+    type: 'peer-reviewed research',
+    url: 'https://secure.aes.org/forum/pubs/journal/?elib=20457',
+    note:
+      'Open-access tutorial and technical review of quantisation error, additive and subtractive dither and noise shaping. Dither changes the statistical character of error and adds noise; it does not recover arbitrary information removed elsewhere in a signal chain.',
+  },
+  {
     id: 'med-nsa-sigsaly',
     author: 'National Security Agency',
     year: '2021; maintained online',
@@ -935,6 +957,17 @@ export const mediaSources: Source[] = [
     url: 'https://www.computerhistory.org/revolution/computer-graphics-music-and-art/15/222',
     note:
       'Museum history of Mathews’s MUSIC programs and Bell Labs computer sound. Early synthesis was usually calculated offline, not played with present-day interactive latency.',
+  },
+  {
+    id: 'med-pierce-computer-music',
+    author: 'John R. Pierce',
+    year: '1993; republished 2018',
+    title: 'Digital Music, Digital Stimuli',
+    publication: 'Technology, Musical Perception, and the Composer; College Music Society',
+    type: 'scholarly history',
+    url: 'https://www.music.org/index.php?Itemid=3665&id=2674&option=com_content&view=article',
+    note:
+      'First-person Bell Labs account stating that Max Mathews wrote the compiler and that Newman Guttman composed In the Silver Scale, played on or about 17 May 1957. A retrospective date is not a substitute for the surviving programme and technical papers.',
   },
   {
     id: 'med-mathews-science',
@@ -1240,8 +1273,8 @@ export const mediaSources: Source[] = [
     title: 'Web Audio API',
     publication: 'W3C Recommendation',
     type: 'standard',
-    url: 'https://www.w3.org/TR/webaudio/',
+    url: 'https://www.w3.org/TR/2021/REC-webaudio-20210617/',
     note:
-      'Normative browser audio-processing model used by the local laboratory. It defines interfaces and signal flow, not the calibration, fidelity or safety of a reader’s loudspeakers, headphones or room.',
+      'Dated 17 June 2021 Recommendation defining the browser audio-processing model used by the local laboratory. It defines interfaces and signal flow, not the calibration, fidelity or safety of a reader’s loudspeakers, headphones or room.',
   },
 ]

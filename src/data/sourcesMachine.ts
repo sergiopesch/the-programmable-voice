@@ -406,13 +406,13 @@ export const machineSources: Source[] = [
   {
     id: 'mac-w3c-media',
     author: 'W3C Accessible Platform Architectures Working Group',
-    year: '2025',
+    year: '2015',
     title: 'Media Accessibility User Requirements',
     publication: 'W3C Working Group Note',
     type: 'official documentation',
     url: 'https://www.w3.org/TR/media-accessibility-reqs/',
     note:
-      'Requirements analysis for captions, transcripts, description, sign-language presentation and user customisation. It explains why no single audio or text rendering serves every access need.',
+      'Working Group Note dated 3 December 2015 cataloguing user requirements for captions, transcripts, description, sign-language presentation and customisation. It is explicitly not a normative baseline for user agents or authoring tools.',
   },
   {
     id: 'mac-who-hearing',
@@ -516,14 +516,14 @@ export const machineSources: Source[] = [
       'Voluntary, use-case-sensitive framework organised around Govern, Map, Measure and Manage. It supplies risk-management outcomes rather than certifying any model or defining a product architecture.',
   },
   {
-    id: 'mac-webauthn3',
+    id: 'mac-webauthn2',
     author: 'W3C Web Authentication Working Group',
-    year: '2026',
-    title: 'Web Authentication: An API for Accessing Public Key Credentials — Level 3',
-    publication: 'W3C Candidate Recommendation Snapshot',
+    year: '2021',
+    title: 'Web Authentication: An API for Accessing Public Key Credentials — Level 2',
+    publication: 'W3C Recommendation',
     type: 'standard',
-    url: 'https://www.w3.org/TR/webauthn-3/',
+    url: 'https://www.w3.org/TR/2021/REC-webauthn-2-20210408/',
     note:
-      'Specification for scoped public-key credentials mediated by user agents and authenticators. Authentication can establish control of a credential; an application still has to decide whether a requested action is authorised and appropriate.',
+      'Stable Recommendation dated 8 April 2021 for scoped public-key credentials mediated by user agents and authenticators. Authentication can establish control of a credential; an application still has to decide whether a requested action is authorised and appropriate.',
   },
 ]

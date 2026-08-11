@@ -4,7 +4,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-disc-shellac',
     number: 11,
-    part: 'IV — Sound becomes an industry',
+    part: 'II — Trace, return and distance',
     title: 'Disc, shellac and mass copying',
     deck: 'The flat record did more than preserve a performance: it made one performance manufacturable by the thousand.',
     kind: 'chapter',
@@ -77,7 +77,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'The bargain of copying',
         text: 'Recording became a mass medium when a trace could be copied reliably. Fidelity helped, but repeatability, labels, factories, distribution and affordable playback created the cultural force.',
         label: 'Synthesis',
         citations: ['med-loc-gramophone', 'med-smithsonian-berliner'],
@@ -103,17 +103,17 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-before-hello',
     number: 12,
-    part: 'IV — Sound becomes an industry',
+    part: 'II — Trace, return and distance',
     title: 'Before “hello”',
     deck: 'Long before a telephone was a network, experimenters tried to make vibration survive distance.',
     kind: 'chapter',
-    era: '1667–1878',
+    era: '1665–1878',
     readingMinutes: 8,
     blocks: [
       {
         type: 'paragraph',
         label: 'Synthesis',
-        text: 'Pull a cord taut between two cups. Speak into one and the bottom trembles; along the cord, tension carries that motion to the other cup and back into air. The sound is faint and the line dislikes corners, slack and contact with other objects, yet the experience is startlingly direct. Your voice has not become a code. Its mechanical pattern has travelled through matter. Seventeenth-century accounts associated with Robert Hooke describe sending sound along a stretched wire, centuries before the electrical telephone acquired its familiar name.',
+        text: 'Pull a cord taut between two cups. Speak into one and the bottom trembles; along the cord, tension carries that motion to the other cup and back into air. The sound is faint and the line dislikes slack and contact with other objects, yet the experience is startlingly direct. Your voice has not become a code. Its mechanical pattern has travelled through matter. This familiar demonstration is an analogy, not a reconstruction of Robert Hooke’s apparatus. In the 1665 preface to Micrographia, Hooke reported that a “distended wire” carried sound over a considerable distance, even when bent through many angles. He did not describe an electrical telephone, a recorder or a clearly documented transmission of intelligible speech. The narrower claim is still remarkable: sound could propagate through a solid medium rather than through air alone.',
         citations: ['med-hooke-acoustic'],
       },
       {
@@ -164,7 +164,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Distance without storage',
         text: '“Who invented the telephone?” is several questions disguised as one. Ask whether you mean an idea, an acoustic device, electrical speech, a caveat, a patent, an intelligible experiment, a practical instrument or a network.',
         label: 'Contested history',
         citations: ['med-loc-telephone-priority', 'med-bell-patent'],
@@ -190,7 +190,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-telephone-network',
     number: 13,
-    part: 'IV — Sound becomes an industry',
+    part: 'II — Trace, return and distance',
     title: 'The telephone becomes a network',
     deck: 'Transmitters, operators, exchanges and etiquette turned an experiment between rooms into shared infrastructure.',
     kind: 'chapter',
@@ -263,7 +263,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'The network is people',
         text: 'A communication medium is never only its signal. Addressing, switching, labour, payment, etiquette and repair determine whose voice can arrive, how quickly and under whose control.',
         label: 'Our thesis',
         citations: ['med-nps-first-exchange', 'med-smg-telephone-users', 'med-smg-electrophone'],
@@ -289,7 +289,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-electric-studio',
     number: 14,
-    part: 'V — The mediated voice',
+    part: 'III — Presence becomes producible',
     title: 'Electricity enters the studio',
     deck: 'The microphone separated performance from the force required to cut a groove, making intimacy recordable.',
     kind: 'chapter',
@@ -356,7 +356,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Intimacy is engineered',
         text: 'A microphone does not merely preserve a voice. It creates a new listening distance, amplifying details that a public hall might lose and making quietness culturally powerful.',
         label: 'Our thesis',
         citations: ['med-wente-patent', 'med-smithsonian-crooning'],
@@ -382,7 +382,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-broadcast-voice',
     number: 15,
-    part: 'V — The mediated voice',
+    part: 'III — Presence becomes producible',
     title: 'The broadcast voice',
     deck: 'Radio made one unseen speaker present to a scattered public and taught institutions how authority should sound.',
     kind: 'chapter',
@@ -449,7 +449,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Who gets to sound public',
         text: 'Broadcasting scales presence, not reciprocity. Its characteristic power comes from making millions feel individually addressed while only a few control the live microphone.',
         label: 'Our thesis',
         citations: ['med-bbc-world-service', 'med-iwm-radio'],
@@ -475,7 +475,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-record-culture',
     number: 16,
-    part: 'V — The mediated voice',
+    part: 'III — Presence becomes producible',
     title: 'Vinyl becomes a culture',
     deck: 'The LP, the 45 and stereo made records into albums, singles, collections, instruments and rituals.',
     kind: 'chapter',
@@ -542,7 +542,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Repetition changes culture',
         text: 'A record is at once signal, manufactured object, artwork, commodity, memory and possible instrument. Debates about its “sound” become confused when those meanings are treated as one.',
         label: 'Our thesis',
         citations: ['med-loc-lp', 'med-iasa-equalisation', 'med-smithsonian-kool-herc'],
@@ -568,7 +568,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-tape-editable-time',
     number: 17,
-    part: 'V — The mediated voice',
+    part: 'III — Presence becomes producible',
     title: 'Tape makes time editable',
     deck: 'Magnetic recording turned an event into a strip that could be cut, copied, layered and revised.',
     kind: 'chapter',
@@ -588,7 +588,7 @@ export const mediaSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Primary document',
-        text: 'Valdemar Poulsen’s magnetic-recording patent, granted in the United States in 1900, described storing changing electrical signals as changing magnetisation in a moving medium. A record head turns current into a magnetic field; the passing coating retains a pattern of magnetic domains. On replay, that changing pattern induces a small electrical signal in a head. An erase head can randomise or overwrite the pattern before reuse. The carrier moves mechanically, but the inscription is invisible and need not be carved.',
+        text: 'Valdemar Poulsen’s magnetic-recording patent, granted in the United States in 1900, described storing changing electrical signals as changing magnetisation in a moving ferromagnetic carrier; early systems used steel wire. A record head turns current into a magnetic field, and the carrier retains remanent magnetisation. On replay, that changing pattern induces a small electrical signal in a head. A later erase system can randomise the old pattern with an alternating field, while recording over it writes another signal. Coated plastic tape belongs to the later Magnetophon lineage. The inscription is invisible and need not be carved.',
         citations: ['med-poulsen-patent', 'med-aes-magnetic-history'],
       },
       {
@@ -635,7 +635,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Time becomes editable',
         text: 'Tape made recording reversible before release. The master stopped being merely evidence of an event and became a workspace in which an event could be designed.',
         label: 'Our thesis',
         citations: ['med-aes-mullin', 'med-aes-les-paul-console'],
@@ -677,7 +677,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-electric-instrument',
     number: 18,
-    part: 'VI — Sound becomes computation',
+    part: 'III — Presence becomes producible',
     title: 'Electricity becomes an instrument',
     deck: 'Oscillators, tape and control voltage made sound itself a material for composition.',
     kind: 'chapter',
@@ -739,7 +739,7 @@ export const mediaSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Scholarly history',
-        text: 'Havana offers a different lesson in what a studio is. Unable to visit better-equipped centres abroad, Juan Blanco assembled a practice from three consumer-grade Silvertone tape decks bought locally, one oscillator and an inexpensive microphone. Neil Leonard’s technical history describes feedback, sound-on-sound dubbing, reversal and splicing. Without the variable-speed tape decks used in better-equipped studios, Blanco altered reel speed with his fingers. In Música para Danza, finished in 1961 and presented publicly in 1964, a one-bar sine-wave ostinato was dubbed four times at progressively lower speeds, creating layers with distinct pitch and tempo. The ingenuity should not romanticise scarcity: restricted access closed possibilities even as it provoked tactile solutions. UNT’s archive catalogues a five-minute, thirty-five-second recording and corroborates the work’s date and tape medium. Rather than naming a universal first, the piece shows electroacoustic modernism being built in Cuba through rhythmic counterpoint and exacting manual control.',
+        text: 'Havana offers a different lesson in what a studio can be. With three consumer tape decks, one oscillator and an inexpensive microphone, Juan Blanco built feedback, reversal, splicing and sound-on-sound dubbing into a practice of his own. Lacking variable-speed machines, he changed reel speed by hand. For Música para Danza, completed in 1961 and presented in 1964, a one-bar sine-wave pattern became four layers at progressively lower speeds. Scarcity closed possibilities; it also made exacting manual invention visible. The work places Cuban rhythmic thought inside electroacoustic modernism without turning Blanco into another solitary “first”.',
         citations: ['med-leonard-juan-blanco', 'med-unt-musica-para-danza'],
       },
       {
@@ -756,7 +756,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'A studio can be anywhere',
         text: 'Electronic music has two intertwined roots: generating a controllable signal and transforming recorded sound. Modern synthesis, sampling and effects continually recombine both.',
         label: 'Synthesis',
         citations: ['med-ina-grm', 'med-smithsonian-synth-oral-history'],
@@ -782,7 +782,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-counting-waveform',
     number: 19,
-    part: 'VI — Sound becomes computation',
+    part: 'IV — Sound becomes data',
     title: 'Counting a waveform',
     deck: 'Sampling and quantisation turned continuously changing sound into a sequence of numbers.',
     kind: 'chapter',
@@ -818,8 +818,8 @@ export const mediaSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Established science',
-        text: 'Sampling chooses moments at which to measure amplitude. For a signal limited to frequencies below a known bound, the sampling theorem gives conditions under which those measurements determine the continuous signal: the sampling rate must exceed twice the highest frequency present. That sentence is powerful and easily abused. Real microphones receive energy beyond the desired band, real filters have transition regions, clocks have error and finite recordings have boundaries. An anti-alias filter must restrict the input before sampling; otherwise higher frequencies can masquerade as lower ones.',
-        citations: ['med-nyquist-telegraphy', 'med-shannon-sampling'],
+        text: 'Sampling chooses moments at which to measure amplitude. The result often called the Nyquist–Shannon theorem belongs to a longer mathematical lineage that includes Whittaker and Kotelnikov. For a signal limited to frequencies below a known bound, it gives conditions under which samples determine the continuous signal: the sampling rate must exceed twice the highest frequency present. That sentence is powerful and easily abused. Real microphones receive energy beyond the desired band, real filters have transition regions, clocks have error and finite recordings have boundaries. An anti-alias filter must restrict the input before sampling; otherwise higher frequencies can masquerade as lower ones.',
+        citations: ['med-luke-sampling-history', 'med-nyquist-telegraphy', 'med-shannon-sampling'],
       },
       {
         type: 'figure',
@@ -833,12 +833,12 @@ export const mediaSections: BookSection[] = [
         type: 'paragraph',
         label: 'Established science',
         text: 'Quantisation follows sampling. A converter cannot emit every possible real number, so it maps each measurement to one of a finite set of levels. The difference is quantisation error. More bits provide more levels and, under suitable conditions, lower error; they do not increase the highest representable frequency. Dither—small, deliberately added noise—can decorrelate error from the programme and turn objectionable distortion into a steadier noise floor. It may seem perverse to add noise, but predictability can be more useful than a quieter pattern tied to the signal.',
-        citations: ['med-bennett-quantisation'],
+        citations: ['med-bennett-quantisation', 'med-stuart-craven-dither'],
       },
       {
         type: 'paragraph',
         label: 'Primary document',
-        text: 'Pulse-code modulation sends the quantised values as code words. Alec Reeves described such a system in patent filings made before the Second World War; his US patent was granted in 1942. PCM separates signal quality from the exact shape of every transmitted pulse. A repeater can decide which symbol arrived and regenerate a clean pulse, so modest analogue damage need not accumulate continuously along the route. If noise is severe enough to change a decision, however, the resulting error can be abrupt. Digital is robust within margins, not immune to physics.',
+        text: 'Pulse-code modulation sends the quantised values as code words. Alec Reeves claimed French priority on 3 October 1938, filed in the United States on 22 November 1939 and received the US patent on 3 February 1942. PCM separates signal quality from the exact shape of every transmitted pulse. A repeater can decide which symbol arrived and regenerate a clean pulse, so modest analogue damage need not accumulate continuously along the route. If noise is severe enough to change a decision, however, the resulting error can be abrupt. Digital is robust within margins, not immune to physics.',
         citations: ['med-reeves-pcm-patent'],
       },
       {
@@ -859,7 +859,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Counting preserves by choosing',
         text: 'Sampling rate locates measurements in time; bit depth provides amplitude choices. Neither is a percentage of “how much sound” survives, and neither alone determines audible quality.',
         label: 'Established science',
         citations: ['med-shannon-sampling', 'med-bennett-quantisation'],
@@ -885,7 +885,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-studio-software',
     number: 20,
-    part: 'VI — Sound becomes computation',
+    part: 'IV — Sound becomes data',
     title: 'The studio becomes software',
     deck: 'Computer music, digital recording, sampling, MIDI and the DAW moved more of the studio into editable instructions.',
     kind: 'chapter',
@@ -895,8 +895,8 @@ export const mediaSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Scholarly history',
-        text: 'At Bell Laboratories in 1957, Max Mathews used an IBM 704 and his MUSIC program to produce a seventeen-second composition. The machine did not respond like a keyboard. Instructions and numerical parameters became a batch job; computation produced a digital waveform that could later be converted to sound. The wait separated composing from hearing, but it proved a vast idea in miniature: one general-purpose computer could become many imagined instruments by changing software rather than rebuilding hardware.',
-        citations: ['med-max-mathews'],
+        text: 'At Bell Laboratories in 1957, Max Mathews wrote MUSIC I for an IBM 704; Newman Guttman used it to compose the seventeen-second In the Silver Scale. The machine did not respond like a keyboard. Instructions and numerical parameters became a batch job; computation produced a digital waveform that could later be converted to sound. The wait separated composing from hearing, but it proved a vast idea in miniature: one general-purpose computer could become many imagined instruments by changing software rather than rebuilding hardware.',
+        citations: ['med-max-mathews', 'med-pierce-computer-music'],
       },
       {
         type: 'heading',
@@ -952,7 +952,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'The session is a promise',
         text: 'A software studio does not abolish instruments, rooms or ears. It makes their relationships recallable, copyable and automatable—and therefore much easier to revise.',
         label: 'Our thesis',
         citations: ['med-mathews-science', 'med-daw-history'],
@@ -978,7 +978,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-disc-file-stream',
     number: 21,
-    part: 'VII — Sound on the network',
+    part: 'IV — Sound becomes data',
     title: 'The disc, file and stream',
     deck: 'The compact disc stabilised digital playback; compressed files and networks then detached listening from the carrier.',
     kind: 'chapter',
@@ -1045,7 +1045,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Access changes ownership',
         text: 'A disc is a carrier, a file is a copyable bitstream, and a stream is an ongoing service relationship. They can carry similar audio while giving the listener very different rights and dependencies.',
         label: 'Our thesis',
         citations: ['med-iec-cd', 'med-napster-opinion', 'med-itunes-launch'],
@@ -1071,7 +1071,7 @@ export const mediaSections: BookSection[] = [
   {
     id: 'media-voice-packets',
     number: 22,
-    part: 'VII — Sound on the network',
+    part: 'IV — Sound becomes data',
     title: 'Voice becomes packets',
     deck: 'Packet speech made timing, loss, codecs and buffering part of every internet conversation.',
     kind: 'chapter',
@@ -1160,7 +1160,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'The deadline shapes the voice',
         text: 'In packet voice, the network becomes an acoustic component. Timing policy, buffering and loss concealment can change a conversation even when the words and codec remain the same.',
         label: 'Our thesis',
         citations: ['med-rtp', 'med-webrtc'],

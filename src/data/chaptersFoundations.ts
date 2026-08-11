@@ -4,7 +4,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-disturbance-world',
     number: 1,
-    part: 'I — Before the signal',
+    part: 'I — Air, bodies and memory',
     title: 'A disturbance in the world',
     deck: 'Sound begins not as a thing, but as matter passing motion onwards.',
     kind: 'chapter',
@@ -70,7 +70,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'The first bargain',
         label: 'Synthesis',
         text: 'Sound is energy organised as change, not a substance poured from source to listener. Matter moves locally; a pattern travels. Every later medium—from string to groove to voltage to sample—will preserve some structure of that changing pattern and surrender something else.',
         citations: ['fdn-openstax-sound'],
@@ -86,7 +86,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-listening-body',
     number: 2,
-    part: 'I — Before the signal',
+    part: 'I — Air, bodies and memory',
     title: 'The listening body',
     deck: 'Hearing is a chain of transformations, while listening recruits a whole person.',
     kind: 'chapter',
@@ -152,7 +152,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'What listening adds',
         label: 'Our thesis',
         text: 'Hearing is transduction; listening is participation. A device may measure pressure accurately and still miss what a person is following, feeling or needing. Accessibility begins by admitting more than one legitimate route into a sound world.',
         citations: ['fdn-nidcd-hearing', 'fdn-glennie-hearing'],
@@ -168,7 +168,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-string-tension',
     number: 3,
-    part: 'I — Before the signal',
+    part: 'I — Air, bodies and memory',
     title: 'A string under tension',
     deck: 'A stretched string makes the bargains between length, mass, tension and pitch tangible.',
     kind: 'chapter',
@@ -240,7 +240,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'The hidden ratio',
         label: 'Synthesis',
         text: 'Pitch is not stored in one property. It emerges from a system: length, tension, mass, boundary conditions and coupling. The same systems lesson will return in every microphone, room, record player and voice model we meet.',
         citations: ['fdn-openstax-string'],
@@ -256,7 +256,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-rooms-membranes-resonances',
     number: 4,
-    part: 'I — Before the signal',
+    part: 'I — Air, bodies and memory',
     title: 'Rooms, membranes and resonances',
     deck: 'Boundaries do not merely contain sound; they select, return and reshape it.',
     kind: 'chapter',
@@ -323,7 +323,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'The room joins in',
         label: 'Synthesis',
         text: 'A boundary is an editor. It delays, attenuates, transmits and favours. The “same” voice in a tiled station, a carpeted bedroom and a stone chapel is three different acoustic signals before any microphone makes a choice.',
         citations: ['fdn-sabine-papers'],
@@ -339,7 +339,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-music-before-machines',
     number: 5,
-    part: 'II — Human instruments',
+    part: 'I — Air, bodies and memory',
     title: 'Music before machines',
     deck: 'Long before sound could be stored, people built time together with breath, bone, skin and string.',
     kind: 'chapter',
@@ -421,7 +421,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'What performance keeps',
         label: 'Synthesis',
         text: 'Music did not wait for a storage medium. It lived in bodies, materials, places and repeated practice. An artefact preserves possibility; a tradition preserves ways of making the possibility real.',
         citations: ['fdn-british-museum-instruments', 'fdn-unesco-oral'],
@@ -437,7 +437,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-instrument-we-grow',
     number: 6,
-    part: 'II — Human instruments',
+    part: 'I — Air, bodies and memory',
     title: 'The instrument we grow',
     deck: 'Voice is breath made periodic, noisy and resonant by living tissue under exquisite control.',
     kind: 'chapter',
@@ -504,7 +504,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'A living instrument',
         label: 'Our thesis',
         text: 'A voice is neither “just a waveform” nor a mystical fingerprint. It is a skilled, changing act produced by a body in a culture. Any machine that captures or imitates it touches physiology, identity and relationship at once.',
         citations: ['fdn-nidcd-voice', 'fdn-source-filter'],
@@ -520,7 +520,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-memory-without-recording',
     number: 7,
-    part: 'II — Human instruments',
+    part: 'I — Air, bodies and memory',
     title: 'Memory without recording',
     deck: 'A living tradition survives through people who repeat, vary, correct and renew it.',
     kind: 'chapter',
@@ -629,7 +629,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Memory’s condition',
         label: 'Synthesis',
         text: 'Memory is not failed recording. A living tradition stores relationships, rules and possibilities across people. Recording will preserve otherwise unreachable detail, but it will also tempt later listeners to treat one performance as the tradition itself.',
         citations: ['fdn-unesco-oral', 'fdn-parry-collection'],
@@ -645,18 +645,46 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-machines-imagine-speech',
     number: 8,
-    part: 'III — Sound leaves a trace',
+    part: 'II — Trace, return and distance',
     title: 'Machines imagine speech',
     deck: 'Long before software, mechanical experimenters separated voice into power, excitation and shape.',
     kind: 'chapter',
-    era: '1779–1791',
-    readingMinutes: 8,
+    era: 'Ancient traditions–1791',
+    readingMinutes: 10,
     blocks: [
       {
         type: 'paragraph',
         label: 'Synthesis',
         text: 'A hand presses a bellows. Air enters a small chamber, a reed begins to rasp, and the operator squeezes a leather passage while covering and uncovering openings with the fingers. Something between a toy trumpet, an anatomical model and a stranger’s voice emerges. The sound is limited and uncanny, but the room hears an impossible separation: speech-like form without lungs, larynx, tongue or intention of its own.',
         citations: ['fdn-kempelen-machine', 'mac-klatt1987'],
+      },
+      {
+        type: 'heading',
+        text: 'Before the bellows: speech becomes analysable',
+      },
+      {
+        type: 'paragraph',
+        label: 'Scholarly history',
+        text: 'In traditions of Vedic recitation, preserving a text meant analysing the act of saying it. Across the Prātiśākhya and Śikṣā texts, scholars described sound units, accent, quantity and junction, and distinguished the active articulator from the place it approached or touched. The surviving treatises do not speak with one voice: their disagreements may preserve differences among Vedic schools. Precision grew through disciplined listening and teaching, not through a single inventor.',
+        citations: ['fdn-allen-ancient-india'],
+      },
+      {
+        type: 'paragraph',
+        label: 'Scholarly history',
+        text: 'From the eighth century onward, Arabic scholars working across grammar, lexicography and Qurʾānic interpretation made speech similarly physical. In a cumulative tradition, sounds were ordered and compared by where they formed—from the throat towards the lips—and by features including closure, voicing and nasality. Later focused treatises extended questions already present in broader grammatical works. This was an archive of argument across centuries, not the achievement of one name.',
+        citations: ['fdn-versteegh-arabic-tradition', 'fdn-bakalla-arab-phonetics', 'fdn-owens-arabic-grammar'],
+      },
+      {
+        type: 'paragraph',
+        label: 'Scholarly history',
+        text: 'Chinese phonological scholarship took another route: it mapped relationships among characters and reading traditions. Fanqie indicated one character’s pronunciation through two others; the Qieyun of 601 organised characters by tone and rhyme, and later rhyme tables turned relationships among initials, finals and tones into visible grids. These are records of analysis, not captured sound. Nor should the Qieyun be read as a simple transcript of one city’s speech: it is generally analysed as a composite standard, while its exact relationship to spoken varieties remains debated.',
+        citations: ['fdn-tam-chinese-language', 'fdn-branner-rime-tables', 'fdn-shen-chinese-phonology'],
+      },
+      {
+        type: 'paragraph',
+        label: 'Scholarly history',
+        text: 'These paths did not form a neat relay race. In 1648, a London book concerned with communication and education for deaf people gave mechanical imagination a startling turn. John Bulwer documented signed practices and described speech as bodily motion; he also speculated that a puppet might pronounce a word by imitating the instruments of voice. The same pages repeat legendary talking heads, so they document an ambition, not a working machine—and Bulwer did not invent sign language. John Wallis and William Holder later offered different English schemes within oralist teaching projects whose assumptions remain contested. If speech could be taken apart into bodily operations, could those operations be rebuilt?',
+        citations: ['fdn-oates-speaking-hands', 'fdn-bulwer-philocophus', 'fdn-wallis-loquela', 'fdn-holder-elements-speech'],
       },
       { type: 'heading', text: 'The plain question: what is the least machinery that can sound like speech?' },
       {
@@ -674,8 +702,8 @@ export const foundationSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Synthesis',
-        text: 'In 1779 Christian Gottlieb Kratzenstein presented resonators designed to produce five sustained vowel sounds when excited by reeds. They did not converse; their value was analytical. If different cavity shapes turned broadly similar excitation into recognisably different vowels, then articulation could be investigated through acoustics rather than treated as an indivisible gift of life. Dennis Klatt’s historical review places these devices among the mechanical ancestors of text-to-speech, while cautioning us through hindsight: a vowel demonstration is not yet language.',
-        citations: ['mac-klatt1987'],
+        text: 'In response to a 1780 St Petersburg Academy prize question, Christian Gottlieb Kratzenstein designed resonators that produced five sustained vowel sounds when excited by reeds; his account appeared in 1781. They did not converse. Their value was analytical: different cavity shapes could turn broadly similar excitation into recognisably different vowels. Articulation had become something acoustics could test rather than an indivisible gift of life. A vowel demonstration, however ingenious, was not yet language.',
+        citations: ['fdn-kratzenstein2011', 'mac-klatt1987'],
       },
       {
         type: 'paragraph',
@@ -718,7 +746,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'A voice assembled',
         label: 'Our thesis',
         text: 'Synthesis begins by choosing a model of what matters. Kempelen did not reproduce a body; he reproduced enough causal roles for a listener to hear speech. Every later synthetic voice makes the same kind of wager at a different scale.',
         citations: ['fdn-kempelen-machine', 'fdn-source-filter'],
@@ -734,7 +762,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-sound-draws-itself',
     number: 9,
-    part: 'III — Sound leaves a trace',
+    part: 'II — Trace, return and distance',
     title: 'Sound draws itself',
     deck: 'The first durable records of airborne sound were made to be seen, not heard.',
     kind: 'chapter',
@@ -808,7 +836,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Trace without return',
         label: 'Synthesis',
         text: 'Recording and playback are separate inventions. Capture chooses a durable representation; playback builds a trustworthy inverse path. Confusing them erases Scott’s achievement and obscures what Edison solved next.',
         citations: ['fdn-scott-loc', 'fdn-edison-patent'],
@@ -824,7 +852,7 @@ export const foundationSections: BookSection[] = [
   {
     id: 'fdn-tinfoil-wax-cylinder',
     number: 10,
-    part: 'III — Sound leaves a trace',
+    part: 'II — Trace, return and distance',
     title: 'Tinfoil, wax and cylinder',
     deck: 'Playback turned a trace into an encounter, then wax made the encounter repeatable enough to travel.',
     kind: 'chapter',
@@ -896,7 +924,7 @@ export const foundationSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Return becomes possible',
         label: 'Our thesis',
         text: 'Playback makes absence feel present, but no medium returns an untouched past. It creates a new event from a selective, ageing trace. The duty to preserve a voice therefore includes the duty to preserve its provenance, limits and human authority.',
         citations: ['fdn-edison-patent', 'fdn-loc-passamaquoddy'],

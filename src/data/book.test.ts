@@ -30,14 +30,14 @@ describe('editorial data contract', () => {
     for (const section of companions) expect(section.title).not.toMatch(/^[A-D] — /)
   })
 
-  it('resolves every claim-level citation', () => {
+  it('resolves every evidential-passage citation', () => {
     const cited = sections.flatMap((section) => section.blocks.flatMap(blockSourceIds))
     expect(cited.length).toBeGreaterThan(600)
     expect([...new Set(cited)].filter((id) => !sourceById.has(id))).toEqual([])
   })
 
   it('keeps the evidence register stable and linkable', () => {
-    expect(sources).toHaveLength(205)
+    expect(sources).toHaveLength(220)
     expect(new Set(sources.map((source) => source.id)).size).toBe(sources.length)
     expect(new Set(sources.map((source) => source.url.replace(/\/$/, '').toLocaleLowerCase())).size).toBe(sources.length)
     const cited = new Set(sections.flatMap((section) => section.blocks.flatMap(blockSourceIds)))
@@ -48,6 +48,23 @@ describe('editorial data contract', () => {
       expect(source.title.trim(), source.id).not.toBe('')
       expect(source.note?.trim(), source.id).not.toBe('')
     }
+  })
+
+  it('defines every visible epistemic label in the evidence ledger', () => {
+    const method = sections.find((section) => section.id === 'evidence-method')
+    const legend = method?.blocks.find(
+      (block) => block.type === 'list' && block.title === 'Labels used in this edition',
+    )
+    expect(legend?.type).toBe('list')
+    if (!legend || legend.type !== 'list') return
+
+    const defined = new Set(legend.items.map((item) => item.split(' — ')[0]))
+    const used = new Set(
+      sections.flatMap((section) =>
+        section.blocks.flatMap((block) => ('label' in block && block.label ? [block.label] : [])),
+      ),
+    )
+    expect(defined).toEqual(used)
   })
 
   it('states the future architecture with explicit epistemic boundaries', () => {

@@ -55,7 +55,7 @@ export function assertSafeImportPath(relativePath: string) {
 
   const audioPath = /^public\/audio\/narration\/edition-[a-z0-9-]+\/[a-z0-9][a-z0-9-]*-[a-f0-9]{64}\.mp3$/
   const metadataPath = /^\.narration-work\/(generation-state|pilot-manifest|pilot-approval|candidate-manifest)\.json$/
-  const comparisonPath = /^\.narration-work\/british-voice-comparison\/(?:manifest\.json|candidate-[a-z]-[a-f0-9]{64}\.mp3)$/
+  const comparisonPath = /^\.narration-work\/british-voice-comparison\/(?:manifest\.json|approval\.json|candidate-[a-z]-[a-f0-9]{64}\.mp3)$/
   if (!audioPath.test(relativePath) && !metadataPath.test(relativePath) && !comparisonPath.test(relativePath)) {
     throw new Error(`Narration import path is outside the allowlist: ${relativePath}.`)
   }

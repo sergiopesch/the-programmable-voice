@@ -1,7 +1,7 @@
 export const narrationEditionConfiguration = {
   edition: '2026.1',
   model: 'gpt-4o-mini-tts-2025-12-15',
-  voice: 'shimmer',
+  voice: 'coral',
   responseFormat: 'mp3',
   voiceProfile: 'one mature adult woman; warm, thoughtful and intimate; natural modern Standard Southern British English',
   targetWordsPerMinute: 140,
@@ -41,6 +41,16 @@ export const narrationBritishVoiceComparison = {
 
 export const narrationDisclosure = 'This recorded narration is AI-generated, not a human voice. It was generated once for this edition and is never recreated during playback.'
 export const narrationApprovalChecklistVersion = '2026.2'
+export const narrationComparisonApprovalChecklistVersion = '2026.1'
+
+export const narrationComparisonApprovalConfirmations = [
+  { flag: '--confirm-listened', label: 'all equal-text comparison candidates listened to in full' },
+  { flag: '--confirm-device-check', label: 'all candidates compared on both headphones and a phone speaker' },
+  { flag: '--confirm-british-accent', label: 'the selected candidate is consistently natural contemporary Southern British English' },
+  { flag: '--confirm-adult-woman', label: 'the selected candidate presents as one mature adult woman' },
+  { flag: '--confirm-warmth', label: 'the selected candidate is warm, intimate and suitable for literary documentary narration' },
+  { flag: '--confirm-cadence', label: 'the selected candidate has a measured, lucid and non-theatrical cadence' },
+] as const
 
 export const narrationEditionAssetDirectory = `edition-${narrationEditionConfiguration.edition.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')}`
 
@@ -55,6 +65,10 @@ export const narrationPilotPassageIds = [
   'passage:fdn-string-tension:block-6-paragraph',
   'passage:fdn-music-before-machines:block-4-paragraph',
   'passage:fdn-memory-without-recording:block-8-paragraph',
+  'passage:fdn-machines-imagine-speech:block-2-paragraph',
+  'passage:fdn-machines-imagine-speech:block-3-paragraph',
+  'passage:fdn-machines-imagine-speech:block-4-paragraph',
+  'passage:fdn-machines-imagine-speech:block-5-paragraph',
   'passage:fdn-tinfoil-wax-cylinder:block-8-paragraph',
   'passage:media-tape-editable-time:block-2-paragraph',
   'passage:media-counting-waveform:block-0-paragraph',
@@ -77,6 +91,7 @@ export const narrationPassageReadingNotes: Readonly<Record<string, string>> = {
   'passage:media-counting-waveform:block-2-paragraph': 'Pronounce Joseph Fourier with Fourier as FOO-ree-ay.',
   'passage:media-counting-waveform:block-3-paragraph': 'Pronounce Fourier as FOO-ree-ay.',
   'passage:media-counting-waveform:block-10-paragraph': 'Pronounce SIGSALY as sig-SAL-ee, as a spoken name rather than separate letters.',
+  'passage:media-studio-software:block-0-paragraph': 'Read MUSIC I as “Music One”, IBM 704 as “I-B-M seven-oh-four”, and In the Silver Scale as the title of the piece.',
   'passage:chronology:block-0-timeline-item-2-year': 'Pronounce Mersenne: mehr-SENN.',
   'passage:chronology:block-0-timeline-item-8-year': 'Pronounce Poulsen: POWL-sen.',
 }

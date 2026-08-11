@@ -80,11 +80,11 @@ describe('book narration units', () => {
       text: 'The Programmable Voice',
     })
     expect(bookNarrationUnits.at(-1)).toEqual({
-      id: 'narration:trust-after-voice:block-4-callout-text',
+      id: 'narration:trust-after-voice:block-9-list-item-8',
       sectionId: 'trust-after-voice',
-      targetId: 'narration-trust-after-voice-block-4',
-      kind: 'callout-text',
-      text: 'Voice is an interface, not authority. Warmth can invite; it cannot authenticate. Fluency can clarify; it cannot consent. Memory can assist; it cannot own. A system worthy of trust makes it easy to know which of those things is happening now.',
+      targetId: 'narration-trust-after-voice-block-9-item-8',
+      kind: 'list-item',
+      text: 'Owner and review — documentary team; 11 August 2027.',
     })
 
     for (const unit of bookNarrationUnits) {

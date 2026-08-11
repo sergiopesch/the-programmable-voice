@@ -5,6 +5,7 @@ export default defineConfig({
     environment: 'node',
     include: [
       'scripts/narration-job-lib.test.ts',
+      'scripts/narration-comparison-contract.test.ts',
       'scripts/narration-vercel-job.test.ts',
     ],
   },

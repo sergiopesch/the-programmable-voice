@@ -26,6 +26,7 @@ import {
   type NarrationPilotManifest,
   type NarrationTechnicalQc,
 } from '../src/lib/narrationRelease'
+import { requireSelectedNarrationComparison } from './narration-comparison-contract'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -393,6 +394,7 @@ async function main() {
   if (selected.length === 0) throw new Error('No narration passages matched the requested scope.')
   for (const passage of selected) if (passage.text.length > 4096) throw new Error(`${passage.id} exceeds the Speech API 4,096-character limit.`)
 
+  await requireSelectedNarrationComparison(projectRoot)
   const configurationHash = sha256(JSON.stringify(configuration))
   const { manuscriptHash } = manuscriptIdentity(configurationHash)
   const pilotProfileHash = pilot ? '' : await requireApprovedPilot(configurationHash, manuscriptHash)

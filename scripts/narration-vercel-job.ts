@@ -17,10 +17,19 @@ import { bookNarrationPassages } from '../src/lib/narration'
 import {
   narrationPilotApprovalIsComplete,
   narrationPilotProfileMaterial,
+  type NarrationComparisonManifest,
   type NarrationManifestEntry,
   type NarrationPilotApproval,
   type NarrationPilotManifest,
 } from '../src/lib/narrationRelease'
+import {
+  assertNarrationComparisonManifestMatchesCurrent,
+  narrationComparisonApprovalName,
+  narrationComparisonDirectory,
+  narrationComparisonManifestName,
+  removeNarrationComparisonApproval,
+  requireSelectedNarrationComparison,
+} from './narration-comparison-contract'
 import {
   assertArchivePath,
   assertSafeImportPath,
@@ -361,6 +370,15 @@ async function fullPrerequisiteProblems(root = projectRoot) {
   return problems
 }
 
+async function comparisonPrerequisiteProblems(root = projectRoot) {
+  try {
+    await requireSelectedNarrationComparison(root)
+    return []
+  } catch (error) {
+    return [error instanceof Error ? error.message : 'British voice comparison approval is unavailable.']
+  }
+}
+
 async function copyFileIntoStage(source: string, destination: string, allowMissing = false) {
   let stat
   try {
@@ -375,7 +393,25 @@ async function copyFileIntoStage(source: string, destination: string, allowMissi
   return true
 }
 
-async function copyNarrationInputs(sourceRoot: string, stageRoot: string) {
+async function copyNarrationComparisonInputs(sourceRoot: string, stageRoot: string) {
+  const { manifest } = await requireSelectedNarrationComparison(sourceRoot)
+  const relativePaths = [
+    `${narrationComparisonDirectory}/${narrationComparisonManifestName}`,
+    `${narrationComparisonDirectory}/${narrationComparisonApprovalName}`,
+    ...manifest.candidates.map(({ filename }) => `${narrationComparisonDirectory}/${filename}`),
+  ]
+  for (const relativePath of relativePaths) {
+    assertSafeImportPath(relativePath)
+    const sourcePath = path.join(sourceRoot, relativePath)
+    const bytes = new Uint8Array(await fs.readFile(sourcePath))
+    if (relativePath.endsWith('.json') && (containsCredentialLikeMaterial(bytes) || containsLikelyStagingSecret(bytes))) {
+      throw new Error(`Credential-like material detected in narration comparison input ${relativePath}.`)
+    }
+    await copyFileIntoStage(sourcePath, path.join(stageRoot, relativePath))
+  }
+}
+
+async function copyNarrationInputs(sourceRoot: string, stageRoot: string, includeComparison = false) {
   const referencedAudio = new Map<string, string>()
   for (const name of metadataNames) {
     const sourcePath = path.join(sourceRoot, '.narration-work', name)
@@ -413,6 +449,7 @@ async function copyNarrationInputs(sourceRoot: string, stageRoot: string) {
     if (sha256(bytes) !== expectedHash) throw new Error(`Narration input checksum failed for ${relativePath}.`)
     await copyFileIntoStage(sourcePath, path.join(stageRoot, relativePath))
   }
+  if (includeComparison) await copyNarrationComparisonInputs(sourceRoot, stageRoot)
 }
 
 function repositoryPathIsExcluded(relativePath: string) {
@@ -457,7 +494,7 @@ async function stageRepository(stageRoot: string, options: JobOptions) {
 
   await copyFileIntoStage(canonicalLinkPath, path.join(stageRoot, '.vercel/project.json'))
   await atomicWrite(path.join(stageRoot, 'narration-job-project.json'), `${JSON.stringify(canonicalProject)}\n`)
-  await copyNarrationInputs(projectRoot, stageRoot)
+  await copyNarrationInputs(projectRoot, stageRoot, options.mode !== 'comparison')
   await atomicWrite(path.join(stageRoot, '.vercelignore'), `${temporaryVercelIgnoreEntries.join('\n')}\n`)
 
   const packagePath = path.join(stageRoot, 'package.json')
@@ -520,34 +557,6 @@ interface ExportPassageManifest {
   }>
 }
 
-interface BritishVoiceComparisonManifest {
-  schemaVersion: number
-  comparisonId: string
-  edition: string
-  model: string
-  configurationHash: string
-  manuscriptHash: string
-  provisionalProductionVoice: string
-  passage: { id: string; text: string; sha256: string }
-  candidates: Array<{
-    label: string
-    voice: string
-    filename: string
-    sha256: string
-    technicalQc: {
-      durationSeconds: number
-      wordsPerMinute: number
-      integratedLoudnessLufs: number
-      loudnessRangeLu: number
-      truePeakDbtp: number
-      sampleRateHz: number
-      channels: number
-      bitrateKbps: number
-      fullDecodePassed: boolean
-    }
-  }>
-}
-
 async function referencedAudioSources(mode: NarrationJobMode, manifest: ExportPassageManifest, root = projectRoot) {
   const expectedIds = mode === 'pilot' ? [...narrationPilotPassageIds] : bookNarrationPassages.map(({ id }) => id)
   if (
@@ -588,11 +597,12 @@ async function collectExportSources(mode: NarrationJobMode) {
     if (containsCredentialLikeMaterial(manifestBytes) || containsLikelyStagingSecret(manifestBytes)) {
       throw new Error('Credential-like material detected in the British voice comparison manifest.')
     }
-    const manifest = JSON.parse(Buffer.from(manifestBytes).toString('utf8')) as BritishVoiceComparisonManifest
+    const manifest = assertNarrationComparisonManifestMatchesCurrent(
+      JSON.parse(Buffer.from(manifestBytes).toString('utf8')) as NarrationComparisonManifest,
+    )
     const expectedCandidates = narrationBritishVoiceComparison.candidates
     if (
-      manifest.schemaVersion !== 1
-      || manifest.edition !== narrationEditionConfiguration.edition
+      manifest.edition !== narrationEditionConfiguration.edition
       || manifest.model !== narrationEditionConfiguration.model
       || manifest.provisionalProductionVoice !== narrationEditionConfiguration.voice
       || manifest.candidates.length !== expectedCandidates.length
@@ -808,12 +818,13 @@ async function validateDownloadedNarrationMetadata(
   const identity = await currentManuscriptIdentity()
   if (options.mode === 'comparison') {
     const manifestPath = '.narration-work/british-voice-comparison/manifest.json'
-    const manifest = await readValidatedJson<BritishVoiceComparisonManifest>(validated, manifestPath)
+    const manifest = assertNarrationComparisonManifestMatchesCurrent(
+      await readValidatedJson<NarrationComparisonManifest>(validated, manifestPath),
+    )
     const expectedCandidates = narrationBritishVoiceComparison.candidates
     const passage = bookNarrationPassages.find(({ id }) => id === narrationBritishVoiceComparison.passageId)
     if (
       !passage
-      || manifest.schemaVersion !== 1
       || !/^british-voice-comparison-\d{4}-\d{2}-\d{2}-[a-f0-9]{10}$/.test(manifest.comparisonId)
       || manifest.edition !== narrationEditionConfiguration.edition
       || manifest.model !== narrationEditionConfiguration.model
@@ -1029,7 +1040,9 @@ function assertOwnedTemporaryDirectory(temporaryRoot: string) {
 
 async function localJob(options: JobOptions) {
   await validateCanonicalLink()
-  const prerequisiteProblems = options.mode === 'full' ? await fullPrerequisiteProblems() : []
+  const comparisonProblems = options.mode === 'comparison' ? [] : await comparisonPrerequisiteProblems()
+  const pilotProblems = options.mode === 'full' ? await fullPrerequisiteProblems() : []
+  const prerequisiteProblems = [...comparisonProblems, ...pilotProblems]
   if (options.dryRun) {
     const stagedSourceFileCount = (await collectRepositoryStageInputs()).length
     line(JSON.stringify({
@@ -1040,13 +1053,14 @@ async function localJob(options: JobOptions) {
       packagedBuildOnlyDependencies: [`${ffmpegPackage}@${ffmpegPackageVersion}`, `${ffprobePackage}@${ffprobePackageVersion}`],
       chunkBytes: options.chunkBytes,
       stagedSourceFileCount,
-      fullPrerequisiteProblems: prerequisiteProblems,
+      comparisonPrerequisiteProblems: comparisonProblems,
+      fullPrerequisiteProblems: pilotProblems,
       aliasesChanged: false,
       keyExported: false,
     }, null, 2))
     return
   }
-  if (prerequisiteProblems.length > 0) throw new Error(`Full narration job is not ready:\n- ${prerequisiteProblems.join('\n- ')}`)
+  if (prerequisiteProblems.length > 0) throw new Error(`${options.mode === 'pilot' ? 'Narration pilot' : 'Full narration job'} is not ready:\n- ${prerequisiteProblems.join('\n- ')}`)
 
   const temporaryRoot = assertOwnedTemporaryDirectory(await fs.mkdtemp(path.join(os.tmpdir(), 'pv-narration-job-')))
   const stageRoot = path.join(temporaryRoot, 'stage')
@@ -1077,6 +1091,9 @@ async function localJob(options: JobOptions) {
     line(`Disposable deployment ready: ${deployment.id}. The canonical alias was not changed.`)
     const { manifest, validated } = await validateAndStageDownloads(downloadRoot, options, deployment.url, stageRoot)
     await importValidatedFiles(validated)
+    if (options.mode === 'comparison') {
+      await removeNarrationComparisonApproval(projectRoot)
+    }
     line(`Imported ${manifest.fileCount} verified ${options.mode} files into the workspace.`)
   } catch (error) {
     operationError = error
@@ -1157,7 +1174,9 @@ export {
   assertNoLiveSecretInFile,
   canonicalProject,
   cleanupDisposableDeployments,
+  comparisonPrerequisiteProblems,
   copyFileIntoStage,
+  copyNarrationComparisonInputs,
   copyNarrationInputs,
   deploymentArguments,
   deploymentListArguments,

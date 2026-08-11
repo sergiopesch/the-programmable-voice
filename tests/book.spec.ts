@@ -19,7 +19,7 @@ import {
   type NarrationManifest,
 } from '../src/lib/narrationRelease'
 
-const surfaces = ['#opening', '#media-tape-editable-time', '#sound-laboratory', '#representation-ladder']
+const surfaces = ['#opening', '#media-tape-editable-time', '#air-again', '#sound-laboratory', '#representation-ladder', '#evidence-method']
 const axeSurfaces = [
   '#opening',
   '#fdn-disturbance-world',
@@ -108,6 +108,34 @@ function approvedNarrationManifest() {
       confirmations: narrationReleaseApprovalConfirmations.map(({ label }) => label),
     },
   } satisfies NarrationManifest
+}
+
+async function installApprovedNarration(page: Page) {
+  const manifest = approvedNarrationManifest()
+  await page.route('**/audio/narration/manifest.json', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(manifest),
+  }))
+  await page.addInitScript(() => {
+    class TestAudio extends EventTarget {
+      static instances: TestAudio[] = []
+      preload = ''
+      src = ''
+      currentTime = 0
+      duration = 31
+      playbackRate = 1
+      paused = true
+      constructor() { super(); TestAudio.instances.push(this) }
+      play() { this.paused = false; queueMicrotask(() => this.dispatchEvent(new Event('loadedmetadata'))); return Promise.resolve() }
+      pause() { this.paused = true }
+      load() {}
+      removeAttribute(name: string) { if (name === 'src') this.src = '' }
+    }
+    Object.defineProperty(window, 'Audio', { configurable: true, value: TestAudio })
+    Object.defineProperty(window, '__narrationTestAudio', { configurable: true, value: TestAudio })
+  })
+  return manifest
 }
 
 test('opening communicates the book and begins the reading flow', async ({ page }) => {
@@ -248,8 +276,26 @@ test('the operating-system reduced-motion setting overrides a stored full-motion
   const context = await browser.newContext({ reducedMotion: 'reduce' })
   const page = await context.newPage()
   await page.addInitScript(() => localStorage.setItem('pv:preferences:v1', JSON.stringify({ version: 1, textSize: 'default', reduceMotion: false })))
-  await page.goto('/')
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced')
+  for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced')
+    const geometry = await page.locator('.opening__cover').evaluate((cover) => {
+      const coverBounds = cover.getBoundingClientRect()
+      const titleBounds = cover.querySelector('h1')!.getBoundingClientRect()
+      const actionBounds = cover.querySelector('button')!.getBoundingClientRect()
+      return {
+        cover: { left: coverBounds.left, right: coverBounds.right },
+        title: { left: titleBounds.left, right: titleBounds.right },
+        action: { left: actionBounds.left, right: actionBounds.right },
+        viewportWidth: document.documentElement.clientWidth,
+      }
+    })
+    for (const bounds of [geometry.cover, geometry.title, geometry.action]) {
+      expect(bounds.left, `${viewport.width}px reduced-motion left edge`).toBeGreaterThanOrEqual(0)
+      expect(bounds.right, `${viewport.width}px reduced-motion right edge`).toBeLessThanOrEqual(geometry.viewportWidth)
+    }
+  }
   await context.close()
 })
 
@@ -347,8 +393,8 @@ test('all sections resolve with unique IDs and valid evidence references', async
   }
 })
 
-test('special-layout narration targets contain their exact manuscript strings', async ({ page }) => {
-  for (const sectionId of ['opening', 'sound-laboratory', 'representation-ladder']) {
+test('special-layout and glossary narration targets contain their exact manuscript strings', async ({ page }) => {
+  for (const sectionId of ['opening', 'sound-laboratory', 'representation-ladder', 'evidence-method']) {
     await page.goto(`/#${sectionId}`)
     const units = bookNarrationUnits.filter((unit) => unit.sectionId === sectionId)
 
@@ -373,6 +419,39 @@ test('representative surfaces pass automated WCAG checks in both themes', async 
   }
 })
 
+test('small evidence labels retain AA contrast in both themes', async ({ page }) => {
+  await page.goto('/#fdn-disturbance-world')
+  const label = page.locator('.epistemic-label').first()
+  await expect(label).toBeVisible()
+
+  for (const theme of ['light', 'dark'] as const) {
+    const currentTheme = await page.locator('html').getAttribute('data-theme')
+    if (currentTheme !== theme) await page.getByRole('button', { name: theme === 'dark' ? 'Dark' : 'Light' }).click()
+    const ratio = await label.evaluate((element) => {
+      const rootStyle = getComputedStyle(document.documentElement)
+      const swatch = document.createElement('span')
+      swatch.style.color = rootStyle.getPropertyValue('--paper')
+      document.body.append(swatch)
+      const background = getComputedStyle(swatch).color
+      swatch.remove()
+      const foreground = getComputedStyle(element).color
+      const luminance = (value: string) => {
+        const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number) ?? []
+        const linear = channels.map((channel) => {
+          const normal = channel / 255
+          return normal <= 0.04045 ? normal / 12.92 : ((normal + 0.055) / 1.055) ** 2.4
+        })
+        return 0.2126 * linear[0]! + 0.7152 * linear[1]! + 0.0722 * linear[2]!
+      }
+      const foregroundLuminance = luminance(foreground)
+      const backgroundLuminance = luminance(background)
+      return (Math.max(foregroundLuminance, backgroundLuminance) + 0.05)
+        / (Math.min(foregroundLuminance, backgroundLuminance) + 0.05)
+    })
+    expect(ratio, `evidence label in ${theme}`).toBeGreaterThanOrEqual(4.5)
+  }
+})
+
 test('mobile controls retain names and pass WCAG checks in both themes', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 })
   for (const hash of ['#opening', '#media-tape-editable-time', '#sound-laboratory']) {
@@ -390,28 +469,9 @@ test('mobile controls retain names and pass WCAG checks in both themes', async (
 })
 
 test('the released narration manifest drives one persistent ended-chain and restores an ordinary saved start', async ({ page }) => {
-  const manifest = approvedNarrationManifest()
+  const manifest = await installApprovedNarration(page)
   const sectionPassages = manifest.passages.filter(({ sectionId }) => sectionId === 'fdn-disturbance-world')
   expect(sectionPassages.length).toBeGreaterThan(3)
-  await page.route('**/audio/narration/manifest.json', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(manifest) }))
-  await page.addInitScript(() => {
-    class TestAudio extends EventTarget {
-      static instances: TestAudio[] = []
-      preload = ''
-      src = ''
-      currentTime = 0
-      duration = 31
-      playbackRate = 1
-      paused = true
-      constructor() { super(); TestAudio.instances.push(this) }
-      play() { this.paused = false; queueMicrotask(() => this.dispatchEvent(new Event('loadedmetadata'))); return Promise.resolve() }
-      pause() { this.paused = true }
-      load() {}
-      removeAttribute(name: string) { if (name === 'src') this.src = '' }
-    }
-    Object.defineProperty(window, 'Audio', { configurable: true, value: TestAudio })
-    Object.defineProperty(window, '__narrationTestAudio', { configurable: true, value: TestAudio })
-  })
   await page.goto('/#fdn-disturbance-world')
   const listen = page.getByRole('button', { name: 'Listen from this section' })
   await expect(listen).toBeEnabled()
@@ -447,9 +507,64 @@ test('the released narration manifest drives one persistent ended-chain and rest
   expect(await page.evaluate(() => (window as unknown as { __narrationTestAudio: { instances: unknown[] } }).__narrationTestAudio.instances.length)).toBe(1)
 })
 
+test('released narration controls remain legible and compact on a short mobile landscape', async ({ page }) => {
+  await page.setViewportSize({ width: 568, height: 320 })
+  await installApprovedNarration(page)
+  await page.goto('/#fdn-disturbance-world')
+  await page.getByRole('button', { name: 'Listen from this section' }).click()
+
+  const player = page.getByRole('region', { name: 'Recorded narration player' })
+  await expect(player).toBeVisible()
+  await expect(player.getByText('AI-generated, not human · fixed edition')).toBeVisible()
+  const bounds = await player.boundingBox()
+  expect(bounds).not.toBeNull()
+  expect(bounds!.height).toBeLessThanOrEqual(125)
+  expect(bounds!.y).toBeGreaterThanOrEqual(190)
+
+  for (const theme of ['light', 'dark'] as const) {
+    const currentTheme = await page.locator('html').getAttribute('data-theme')
+    if (currentTheme !== theme) await page.getByRole('button', { name: theme === 'dark' ? 'Dark' : 'Light' }).click()
+    for (const name of ['Go back 15 seconds', 'Pause', 'Go forward 15 seconds', 'Stop narration']) {
+      await expect(player.getByRole('button', { name })).toBeVisible()
+    }
+    const buttonRatios = await player.locator('button').evaluateAll((buttons) => {
+      const luminance = (value: string) => {
+        const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number) ?? []
+        const linear = channels.map((channel) => {
+          const normal = channel / 255
+          return normal <= 0.04045 ? normal / 12.92 : ((normal + 0.055) / 1.055) ** 2.4
+        })
+        return 0.2126 * linear[0]! + 0.7152 * linear[1]! + 0.0722 * linear[2]!
+      }
+      return buttons.map((button) => {
+        const style = getComputedStyle(button)
+        const foreground = luminance(style.color)
+        const background = luminance(style.backgroundColor)
+        return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05)
+      })
+    })
+    expect(buttonRatios.every((ratio) => ratio >= 4.5), `released player button contrast in ${theme}`).toBe(true)
+    const results = await new AxeBuilder({ page })
+      .include('#narration-player')
+      .withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
+      .analyze()
+    expect(results.violations, `released narration player in ${theme}`).toEqual([])
+  }
+})
+
+test('mobile section navigation follows the manuscript instead of covering it', async ({ page }) => {
+  await page.setViewportSize({ width: 568, height: 320 })
+  await page.goto('/#media-tape-editable-time')
+  const navigation = page.getByRole('navigation', { name: 'Section navigation' })
+  await expect(navigation).toHaveCSS('position', 'static')
+  const bounds = await navigation.boundingBox()
+  expect(bounds).not.toBeNull()
+  expect(bounds!.y).toBeGreaterThanOrEqual(320)
+})
+
 test('recorded narration fails closed with a friendly message when no approved release exists', async ({ page }) => {
   await page.goto('/#fdn-disturbance-world')
-  const unavailable = page.getByRole('status').filter({ hasText: 'Narration in preparation' })
+  const unavailable = page.getByRole('status').filter({ hasText: 'Narration awaiting editorial approval' })
   await expect(unavailable).toBeVisible()
   await expect(unavailable).toHaveAttribute('title', 'The approved recorded edition is not available yet.')
   await expect(page.getByRole('button', { name: /Recorded edition awaiting release/i })).toHaveCount(0)

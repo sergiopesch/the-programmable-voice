@@ -12,6 +12,11 @@ import {
   narrationPassageHashMaterial,
 } from '../src/data/narrationEdition'
 import { bookNarrationPassages } from '../src/lib/narration'
+import type { NarrationComparisonManifest } from '../src/lib/narrationRelease'
+import {
+  narrationComparisonProfileHash,
+  removeNarrationComparisonApproval,
+} from './narration-comparison-contract'
 
 const execFileAsync = promisify(execFile)
 const projectRoot = path.resolve(import.meta.dirname, '..')
@@ -178,6 +183,7 @@ async function main() {
   const candidates = []
   try {
     await fs.mkdir(outputRoot, { recursive: true })
+    await removeNarrationComparisonApproval(projectRoot)
     for (const candidate of narrationBritishVoiceComparison.candidates) {
       const rawBytes = await requestSpeech(candidate.voice, passage.text)
       const bytes = await normaliseAudio(rawBytes, candidate.label, temporaryRoot)
@@ -190,8 +196,8 @@ async function main() {
       process.stdout.write(`Candidate ${candidate.label}: ${qc.durationSeconds.toFixed(1)}s, ${qc.wordsPerMinute.toFixed(0)} wpm, technical QC passed.\n`)
     }
 
-    const manifest = {
-      schemaVersion: 1,
+    const manifestBase = {
+      schemaVersion: 2 as const,
       comparisonId,
       generatedAt: new Date().toISOString(),
       disclosure: narrationDisclosure,
@@ -202,6 +208,9 @@ async function main() {
       provisionalProductionVoice: configuration.voice,
       voiceProfile: configuration.voiceProfile,
       instructions: narrationInstructionsFor(passage.id),
+      responseFormat: configuration.responseFormat,
+      speechSpeed: 1,
+      normalisation: { ...configuration.normalisation },
       passage: { id: passage.id, text: passage.text, sha256: sha256(passage.text) },
       candidates,
       humanApprovalRequired: true,
@@ -211,6 +220,10 @@ async function main() {
         'warm, intimate literary-documentary delivery without theatricality',
         'comfortable pace, articulation and tonal balance',
       ],
+    }
+    const manifest: NarrationComparisonManifest = {
+      ...manifestBase,
+      comparisonProfileHash: narrationComparisonProfileHash(manifestBase as NarrationComparisonManifest),
     }
     const manifestBytes = `${JSON.stringify(manifest, null, 2)}\n`
     if (/\bsk-(?:proj-|svcacct-)?[A-Za-z0-9_-]{16,}/.test(manifestBytes) || /OPENAI_API_KEY/.test(manifestBytes)) {

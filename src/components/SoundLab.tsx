@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent a
 import type { BookSection } from '../types'
 import type { NarrationCatalogueStatus, NarrationStatus } from '../hooks/useNarrationPlayer'
 import { narrationTargetId } from '../lib/narration'
-import { PauseIcon, PlayIcon } from './Icons'
+import { PlayIcon, StopIcon } from './Icons'
 import { SectionListenButton } from './NarrationControls'
 import { ScientificFigure } from './ScientificFigure'
 
@@ -422,15 +422,13 @@ export function SoundLab({
         : 'The two lanes separate who is producing audio. Processed mode demonstrates overlap, response delay, and an interruption marker.'
   const headerTargetId = narrationTargetId(section.id)
   const introTargetId = narrationTargetId(section.id, 0)
-  const disclaimerTargetId = narrationTargetId(section.id, 1)
-  const loopHeadingTargetId = narrationTargetId(section.id, 2)
-  const loopCopyTargetId = narrationTargetId(section.id, 3)
-  const loopFigureTargetId = narrationTargetId(section.id, 4)
+  const loopHeadingTargetId = narrationTargetId(section.id, 1)
+  const loopCopyTargetId = narrationTargetId(section.id, 2)
+  const loopFigureTargetId = narrationTargetId(section.id, 3)
   const intro = section.blocks[0]
-  const disclaimer = section.blocks[1]
-  const loopHeading = section.blocks[2]
-  const loopCopy = section.blocks[3]
-  const loopFigure = section.blocks[4]
+  const loopHeading = section.blocks[1]
+  const loopCopy = section.blocks[2]
+  const loopFigure = section.blocks[3]
 
   return (
     <article className="sound-lab" aria-labelledby="sound-lab-title">
@@ -510,7 +508,7 @@ export function SoundLab({
 
           <div className="lab-actions">
             <button className="lab-play" type="button" onClick={playing ? stop : () => void play()}>
-              {playing ? <PauseIcon /> : <PlayIcon />}
+              {playing ? <StopIcon /> : <PlayIcon />}
               <span>{playing ? 'Stop' : 'Play'}</span>
             </button>
             <div className="segmented" role="group" aria-label="Audio comparison">
@@ -522,12 +520,6 @@ export function SoundLab({
           {error ? <p className="lab-error" role="alert">{error}</p> : null}
         </div>
       </section>
-
-      {disclaimer?.type === 'paragraph' ? (
-        <p id={disclaimerTargetId} className={`lab-disclaimer narration-target${activeNarrationTargetId === disclaimerTargetId ? ' narration-target--active' : ''}`}>
-          <strong>{disclaimer.text.slice(0, disclaimer.text.indexOf('.') + 1)}</strong>{disclaimer.text.slice(disclaimer.text.indexOf('.') + 1)}
-        </p>
-      ) : null}
 
       <section className="live-loop">
         <div>

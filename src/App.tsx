@@ -39,9 +39,9 @@ export default function App() {
   const focusReader = useCallback(() => {
     requestAnimationFrame(() => {
       readerRef.current?.focus({ preventScroll: true })
-      window.scrollTo({ top: 0, behavior: preferences.reduceMotion ? 'auto' : 'smooth' })
+      window.scrollTo({ top: 0, behavior: 'auto' })
     })
-  }, [preferences.reduceMotion])
+  }, [])
 
   const presentNarrationPassage = useCallback(async (passage: NarrationPassage) => {
     if (!sectionById.has(passage.sectionId)) return

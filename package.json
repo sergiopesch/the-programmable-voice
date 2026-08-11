@@ -27,9 +27,11 @@
     "narration:approve-pilot": "tsx scripts/verify-narration.ts --approve-pilot",
     "narration:generate": "tsx scripts/generate-narration.ts",
     "narration:vercel-job": "tsx scripts/narration-vercel-job.ts",
+    "narration:approve-comparison": "tsx scripts/approve-narration-comparison.ts",
     "narration:approve": "tsx scripts/verify-narration.ts --approve",
     "narration:verify": "tsx scripts/verify-narration.ts",
     "narration:verify-build": "tsx scripts/verify-narration.ts --lightweight",
+    "check:app": "npm run lint && npm run test && npm run build:app",
     "check": "npm run lint && npm run test && npm run narration:verify && npm run build:app"
   },
   "dependencies": {

@@ -22,6 +22,7 @@ export type EpistemicLabel =
   | 'Synthesis'
   | 'Inference'
   | 'Our thesis'
+  | 'Conditional projection'
 
 export interface Source {
   id: string

@@ -55,7 +55,7 @@ export function SectionListenButton({
         role="status"
       >
         <SpeakerIcon />
-        <span>Narration in preparation</span>
+        <span>Narration awaiting editorial approval</span>
       </span>
     )
   }
@@ -154,6 +154,7 @@ export function NarrationDock({
       <div className="narration-dock__passage">
         <span>{statusText(status)}</span>
         <strong>{sectionTitle || passage?.sectionId || 'The Programmable Voice'}</strong>
+        <small className="narration-dock__mobile-disclosure">AI-generated, not human · fixed edition</small>
         {sectionProgress.total > 0 ? (
           <small>{String(sectionProgress.current).padStart(2, '0')} / {String(sectionProgress.total).padStart(2, '0')} passages</small>
         ) : null}

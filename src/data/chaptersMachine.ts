@@ -4,7 +4,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'templates-to-probabilities',
     number: 23,
-    part: 'VIII — The machine voice',
+    part: 'V — The machine listens and speaks',
     title: 'From templates to probabilities',
     deck: 'A machine stopped waiting for one perfect sound and began comparing many possible paths through time.',
     kind: 'chapter',
@@ -87,7 +87,7 @@ export const machineSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Established science',
-        text: 'Deep learning first changed who scored those frames. In the systems surveyed in 2012, deep neural networks often replaced Gaussian mixtures while HMMs still organised time. CTC then offered a different bridge between long input and short transcript: the network emits label probabilities plus a blank symbol, and training sums over all frame-level paths that collapse to the required sequence. Exact hand-marked boundaries are unnecessary, but alignment has not vanished; it has become latent and is marginalised by the objective. Modern recognition contains many other designs, yet this is the decisive turn from matching examples towards learning distributions over possible explanations.',
+        text: 'Deep learning first changed who scored those frames. In the systems surveyed in 2012, deep neural networks often replaced Gaussian mixtures while HMMs still organised time. CTC then offered a different bridge between long input and short transcript: the network emits label probabilities plus a blank symbol, and training sums over all frame-level paths that collapse to the required sequence. Exact hand-marked boundaries are unnecessary, but alignment has not vanished; it has become latent and is marginalised by the objective. Across this longer lineage, recognition moved from fixed whole-utterance templates towards models that score many possible state and alignment paths.',
         citations: ['mac-hinton2012', 'mac-graves2006'],
       },
       {
@@ -100,7 +100,7 @@ export const machineSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Recognition is scoped',
         label: 'Our thesis',
         text: 'Recognition is never bare listening. It is listening through a set of permitted distinctions. Templates made those permissions obvious; learned probabilities can hide them inside data and weights. Whenever a score looks miraculous, ask who spoke, what they were allowed to say, which errors were counted and what happened outside the test.',
         citations: ['mac-davis1952', 'mac-datasheets2021'],
@@ -116,7 +116,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'voder-to-neural-speech',
     number: 24,
-    part: 'VIII — The machine voice',
+    part: 'V — The machine listens and speaks',
     title: 'From Voder to neural speech',
     deck: 'The artificial voice moved from a skilled performance, through compact rules and chips, into learned generation.',
     kind: 'chapter',
@@ -184,7 +184,7 @@ export const machineSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'A made voice carries history',
         label: 'Our thesis',
         text: 'A synthetic voice is an instrument before it is an identity. Someone designs its controls, someone supplies examples, someone chooses it and listeners complete it with expectation. Ask not only “Does it sound real?” but “Who can steer it, whose history does it carry, and whose voice does it become?”',
         citations: ['mac-hawking-archive'],
@@ -200,7 +200,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'whose-voice-in-data',
     number: 25,
-    part: 'VIII — The machine voice',
+    part: 'V — The machine listens and speaks',
     title: 'Whose voice is in the data?',
     deck: 'Every speech model contains a social map of who was recorded, how they were labelled and which mistakes mattered.',
     kind: 'chapter',
@@ -274,7 +274,7 @@ export const machineSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Data is never disembodied',
         label: 'Our thesis',
         text: 'Data is not voices poured into a bucket. It is a chain of relationships and decisions. Ask who could participate, who performed the hidden listening, who was grouped under each label, who may withdraw, and who bears the cost when the model is wrong.',
         citations: ['mac-gray-suri2019', 'mac-datasheets2021'],
@@ -290,7 +290,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'voice-becomes-tokens',
     number: 26,
-    part: 'VIII — The machine voice',
+    part: 'V — The machine listens and speaks',
     title: 'Voice becomes tokens',
     deck: 'Neural codecs turn sound into sequences of learned indices—compact enough to transmit and structured enough to generate.',
     kind: 'chapter',
@@ -308,7 +308,7 @@ export const machineSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Established science',
-        text: 'A neural codec is trained as an encoder, a bottleneck and a decoder. The encoder compresses waveform context into latent vectors. Vector quantisation replaces each vector with an entry from a finite codebook; residual quantisers can add successive codebooks to refine what earlier stages missed. The decoder turns the selected embeddings back into samples. Training losses reward particular kinds of reconstruction: waveform or spectral similarity, perceptual plausibility, adversarial realism, perhaps intelligibility. The resulting token is therefore not a discovered particle of sound. It is an address whose meaning depends on this codec, this training objective and this codebook version.',
+        text: 'A neural codec learns three linked moves: compress a short stretch of waveform, choose nearby entries from one or more finite codebooks, then rebuild sound from those choices. Extra codebooks can refine what the first one missed. The system is rewarded for selected kinds of resemblance—perhaps waveform shape, spectrum, intelligibility or perceptual realism—so every token reflects those priorities. It is not a particle waiting inside the sound. It is an address meaningful only to this codec, objective and codebook version.',
         citations: ['mac-soundstream2021', 'mac-encodec2022'],
       },
       {
@@ -359,7 +359,7 @@ export const machineSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Tokens belong to a model',
         label: 'Our thesis',
         text: 'An audio token is a bargain written by an objective: preserve enough of these examples to satisfy these losses at this bitrate. To understand it, ask which codec made it, which codebook version interprets it, what listeners and metrics rewarded, and which human qualities remain recoverable.',
         citations: ['mac-soundstream2021', 'mac-encodec2022'],
@@ -375,7 +375,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'conversation-becomes-stream',
     number: 27,
-    part: 'VIII — The machine voice',
+    part: 'V — The machine listens and speaks',
     title: 'Conversation becomes a stream',
     deck: 'A speaking system must decide not only what sound means, but when to wait, yield, overlap and repair.',
     kind: 'chapter',
@@ -450,7 +450,7 @@ export const machineSections: BookSection[] = [
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Conversation needs clocks',
         label: 'Our thesis',
         text: 'Low latency makes a voice feel present; good coordination makes another person feel present. Measure them separately. Ask how the system behaves during silence, overlap, false starts, background speech, cancellation and repair—not merely how quickly its first audio packet arrives.',
         citations: ['mac-stivers2009', 'mac-moshi2024'],
@@ -466,7 +466,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'access-restoration-agency',
     number: 28,
-    part: 'IX — Voice, agency and return',
+    part: 'VI — Whose voice, whose choice?',
     title: 'Access, restoration and agency',
     deck: 'The most powerful voice system is not the one that sounds most human, but the one its user can trust, shape and refuse.',
     kind: 'chapter',
@@ -496,7 +496,7 @@ export const machineSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Established science',
-        text: 'Hearing is equally diverse. Captions, full transcripts, sign-language interpretation, visual alerts, hearing technologies and audio customisation solve different problems for different people and settings. W3C requirements note that synchronised captions are not sufficient for everyone; an independently available transcript can support people who need more time or another rendering. WHO’s people-centred account likewise places communication needs and local context above one device. “Audio on” and “audio off” are not the two human states.',
+        text: 'Hearing is equally diverse. Captions, full transcripts, sign-language interpretation, visual alerts, hearing technologies and audio customisation solve different problems for different people and settings. A 2015 W3C Working Group Note observes that synchronised captions are not sufficient for everyone; an independently available transcript can support people who need more time or another rendering. WHO’s people-centred account likewise places communication needs and local context above one device. “Audio on” and “audio off” are not the two human states.',
         citations: ['mac-w3c-media', 'mac-who-hearing'],
       },
       {
@@ -529,12 +529,18 @@ export const machineSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Primary document',
-        text: 'Participant authority is not courtesy added after invention. The UN Convention on the Rights of Persons with Disabilities centres individual autonomy and requires close consultation with disabled people through their representative organisations in relevant decisions. For a voice system, that principle reaches the entire lifecycle: research question, consent process, vocabulary, accent, error policy, data retention, repair, procurement and the right to leave. “Nothing about us without us” must change who can decide, not merely who appears in a usability photograph.',
+        text: 'Participant authority is not courtesy added after invention. The UN Convention on the Rights of Persons with Disabilities centres individual autonomy; Article 4(3) requires close consultation with, and active involvement of, disabled people through their representative organisations when developing and implementing relevant legislation and policies and in other decision-making processes concerning them.',
         citations: ['mac-un-crpd'],
       },
       {
+        type: 'paragraph',
+        label: 'Our thesis',
+        text: 'Applied to a voice system, that principle should reach the entire lifecycle: research question, consent process, vocabulary, accent, error policy, data retention, repair, procurement and the right to leave. “Nothing about us without us” must change who can decide, not merely who appears in a usability photograph.',
+        citations: ['mac-un-crpd', 'mac-agency-neuro2023'],
+      },
+      {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Agency is part of the system',
         label: 'Our thesis',
         text: 'Restoration is not a return to a technical norm. It is an increase in authorship. Judge a system by whether its user can initiate, edit, pace, personalise, conceal, switch mode and refuse—and whether communication partners give the resulting voice time and attention.',
         citations: ['mac-agency-neuro2023', 'mac-asha-aac'],
@@ -550,7 +556,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'consent-provenance-synthetic-self',
     number: 29,
-    part: 'IX — Voice, agency and return',
+    part: 'VI — Whose voice, whose choice?',
     title: 'Consent, provenance and the synthetic self',
     deck: 'A convincing voice can be technically well formed and still be false, unauthorised or used beyond the permission that created it.',
     kind: 'chapter',
@@ -561,7 +567,7 @@ export const machineSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Synthesis',
-        text: 'Your phone plays a short message. The pace, dry laugh and lifted final vowel belong to someone you know. The request does not. For most of recording history, a familiar voice was strong circumstantial evidence that its speaker had stood before a microphone and said roughly those words. Editing weakened that link; generative synthesis can sever it. The ear still performs its old social reflex, recognising a person before the mind has inspected the event.',
+        text: 'Your phone plays a short message. The pace, dry laugh and lifted final vowel belong to someone you know. The request does not. Listeners have commonly treated a familiar recorded voice as evidence that its speaker said roughly those words, although impersonation, dubbing, replay and splicing made that inference fallible long before generative synthesis. A generated voice can weaken the link further. The ear still performs its old social reflex, recognising a person before the mind has inspected the event.',
         citations: ['mac-valle2023', 'mac-ftc-voice', 'mac-nist-synthetic'],
       },
       { type: 'heading', text: 'If it sounds like me, is it mine—and did I say it?' },
@@ -621,11 +627,11 @@ export const machineSections: BookSection[] = [
         type: 'paragraph',
         label: 'Synthesis',
         text: 'A voice should not serve as its own password. It travels through public rooms, broadcasts and recordings; it can be replayed and increasingly synthesised. NIST’s current federal authentication guidance prohibits voice-based biometric comparison within its covered workflows. Even where other policies permit speaker verification, the conceptual boundary remains sound: resemblance may contribute evidence, but consequential access should rest on a stronger authenticator and a separate authorisation decision.',
-        citations: ['mac-nist-80063b4', 'mac-webauthn3'],
+        citations: ['mac-nist-80063b4', 'mac-webauthn2'],
       },
       {
         type: 'callout',
-        title: 'Hold on to this',
+        title: 'Resemblance is not consent',
         label: 'Our thesis',
         text: 'Authenticity is a relationship, not a timbre. Preserve who authorised the voice, what process produced the file, who signed the claims and what the listener independently verified. A perfect imitation with no permission is not more authentic than an obvious synthesiser deliberately chosen by its user.',
         citations: ['mac-hawking-archive', 'mac-c2pa24'],
@@ -641,7 +647,7 @@ export const machineSections: BookSection[] = [
   {
     id: 'air-again',
     number: 30,
-    part: 'IX — Voice, agency and return',
+    part: 'VI — Whose voice, whose choice?',
     title: 'Air again',
     deck: 'Every representation is temporary. The voice returns to pressure, a listener, and a choice about what happens next.',
     kind: 'chapter',
@@ -663,35 +669,10 @@ export const machineSections: BookSection[] = [
         citations: ['mac-nist-80063b4', 'mac-nist-airmf', 'mac-c2pa24'],
       },
       {
-        type: 'list',
-        title: 'The representation ladder, climbed in both directions',
-        ordered: true,
-        items: [
-          'Air pressure carries a physical disturbance, rich with source and room.',
-          'A transducer turns motion into an electrical signal and later reverses the exchange.',
-          'Samples place measured amplitude on a digital clock; frames and spectra reorganise local structure.',
-          'Engineered features and learned embeddings emphasise distinctions useful to an objective.',
-          'Phonemes, characters and words make linguistic hypotheses searchable while leaving much of the performance behind.',
-          'Codec tokens compress recoverable acoustics into model-specific indices that can be transmitted or generated.',
-          'Conversation state joins concurrent audio, timing, partial interpretation and what each participant has actually heard.',
-          'Memory carries selected state beyond the moment; a tool boundary turns interpretation into possible external effect.',
-          'A decoder, converter and loudspeaker return representation to pressure—air again, but never context-free.',
-        ],
-        label: 'Synthesis',
-        citations: [
-          'mac-rabiner1989',
-          'mac-graves2006',
-          'mac-soundstream2021',
-          'mac-audiolm2023',
-          'mac-moshi2024',
-        ],
-      },
-      {
-        type: 'callout',
-        title: 'No rung is the voice itself',
+        type: 'paragraph',
         label: 'Our thesis',
-        text: 'A waveform can answer a forensic acoustic question that a transcript cannot. A transcript can be searched where a waveform cannot. Tokens can generate detail that words never described. State can coordinate a turn that tokens alone do not explain. Keep the lowest-level evidence needed for accountability, the highest-level representation needed for the task, and a documented bridge between them.',
-        citations: ['mac-datasheets2021', 'mac-c2pa24'],
+        text: 'Along the way, voice became motion, voltage, marks, samples, features, words, tokens and shared state. Every form opened a capability by selecting what mattered and leaving something else behind. A trustworthy system keeps the evidence needed for accountability, the representation needed for its task, and a documented bridge between them. No rung is the voice itself.',
+        citations: ['mac-rabiner1989', 'mac-graves2006', 'mac-soundstream2021', 'mac-audiolm2023', 'mac-moshi2024', 'mac-datasheets2021', 'mac-c2pa24'],
       },
       {
         type: 'heading',
@@ -700,7 +681,8 @@ export const machineSections: BookSection[] = [
       {
         type: 'paragraph',
         label: 'Our thesis',
-        text: 'The earliest trace scratched sound into soot without knowing how to return it. The groove returned. The wire carried. The tape yielded to the blade. Samples made a clock of pressure; networks made paths through uncertainty; tokens gave the machine an acoustic alphabet. Through every change, a voice remained more than its container. It was breath offered into relation: someone speaking, someone listening, each able to alter what came next.',
+        text: 'Scott’s early durable airborne-sound trace scratched vibration into soot without knowing how to return it. The groove returned. The wire carried. The tape yielded to the blade. Samples made a clock of pressure; networks made paths through uncertainty; tokens gave the machine an acoustic alphabet. Through every change, a voice remained more than its container. It was breath offered into relation: someone speaking, someone listening, each able to alter what came next.',
+        citations: ['fdn-scott-loc'],
       },
       {
         type: 'paragraph',

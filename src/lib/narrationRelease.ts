@@ -1,8 +1,75 @@
 import {
   narrationApprovalChecklistVersion,
+  narrationComparisonApprovalChecklistVersion,
+  narrationComparisonApprovalConfirmations,
   narrationPilotApprovalConfirmations,
   narrationReleaseApprovalConfirmations,
 } from '../data/narrationEdition'
+
+export interface NarrationComparisonTechnicalQc {
+  durationSeconds: number
+  wordsPerMinute: number
+  integratedLoudnessLufs: number
+  loudnessRangeLu: number
+  truePeakDbtp: number
+  sampleRateHz: number
+  channels: number
+  bitrateKbps: number
+  fullDecodePassed: true
+}
+
+export interface NarrationComparisonCandidate {
+  label: string
+  voice: string
+  filename: string
+  sha256: string
+  technicalQc: NarrationComparisonTechnicalQc
+}
+
+export interface NarrationComparisonManifest {
+  schemaVersion: 2
+  comparisonId: string
+  generatedAt: string
+  disclosure: string
+  edition: string
+  model: string
+  configurationHash: string
+  manuscriptHash: string
+  provisionalProductionVoice: string
+  voiceProfile: string
+  instructions: string
+  responseFormat: string
+  speechSpeed: number
+  normalisation: {
+    version: string
+    integratedLoudnessLufs: number
+    loudnessRangeLu: number
+    truePeakDbtp: number
+    sampleRateHz: number
+    channels: number
+    bitrateKbps: number
+  }
+  passage: { id: string; text: string; sha256: string }
+  candidates: NarrationComparisonCandidate[]
+  comparisonProfileHash: string
+  humanApprovalRequired: true
+  approvalCriteria: string[]
+}
+
+export type NarrationComparisonDecision =
+  | { kind: 'selected'; candidateLabel: string; voice: string }
+  | { kind: 'reject-all' }
+
+export interface NarrationComparisonApproval {
+  schemaVersion: 1
+  decidedAt: string
+  decidedBy: string
+  checklistVersion: string
+  comparisonId: string
+  comparisonProfileHash: string
+  decision: NarrationComparisonDecision
+  confirmations: string[]
+}
 
 export interface NarrationTechnicalQc {
   durationExpectedSeconds: number
@@ -98,6 +165,57 @@ function narrationTechnicalQcIdentity(qc: NarrationTechnicalQc) {
   }
 }
 
+function narrationComparisonTechnicalQcIdentity(qc: NarrationComparisonTechnicalQc) {
+  return {
+    durationSeconds: qc.durationSeconds,
+    wordsPerMinute: qc.wordsPerMinute,
+    integratedLoudnessLufs: qc.integratedLoudnessLufs,
+    loudnessRangeLu: qc.loudnessRangeLu,
+    truePeakDbtp: qc.truePeakDbtp,
+    sampleRateHz: qc.sampleRateHz,
+    channels: qc.channels,
+    bitrateKbps: qc.bitrateKbps,
+    fullDecodePassed: qc.fullDecodePassed,
+  }
+}
+
+/**
+ * Stable material proving exactly which voice profile and equal-text candidate
+ * files were compared. The provisional production voice, whole-manuscript
+ * digest, job id and timestamps are deliberately outside this identity.
+ */
+export function narrationComparisonProfileMaterial(manifest: NarrationComparisonManifest) {
+  return JSON.stringify({
+    profileVersion: 1,
+    model: manifest.model,
+    instructions: manifest.instructions,
+    voiceProfile: manifest.voiceProfile,
+    responseFormat: manifest.responseFormat,
+    speechSpeed: manifest.speechSpeed,
+    normalisation: {
+      version: manifest.normalisation.version,
+      integratedLoudnessLufs: manifest.normalisation.integratedLoudnessLufs,
+      loudnessRangeLu: manifest.normalisation.loudnessRangeLu,
+      truePeakDbtp: manifest.normalisation.truePeakDbtp,
+      sampleRateHz: manifest.normalisation.sampleRateHz,
+      channels: manifest.normalisation.channels,
+      bitrateKbps: manifest.normalisation.bitrateKbps,
+    },
+    passage: {
+      id: manifest.passage.id,
+      text: manifest.passage.text,
+      sha256: manifest.passage.sha256,
+    },
+    candidates: manifest.candidates.map((candidate) => ({
+      label: candidate.label,
+      voice: candidate.voice,
+      filename: candidate.filename,
+      sha256: candidate.sha256,
+      technicalQc: narrationComparisonTechnicalQcIdentity(candidate.technicalQc),
+    })),
+  })
+}
+
 /** Stable JSON material proving exactly which pilot assets were auditioned. */
 export function narrationPilotProfileMaterial(manifest: NarrationPilotManifest) {
   return JSON.stringify({
@@ -180,4 +298,36 @@ export function narrationPilotApprovalIsComplete(approval: NarrationPilotApprova
     && approval.confirmations.length === narrationPilotApprovalConfirmations.length
     && narrationPilotApprovalConfirmations.every(({ label }, index) => approval.confirmations[index] === label),
   )
+}
+
+export function narrationComparisonApprovalIsComplete(approval: NarrationComparisonApproval | null) {
+  if (
+    !approval
+    || approval.schemaVersion !== 1
+    || typeof approval.decidedAt !== 'string'
+    || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(approval.decidedAt)
+    || !Number.isFinite(Date.parse(approval.decidedAt))
+    || new Date(approval.decidedAt).toISOString() !== approval.decidedAt
+    || typeof approval.decidedBy !== 'string'
+    || !approval.decidedBy.trim()
+    || typeof approval.comparisonId !== 'string'
+    || !/^british-voice-comparison-\d{4}-\d{2}-\d{2}-[a-f0-9]{10}$/.test(approval.comparisonId)
+    || approval.checklistVersion !== narrationComparisonApprovalChecklistVersion
+    || !/^[a-f0-9]{64}$/.test(approval.comparisonProfileHash)
+    || !Array.isArray(approval.confirmations)
+  ) return false
+
+  const decision = approval.decision as NarrationComparisonDecision | null | undefined
+  if (!decision || (decision.kind !== 'selected' && decision.kind !== 'reject-all')) return false
+  const expectedConfirmations = decision.kind === 'selected'
+    ? narrationComparisonApprovalConfirmations.map(({ label }) => label)
+    : narrationComparisonApprovalConfirmations.slice(0, 2).map(({ label }) => label)
+  return approval.confirmations.length === expectedConfirmations.length
+    && expectedConfirmations.every((label, index) => approval.confirmations[index] === label)
+    && (decision.kind === 'reject-all' || (
+      typeof decision.candidateLabel === 'string'
+      && decision.candidateLabel.length > 0
+      && typeof decision.voice === 'string'
+      && decision.voice.length > 0
+    ))
 }

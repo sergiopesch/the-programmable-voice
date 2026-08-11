@@ -25,8 +25,8 @@ const prologue: BookSection = {
     },
     {
       type: 'paragraph',
-      label: 'Scholarly history',
-      text: 'For most of human history, people kept sound alive in bodies, rituals, rooms and communities. Recording changed how a voice might outlive its maker. This book follows that material chain, not a parade of lone inventors. At every threshold something is preserved and something falls away. No engineering background is needed: begin with the story, then follow the deeper layer and its evidence. Listen closely to what each representation makes possible—and what it asks us to forget.',
+      label: 'Synthesis',
+      text: 'For most of human history, a voice survived by entering another body: a listener remembered it, a child learnt it, a community called it back. Recording changed that bargain. This book follows what happened next—not as a procession of inventors, but as a chain of choices. Each new form kept something: pitch, timing, words, resemblance. Each left something behind. By the time a machine can answer in a made voice, the old question has become urgent: what, exactly, are we hearing—and who still has the right to decide what happens next?',
       citations: ['fdn-unesco-oral', 'fdn-parry-collection', 'med-iasa-disc-replay', 'mac-datasheets2021'],
     },
   ],
