@@ -29,6 +29,7 @@ import {
   narrationApprovedPilotParityProblems,
   narrationPilotApprovalProblems,
 } from './narration-pilot-contract'
+import { narrationPacingBounds, narrationReportedWordsPerMinute } from './narration-pacing'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -166,12 +167,8 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
   const durationMeasuredSeconds = Number(stdout.trim())
   const durationExpectedSeconds = expectedDurationSeconds(text)
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length
-  const wordsPerMinute = (wordCount / durationMeasuredSeconds) * 60
-  const [minimumWordsPerMinute, maximumWordsPerMinute] = wordCount < 6
-    ? [45, 240]
-    : wordCount < 20
-      ? [90, 195]
-      : [100, 180]
+  const wordsPerMinute = narrationReportedWordsPerMinute((wordCount / durationMeasuredSeconds) * 60)
+  const { minimumWordsPerMinute, maximumWordsPerMinute } = narrationPacingBounds(wordCount)
   if (
     !Number.isFinite(durationMeasuredSeconds)
     || durationMeasuredSeconds < 0.35
@@ -219,7 +216,7 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
   return {
     durationExpectedSeconds,
     durationMeasuredSeconds: Number(durationMeasuredSeconds.toFixed(3)),
-    wordsPerMinute: Number(wordsPerMinute.toFixed(1)),
+    wordsPerMinute,
     integratedLoudnessLufs: Number(integratedLoudnessLufs.toFixed(1)),
     loudnessRangeLu: Number(loudnessRangeLu.toFixed(1)),
     truePeakDbtp: Number(truePeakDbtp.toFixed(1)),

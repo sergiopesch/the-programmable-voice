@@ -36,6 +36,7 @@ import {
   narrationPilotVerificationMessage,
   type CurrentNarrationPilotIdentity,
 } from './narration-pilot-contract'
+import { narrationPacingBounds, narrationReportedWordsPerMinute } from './narration-pacing'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -110,12 +111,8 @@ function assertTechnicalQcShape(entry: NarrationManifestEntry, passage: Narratio
   const spokenText = narrationSpokenTextFor(passage.id, passage.text)
   const words = spokenText.trim().split(/\s+/).filter(Boolean).length
   const expectedDurationSeconds = Number(((words / narrationEditionConfiguration.targetWordsPerMinute) * 60).toFixed(3))
-  const expectedWordsPerMinute = (words / entry.durationSeconds) * 60
-  const [minimumWordsPerMinute, maximumWordsPerMinute] = words < 6
-    ? [45, 240]
-    : words < 20
-      ? [90, 195]
-      : [100, 180]
+  const expectedWordsPerMinute = narrationReportedWordsPerMinute((words / entry.durationSeconds) * 60)
+  const { minimumWordsPerMinute, maximumWordsPerMinute } = narrationPacingBounds(words)
   const finite = [
     entry.durationSeconds,
     qc.durationExpectedSeconds,
@@ -209,7 +206,7 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
   const silence = boundarySilence(silenceStderr, duration)
   const spokenText = narrationSpokenTextFor(passage.id, passage.text)
   const words = spokenText.trim().split(/\s+/).filter(Boolean).length
-  const measuredWordsPerMinute = (words / duration) * 60
+  const measuredWordsPerMinute = narrationReportedWordsPerMinute((words / duration) * 60)
   const qc = entry.technicalQc
   if (
     !Number.isFinite(measuredLoudness)
@@ -218,7 +215,7 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
     || Math.abs(measuredPeak - qc.truePeakDbtp) > 0.15
     || Math.abs(silence.leading - qc.leadingSilenceSeconds) > 0.06
     || Math.abs(silence.trailing - qc.trailingSilenceSeconds) > 0.06
-    || Math.abs(measuredWordsPerMinute - qc.wordsPerMinute) > 0.15
+    || measuredWordsPerMinute !== qc.wordsPerMinute
   ) {
     throw new Error(`${entry.id} failed full media-QC verification.`)
   }
