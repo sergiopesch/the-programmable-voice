@@ -1,27 +1,96 @@
 export const narrationEditionConfiguration = {
-  edition: '2026.1',
-  model: 'gpt-4o-mini-tts-2025-12-15',
-  voice: 'coral',
+  edition: '2026.2',
+  provider: 'local-open-weight-inference',
+  model: 'onnx-community/Kokoro-82M-v1.0-ONNX',
+  modelRevision: '1939ad2a8e416c0acfeecc08a694d14ef25f2231',
+  runtime: 'kokoro-js',
+  runtimeVersion: '1.2.1',
+  quantization: 'q8',
+  device: 'cpu',
+  sourceLicense: 'Apache-2.0',
+  sourceUrl: 'https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX',
+  modelFiles: [
+    { path: 'config.json', sha256: 'df34b4f930b23447cd4dc410fabfb42eb3f24e803e6c3f97d618fb359380a36f' },
+    { path: 'tokenizer.json', sha256: '77a02c8e164413299b4b4c403b14f8e0e1c1b727db4d46a09d6327b861060a34' },
+    { path: 'tokenizer_config.json', sha256: 'be1cb066d6ef6b074b3f15e6a6dd21ac88ff3cdaedf325f0aaed686c70f75d20' },
+    { path: 'onnx/model_quantized.onnx', sha256: 'fbae9257e1e05ffc727e951ef9b9c98418e6d79f1c9b6b13bd59f5c9028a1478' },
+  ],
+  voice: 'bf_emma',
+  voiceFileSha256: '669fe0647f9dd04fcab92f1439a40eeb4c8b4ab1f82e4996fe3d918ce4a63b73',
+  voiceLocale: 'en-gb',
+  voiceGenderCatalogLabel: 'Female',
+  speed: 0.86,
   responseFormat: 'mp3',
-  voiceProfile: 'one mature adult woman; warm, thoughtful and intimate; natural modern Standard Southern British English',
-  targetWordsPerMinute: 140,
+  voiceProfile: 'Emma; one British woman; warm, clear and measured literary-documentary narration',
+  targetWordsPerMinute: 132,
   normalisation: {
-    version: 'loudnorm-2026.1',
+    version: 'loudnorm-2026.2-24khz-48kbps',
     integratedLoudnessLufs: -18,
     loudnessRangeLu: 7,
     truePeakDbtp: -2,
-    sampleRateHz: 44_100,
+    sampleRateHz: 24_000,
     channels: 1,
-    bitrateKbps: 128,
+    bitrateKbps: 48,
   },
   instructions: [
-    'Read the supplied manuscript exactly as written, without additions, omissions, introductions, or paraphrases.',
-    'Use one stable speaker identity throughout: a mature adult British woman from southern England, never a North American or transatlantic speaker.',
-    'Speak in natural modern Standard Southern British English (contemporary Received Pronunciation): non-rhotic, poised and unmistakably British without sounding aristocratic, period-drama theatrical, or like a caricature.',
-    'Use a warm lower-middle register and the intimate authority of an excellent British documentary and literary-audiobook narrator. Sound thoughtful, human and quietly engaged; never breathy, girlish, glossy, promotional or sing-song.',
-    'The audience ranges from teenagers to professors. Make technical terms lucid, keep the pace measured at about 140 words per minute, and allow punctuation and changes of idea to breathe.',
-    'Use British pronunciation and phrasing for dates, abbreviations and ordinary English words. Do not drift into General American vowels, rhotic post-vocalic r sounds, vocal fry, or an American newsreader cadence.',
+    'Editorial generation policy: read the supplied manuscript exactly as written, without additions, omissions, introductions or paraphrases.',
+    'Kokoro does not accept free-form performance instructions; speaker identity, British pronunciation and delivery are therefore fixed by the pinned bf_emma voice, model revision and speed rather than inferred from this text.',
+    'Passage-specific notes remain listening and correction requirements. They are metadata, not unsupported claims that the local synthesiser followed a hidden prompt.',
   ].join(' '),
+} as const
+
+export const narrationGenerationProvenance = {
+  provider: narrationEditionConfiguration.provider,
+  modelRevision: narrationEditionConfiguration.modelRevision,
+  runtime: narrationEditionConfiguration.runtime,
+  runtimeVersion: narrationEditionConfiguration.runtimeVersion,
+  quantization: narrationEditionConfiguration.quantization,
+  device: narrationEditionConfiguration.device,
+  sourceLicense: narrationEditionConfiguration.sourceLicense,
+  sourceUrl: narrationEditionConfiguration.sourceUrl,
+  modelFiles: narrationEditionConfiguration.modelFiles,
+  voiceFileSha256: narrationEditionConfiguration.voiceFileSha256,
+  voiceLocale: narrationEditionConfiguration.voiceLocale,
+  voiceGenderCatalogLabel: narrationEditionConfiguration.voiceGenderCatalogLabel,
+  speed: narrationEditionConfiguration.speed,
+  output: {
+    responseFormat: narrationEditionConfiguration.responseFormat,
+    sampleRateHz: narrationEditionConfiguration.normalisation.sampleRateHz,
+    channels: narrationEditionConfiguration.normalisation.channels,
+    bitrateKbps: narrationEditionConfiguration.normalisation.bitrateKbps,
+    normalisationVersion: narrationEditionConfiguration.normalisation.version,
+  },
+} as const
+
+/**
+ * The project owner listened to this exact fixed diagnostic and explicitly
+ * selected Emma. This receipt approves the speaker choice only. It does not
+ * claim a representative-pilot listen or approve a complete recorded edition.
+ */
+export const narrationVoiceSelectionReceipt = {
+  schemaVersion: 1,
+  selectedAt: '2026-08-11',
+  selectedBy: 'project owner',
+  approvalScope: 'speaker-selection-only',
+  passageId: 'passage:fdn-tinfoil-wax-cylinder:block-10-callout-title',
+  auditionPath: 'docs/narration/voice-selection/kokoro-bf-emma-diagnostic-2026-08-11.mp3',
+  auditionSha256: '899956afe3852838bb4de3c3205ac29242d7a562a8937e57652deb271f59de18',
+  model: narrationEditionConfiguration.model,
+  modelRevision: narrationEditionConfiguration.modelRevision,
+  runtime: narrationEditionConfiguration.runtime,
+  runtimeVersion: narrationEditionConfiguration.runtimeVersion,
+  quantization: narrationEditionConfiguration.quantization,
+  voice: narrationEditionConfiguration.voice,
+  speed: narrationEditionConfiguration.speed,
+  evidence: [
+    'The project owner listened to the fixed Emma diagnostic and described Emma as definitely British.',
+    'The project owner explicitly instructed the book to use Emma as its voice.',
+  ],
+  doesNotApprove: [
+    'representative voice-pilot listening',
+    'complete in-order edition listening',
+    'pronunciation, level, continuity or device checks for the full edition',
+  ],
 } as const
 
 /**
@@ -31,11 +100,9 @@ export const narrationEditionConfiguration = {
  * cannot establish accent or gender presentation.
  */
 export const narrationBritishVoiceComparison = {
-  passageId: 'passage:opening:block-1-paragraph',
+  passageId: narrationVoiceSelectionReceipt.passageId,
   candidates: [
-    { label: 'A', voice: 'shimmer' },
-    { label: 'B', voice: 'nova' },
-    { label: 'C', voice: 'coral' },
+    { label: 'A', voice: 'bf_emma' },
   ],
 } as const
 

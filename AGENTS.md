@@ -46,8 +46,8 @@ No later team may silently broaden an earlier team’s claim. A visually elegant
 ## British-English narration gate
 
 - Narration is a fixed, AI-generated recorded edition. Playback never generates speech live and must always disclose that the voice is not human.
-- The stale `marin` pilot was rejected and is not an approval precedent. `coral` is the current editorial choice from the `shimmer` / `nova` / `coral` comparison, but that choice remains provisional until a human listener confirms a natural mature woman speaking modern Standard Southern British English—or rejects all candidates.
-- A voice name and prompt cannot certify accent, age or gender presentation. Require, in order: equal-text comparison approval; representative pilot approval; complete generation; full in-order human listen; pronunciation, level, continuity and disclosure approval; immutable release manifest.
+- The stale `marin` and `coral` pilots were rejected and are not approval precedents. The project owner selected Kokoro `bf_emma` after hearing the checksum-pinned diagnostic under `docs/narration/voice-selection/`. That receipt approves the speaker identity only; the production-config representative pilot and complete edition still require their separate human listening gates.
+- A voice name and prompt cannot certify accent, age or gender presentation. For edition `2026.2`, the tracked, checksum-pinned Emma diagnostic and explicit project-owner instruction satisfy the candidate-selection gate; they do not satisfy the representative-pilot gate. Require, in order: that exact selection receipt; representative pilot approval; complete generation; full in-order human listen; pronunciation, level, continuity and disclosure approval; immutable release manifest. A changed voice, model, runtime, speed or selection sample requires a new candidate-selection decision.
 - Read the manuscript exactly. Put pronunciation guidance on individual passages so a correction invalidates only the affected recording.
 - Do not release partial, mixed, stale or merely technically valid audio. Technical QC complements human editorial listening; it does not replace it.
 

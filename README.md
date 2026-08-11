@@ -14,11 +14,11 @@ An interactive, evidence-led digital book about the material history of sound, m
 
 ## Recorded narration
 
-Narration is a fixed audio edition, not a live voice session. The generation script sends each approved manuscript passage to the OpenAI Speech API once, trims only boundary silence, normalises it to the edition’s pinned loudness target, writes an MP3 addressed by the checksum of its final audio bytes, and performs pacing, loudness, true-peak, silence, checksum and full-decode checks. Playback fetches approved static files; it never asks a model to recreate the voice.
+Narration is a fixed AI-generated audio edition, not a live voice session. Each settled manuscript passage is synthesised once on the production machine, trimmed only at its outer boundaries, normalised to the pinned loudness target and written as a checksum-addressed static MP3. Generation and verification measure pacing, loudness, true peak, boundary silence and full decoding. Playback never runs a speech model.
 
-The production configuration uses pinned `gpt-4o-mini-tts-2025-12-15` output with the `coral` voice and detailed direction for one mature, warm modern Southern British woman’s reading. `coral` is the current editorial choice from the equal-text candidate comparison; because a model and voice name alone cannot establish gender presentation, accent or identity consistency, human comparison approval and then a representative listening pilot remain hard gates before full generation. The interface clearly discloses that the recording is AI-generated. A partial or subset-run manifest is rejected, so readers cannot accidentally hear a mixture of approved and missing passages.
+Edition `2026.2` uses the British female voice `bf_emma` from `onnx-community/Kokoro-82M-v1.0-ONNX`, pinned to revision `1939ad2a8e416c0acfeecc08a694d14ef25f2231`, q8 inference and `kokoro-js@1.2.1`. Final files are 24 kHz mono MP3 at 48 kbps. The project owner selected Emma after listening to the exact diagnostic stored under `docs/narration/voice-selection/`; that decision approves the speaker only. It does not stand in for the representative-pilot listen or the complete in-order edition listen.
 
-The production key is required only while producing an edition and is never bundled, deployed to the browser or needed during playback.
+The model runs locally and needs no API credential. Its exact model, tokenizer and Emma voice files are checksum-pinned before inference. The synthesiser is isolated in the private `tools/narration/` package rather than installed in the root application dependency tree. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for model, runtime and phonemiser provenance.
 
 ## Run locally
 
@@ -33,61 +33,33 @@ The static manuscript is available at `/manuscript.html`.
 
 ## Produce the narration once
 
-Audio generation also requires FFmpeg/ffprobe and a valid server-side `OPENAI_API_KEY`. The ordinary scripts use `ffmpeg` and `ffprobe` from `PATH` by default and accept absolute `FFMPEG_PATH` and `FFPROBE_PATH` overrides. The key must never be copied into the repository, downloaded from Vercel or exposed to a browser.
-
-The canonical Vercel variable is Sensitive and Production-only, so use the disposable job runner from this already linked workspace. It validates the exact canonical project id, invokes a pinned Vercel CLI, stages version-controlled files plus an explicit allowlist of new application sources, and rejects secret-prone paths or live credential patterns. Pinned npm FFmpeg binaries are added only to the temporary tree. The runner creates a Production-target deployment with `--prod --skip-domain`; the canonical alias is never moved. The build returns only manifest-referenced narration audio and metadata in checksummed chunks. Before importing anything, the runner validates every path, inner/outer digest, size bound, edition, source, manuscript and passage identity. It then removes every deployment bearing that random job id and proves absence with a successful canonical-project query. It never runs `vercel link`, exports the key or prints it.
-
-Inspect the non-mutating plan first:
+Audio generation requires FFmpeg/ffprobe. The scripts use `ffmpeg` and `ffprobe` from `PATH` by default and accept absolute `FFMPEG_PATH` and `FFPROBE_PATH` overrides. Install the pinned, generation-only runtime separately after the root application install:
 
 ```bash
-npm run narration:vercel-job -- --pilot --dry-run
+npm ci --prefix tools/narration
 ```
 
-If the provisional speaker has not yet been accepted, generate the three-voice, equal-text British comparison. Listen to candidates A, B and C in full and select one only if it unmistakably meets the accent, adult-woman, warmth and cadence brief:
+The generator fails closed with that same instruction when the isolated runtime is absent. On first use it downloads only the four files required from the exact model revision into the ignored `.narration-work/models/` cache and verifies every configured SHA-256 digest. The isolated runtime version and bundled Emma voice vector are verified as well.
+
+Generate the representative voice pilot locally:
 
 ```bash
-npm run narration:vercel-job -- --comparison
+npm run narration:pilot
 ```
 
-Record the human decision. Both outcomes require a complete comparison on headphones and a phone speaker. Selecting a candidate additionally requires every accent, speaker and delivery confirmation; rejecting all candidates makes none of those claims:
-
-```bash
-npm run narration:approve-comparison -- --approver="Editor name" --select=B --confirm-listened --confirm-device-check --confirm-british-accent --confirm-adult-woman --confirm-warmth --confirm-cadence
-# Or, if none is acceptable:
-npm run narration:approve-comparison -- --approver="Editor name" --reject-all --confirm-listened --confirm-device-check
-```
-
-The receipt at `.narration-work/british-voice-comparison/approval.json` binds the pinned model, exact instructions and voice profile, output format, normalisation, exact comparison passage, and the ordered candidate audio checksums and technical QC. It deliberately excludes the provisional production voice and the rest of the manuscript: selecting B or C remains valid while `narrationEditionConfiguration.voice` is changed to that selected voice, and an unrelated manuscript edit does not manufacture a new listening decision. A changed comparison passage, voice direction, model, candidate file or QC record does invalidate it. The approval command upgrades the original schema-one comparison manifest in place after verifying its original configuration and every audio checksum, so the existing candidates do not need to be regenerated merely to add the gate. Generating a new comparison removes the older receipt.
-
-Set the selected built-in voice in `src/data/narrationEdition.ts` before generating the representative pilot. Both the local disposable-job preflight and the remote generator require the receipt to select that exact current voice before any Speech API request. If all three were rejected, revise and regenerate the comparison; technical checks cannot certify accent or gender presentation.
-
-First generate the representative voice pilot:
-
-```bash
-npm run narration:vercel-job -- --pilot
-```
-
-Listen to every pilot file listed in `.narration-work/pilot-manifest.json`. If—and only if—they sound like the same warm adult woman, with a natural contemporary Southern British accent, steady cadence, level and correct pronunciations, record that decision explicitly:
+The command writes 14 checksum-addressed 24 kHz / 48 kbps files under `public/audio/narration/edition-2026-2/` and a private `.narration-work/pilot-manifest.json`. Technical QC is not editorial approval. Listen to every listed file in full. If—and only if—the set sounds like the same warm British woman with suitable cadence, level and pronunciations, record that decision explicitly:
 
 ```bash
 npm run narration:approve-pilot -- --approver="Editor name" --confirm-pilot-listened --confirm-same-woman --confirm-british-accent --confirm-warmth --confirm-cadence --confirm-level --confirm-pronunciations
 ```
 
-Only then will the full production-target job run. It refuses to deploy unless the local generation state, pilot manifest, approved pilot digest and pilot audio all match the current manuscript:
+Only then will complete generation run. It refuses to start unless the pilot manifest, approval digest, configuration, manuscript and pilot files all still match:
 
 ```bash
-npm run narration:vercel-job -- --full
+npm run narration:generate
 ```
 
-The resumable generator stores immutable assets under `public/audio/narration/edition-2026-1/`, private generation state under `.narration-work/`, and an unapproved candidate manifest. Passage-specific pronunciation notes participate only in that passage’s digest. Direct `narration:generate -- --section=<id>` and `--limit=<number>` remain available in other trusted server environments for diagnostic runs, but any subset run is permanently marked incomplete and cannot be approved.
-
-Disposable generation consumes OpenAI API usage and Vercel build resources. A complete edition is large and remains subject to the project’s build-duration and output limits. A remote timeout cannot return its new resumable state, so preserve every successfully imported `.narration-work` file and content-addressed MP3. The runner prints a random job id before deployment, catches SIGINT/SIGTERM, stops its active child process, and runs the same metadata-scoped cleanup in `finally`. A forced process kill or machine loss cannot run local cleanup; recover without guessing a deployment id using the printed command:
-
-```bash
-npm run narration:vercel-job -- --cleanup-job="paste the printed hexadecimal job id here"
-```
-
-Cleanup removes only deployments carrying that job id under the canonical linked project. Any failed removal or failed post-removal proof makes the command fail and must be resolved before retrying generation.
+Generation is resumable: verified content-addressed files are reused and private state is persisted after each passage. Passage-specific pronunciation notes participate only in that passage’s digest. Diagnostic `--section=<id>` and `--limit=<number>` subsets are permanently marked incomplete and cannot become a release. The former OpenAI/Vercel generation path is retired; `bf_emma` is not an OpenAI voice and no OpenAI key is used or exported.
 
 After a complete human listening and pronunciation pass, publish the release manifest explicitly:
 
@@ -96,7 +68,7 @@ npm run narration:approve -- --approver="Editor name" --confirm-listened --confi
 npm run narration:verify
 ```
 
-Only that approval step writes `public/audio/narration/manifest.json` and its content-addressed twin under `public/audio/narration/releases/`. A released edition cannot be replaced with different content under the same edition number; bump the edition instead. Commit the approved manifests and immutable audio assets, then deploy them as ordinary static files. Changing the manuscript, voice direction or pinned model invalidates the matching release and requires affected passages—and the complete listening approval—to be produced again.
+Only that approval step writes `public/audio/narration/manifest.json` and its content-addressed twin under `public/audio/narration/releases/`. A released edition cannot be replaced under the same edition number. Commit the approved manifests and immutable audio assets, then deploy them as ordinary static files. A manuscript, voice, model, runtime, speed or encoding change invalidates the matching release.
 
 Passage-sized files preserve exact paragraph highlighting and fine-grained saved-position recovery. The player reuses one audio element, prefetches the next passage and has automated ended-chain coverage. This design still requires the release checklist’s real-device Safari, iOS and background-playback continuity pass; it does not claim the sample files are intrinsically gapless section masters.
 
@@ -113,7 +85,9 @@ npm run test:e2e
 
 ## Deploy to Vercel
 
-Import the repository and deploy. `vercel.json` provides SPA routing and security headers; narration is served from versioned static assets and requires no runtime API function. Keep `OPENAI_API_KEY` server-only for future edition generation and never prefix it with `VITE_`.
+Deploy the approved static release with the application. `vercel.json` provides SPA routing, security headers and immutable caching for edition `2026.2`; narration needs no runtime API function or credential. The 24 kHz / 48 kbps encoding is projected to fit the Hobby plan’s upload ceiling, but the final output must be measured rather than assumed.
+
+Source deployment intentionally excludes `tools/` and all of `public/audio/narration/` through `.vercelignore`, so it cannot install or upload the generation runtime, stale recordings or unapproved recordings. For the final release, build from a clean checkout or worktree at the exact approved Git SHA, run `vercel build --prod`, and prove the complete `.vercel/output` is below 100 MB. Stage it without moving the production alias using `vercel deploy --prebuilt --archive=tgz --prod --skip-domain`; at the unique deployment URL, verify READY status, Git/build metadata, the immutable manifest and every referenced audio asset. Only then promote that exact deployment with `vercel promote <deployment-url>`. Abort if the manifest, checksums, clean SHA or measured size differs from the approved release.
 
 ## Licence
 

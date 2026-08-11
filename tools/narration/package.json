@@ -1,0 +1,14 @@
+{
+  "name": "@the-programmable-voice/narration-toolchain",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned, generation-only dependencies for the fixed recorded narration edition.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "dependencies": {
+    "kokoro-js": "1.2.1"
+  }
+}

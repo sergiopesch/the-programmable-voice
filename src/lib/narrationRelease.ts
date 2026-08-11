@@ -84,6 +84,29 @@ export interface NarrationTechnicalQc {
   fullDecodePassed: true
 }
 
+export interface NarrationGenerationProvenance {
+  provider: string
+  modelRevision: string
+  runtime: string
+  runtimeVersion: string
+  quantization: string
+  device: string
+  sourceLicense: string
+  sourceUrl: string
+  modelFiles: readonly { path: string; sha256: string }[]
+  voiceFileSha256: string
+  voiceLocale: string
+  voiceGenderCatalogLabel: string
+  speed: number
+  output: {
+    responseFormat: string
+    sampleRateHz: number
+    channels: number
+    bitrateKbps: number
+    normalisationVersion: string
+  }
+}
+
 export interface NarrationManifestEntry {
   id: string
   sectionId: string
@@ -111,6 +134,7 @@ export interface NarrationManifest {
   edition: string
   model: string
   voice: string
+  provenance: NarrationGenerationProvenance
   disclosure: string
   configurationHash: string
   manuscriptHash: string
@@ -130,6 +154,7 @@ export interface NarrationPilotManifest {
   edition: string
   model: string
   voice: string
+  provenance: NarrationGenerationProvenance
   configurationHash: string
   manuscriptHash: string
   generatedAt: string
@@ -223,6 +248,7 @@ export function narrationPilotProfileMaterial(manifest: NarrationPilotManifest) 
     edition: manifest.edition,
     model: manifest.model,
     voice: manifest.voice,
+    provenance: manifest.provenance,
     configurationHash: manifest.configurationHash,
     manuscriptHash: manifest.manuscriptHash,
     passageCount: manifest.passageCount,
@@ -245,6 +271,7 @@ export function narrationReleaseIdentityMaterial(manifest: Omit<NarrationManifes
     edition: manifest.edition,
     model: manifest.model,
     voice: manifest.voice,
+    provenance: manifest.provenance,
     disclosure: manifest.disclosure,
     configurationHash: manifest.configurationHash,
     manuscriptHash: manifest.manuscriptHash,

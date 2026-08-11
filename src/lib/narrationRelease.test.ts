@@ -3,6 +3,7 @@ import {
   narrationApprovalChecklistVersion,
   narrationComparisonApprovalChecklistVersion,
   narrationComparisonApprovalConfirmations,
+  narrationGenerationProvenance,
   narrationPilotApprovalConfirmations,
   narrationReleaseApprovalConfirmations,
 } from '../data/narrationEdition'
@@ -72,6 +73,7 @@ function identityFields(): Omit<NarrationManifest, 'releaseId' | 'releaseManifes
     edition: '2026.1',
     model: 'pinned-model',
     voice: 'fixed-voice',
+    provenance: narrationGenerationProvenance,
     disclosure: 'AI-generated.',
     configurationHash: 'a'.repeat(64),
     manuscriptHash: 'b'.repeat(64),
@@ -123,6 +125,12 @@ describe('narration release contracts', () => {
     const changedAsset = identityFields()
     changedAsset.passages[0] = { ...changedAsset.passages[0]!, sha256: '9'.repeat(64) }
     expect(narrationReleaseIdentityMaterial(changedAsset)).not.toBe(narrationReleaseIdentityMaterial(first))
+
+    const changedProvenance = {
+      ...identityFields(),
+      provenance: { ...narrationGenerationProvenance, modelRevision: '0'.repeat(40) },
+    }
+    expect(narrationReleaseIdentityMaterial(changedProvenance)).not.toBe(narrationReleaseIdentityMaterial(first))
   })
 
   it('binds comparison approval to the voice profile and ordered audio, not the provisional voice or unrelated manuscript', () => {

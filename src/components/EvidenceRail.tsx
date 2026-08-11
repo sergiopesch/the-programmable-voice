@@ -34,7 +34,7 @@ export function EvidenceDrawer({ open, section, selectedSourceId, onClose }: Evi
       className="evidence-drawer"
     >
       <div className="evidence-drawer__intro">
-        <p>Claim-level sources for this section. Primary records, scholarship, standards and disclosures remain distinct.</p>
+        <p>Sources for this section, attached to the evidential passages they support. Primary records, scholarship, standards and disclosures remain distinct.</p>
       </div>
       <div className="evidence-drawer__list">
         {sourceIds.map((id) => {

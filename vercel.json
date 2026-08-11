@@ -9,7 +9,7 @@
       ]
     },
     {
-      "source": "/audio/narration/edition-2026-1/(.*)",
+      "source": "/audio/narration/edition-2026-2/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]

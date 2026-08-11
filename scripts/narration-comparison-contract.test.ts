@@ -126,23 +126,24 @@ describe('British narration comparison contract', () => {
     expect(upgraded.manuscriptHash).toBe('an-obsolete-whole-manuscript-hash')
   })
 
-  it('keeps a B/C decision valid across the deliberate production-voice edit and unrelated manuscript changes', () => {
+  it('binds the selected candidate while ignoring unrelated manuscript changes', () => {
     const { manifest } = currentManifest()
-    const approval = selectedApproval(manifest, 'B')
-    expect(assertNarrationComparisonApproval(manifest, approval, 'nova').voice).toBe('nova')
-    expect(() => assertNarrationComparisonApproval(manifest, approval, 'shimmer')).toThrow(/selected candidate B/)
+    const approval = selectedApproval(manifest, 'A')
+    const selectedVoice = manifest.candidates[0]!.voice
+    expect(assertNarrationComparisonApproval(manifest, approval, selectedVoice).voice).toBe(selectedVoice)
+    expect(() => assertNarrationComparisonApproval(manifest, approval, 'different-voice')).toThrow(/selected candidate A/)
     expect(() => assertNarrationComparisonApproval(manifest, {
       ...approval,
-      decision: { kind: 'selected', candidateLabel: 'B', voice: 'coral' },
-    }, 'coral')).toThrow(/does not belong/)
+      decision: { kind: 'selected', candidateLabel: 'A', voice: 'different-voice' },
+    }, 'different-voice')).toThrow(/does not belong/)
     expect(() => assertNarrationComparisonApproval(manifest, {
       ...approval,
       comparisonProfileHash: '0'.repeat(64),
-    }, 'nova')).toThrow(/exact candidate profile/)
+    }, selectedVoice)).toThrow(/exact candidate profile/)
 
-    const unrelatedManuscriptEdit = { ...manifest, manuscriptHash: '9'.repeat(64), provisionalProductionVoice: 'nova' }
+    const unrelatedManuscriptEdit = { ...manifest, manuscriptHash: '9'.repeat(64), provisionalProductionVoice: 'different-voice' }
     expect(() => assertNarrationComparisonManifestMatchesCurrent(unrelatedManuscriptEdit)).not.toThrow()
-    expect(() => assertNarrationComparisonApproval(unrelatedManuscriptEdit, approval, 'nova')).not.toThrow()
+    expect(() => assertNarrationComparisonApproval(unrelatedManuscriptEdit, approval, selectedVoice)).not.toThrow()
 
     const changedComparisonPassage = {
       ...manifest,

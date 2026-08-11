@@ -3,6 +3,7 @@ import path from 'node:path'
 import {
   narrationComparisonApprovalChecklistVersion,
   narrationComparisonApprovalConfirmations,
+  narrationEditionConfiguration,
 } from '../src/data/narrationEdition'
 import {
   narrationComparisonApprovalIsComplete,
@@ -29,6 +30,9 @@ async function atomicWrite(filePath: string, data: string) {
 }
 
 async function main() {
+  if (narrationEditionConfiguration.provider === 'local-open-weight-inference') {
+    throw new Error('The OpenAI comparison approval command is retired. Emma speaker selection is recorded by narrationVoiceSelectionReceipt and does not approve the representative pilot.')
+  }
   const approver = argumentValue('--approver')
   const selectedLabel = argumentValue('--select')?.toUpperCase()
   const rejectAll = process.argv.includes('--reject-all')

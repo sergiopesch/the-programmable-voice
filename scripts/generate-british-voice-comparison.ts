@@ -166,6 +166,9 @@ async function technicalQc(filePath: string, text: string): Promise<TechnicalQc>
 }
 
 async function main() {
+  if (narrationEditionConfiguration.provider === 'local-open-weight-inference') {
+    throw new Error('The OpenAI built-in voice comparison is retired. The project owner selected the checksum-pinned bf_emma diagnostic recorded in narrationVoiceSelectionReceipt.')
+  }
   if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.length < 16) {
     throw new Error('A usable OPENAI_API_KEY was not injected. Run this script only through the authorised Vercel Production environment.')
   }

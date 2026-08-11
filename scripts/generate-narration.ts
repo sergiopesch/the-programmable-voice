@@ -2,16 +2,18 @@ import { createHash } from 'node:crypto'
 import { execFile } from 'node:child_process'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 import {
   narrationApprovalChecklistVersion,
   narrationDisclosure,
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
-  narrationInstructionsFor,
+  narrationGenerationProvenance,
   narrationPassageHashMaterial,
   narrationPilotApprovalConfirmations,
   narrationPilotPassageIds,
+  narrationVoiceSelectionReceipt,
 } from '../src/data/narrationEdition'
 import { bookNarrationPassages, type NarrationPassage } from '../src/lib/narration'
 import {
@@ -26,7 +28,6 @@ import {
   type NarrationPilotManifest,
   type NarrationTechnicalQc,
 } from '../src/lib/narrationRelease'
-import { requireSelectedNarrationComparison } from './narration-comparison-contract'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
@@ -39,7 +40,11 @@ const candidateManifestPath = path.join(workRoot, 'candidate-manifest.json')
 const pilotManifestPath = path.join(workRoot, 'pilot-manifest.json')
 const pilotApprovalPath = path.join(workRoot, 'pilot-approval.json')
 const statePath = path.join(workRoot, 'generation-state.json')
+const narrationToolchainRoot = path.join(projectRoot, 'tools', 'narration')
+const narrationRuntimeInstallCommand = 'npm ci --prefix tools/narration'
 const configuration = narrationEditionConfiguration
+const modelCacheKey = `kokoro-82m-v1-0-onnx-${configuration.modelRevision.slice(0, 7)}`
+const modelRoot = path.join(workRoot, 'models', modelCacheKey)
 
 interface GenerationState {
   configurationHash: string
@@ -52,10 +57,33 @@ interface CandidateManifest extends Omit<NarrationManifest, 'releaseId' | 'relea
   generationScope: { mode: 'full' | 'subset'; requestedPassageCount: number }
 }
 
-class SpeechRequestError extends Error {
-  constructor(message: string, readonly retryable: boolean, readonly retryAfterMs = 0) {
-    super(message)
+interface KokoroAudio {
+  audio: Float32Array
+  sampling_rate: number
+}
+
+interface NarrationTextSplitter {
+  push(text: string): void
+  close(): void
+}
+
+interface KokoroEngine {
+  voices: Record<string, { language: string; gender: string }>
+  generate(text: string, options: { voice: string; speed: number }): Promise<KokoroAudio>
+  stream(
+    splitter: NarrationTextSplitter,
+    options: { voice: string; speed: number },
+  ): AsyncIterable<{ text: string; audio: KokoroAudio }>
+}
+
+interface KokoroRuntimeModule {
+  KokoroTTS: {
+    from_pretrained(
+      snapshot: string,
+      options: { dtype: string; device: string },
+    ): Promise<KokoroEngine>
   }
+  TextSplitterStream: new () => NarrationTextSplitter
 }
 
 function sha256(value: string | Uint8Array) {
@@ -142,7 +170,7 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
     ? [45, 240]
     : wordCount < 20
       ? [90, 195]
-      : [115, 175]
+      : [100, 180]
   if (
     !Number.isFinite(durationMeasuredSeconds)
     || durationMeasuredSeconds < 0.35
@@ -203,7 +231,7 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
 async function normaliseAudio(bytes: Uint8Array, passageId: string) {
   const safeId = passageId.replace(/[^a-z0-9]+/gi, '-').slice(0, 72)
   const unique = `${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`
-  const rawPath = path.join(workRoot, 'temporary', `${safeId}-${unique}-raw.mp3`)
+  const rawPath = path.join(workRoot, 'temporary', `${safeId}-${unique}-raw.wav`)
   const normalisedPath = path.join(workRoot, 'temporary', `${safeId}-${unique}-normalised.mp3`)
   await fs.mkdir(path.dirname(rawPath), { recursive: true })
   await fs.writeFile(rawPath, bytes)
@@ -234,58 +262,152 @@ async function normaliseAudio(bytes: Uint8Array, passageId: string) {
   }
 }
 
-async function requestSpeech(passage: NarrationPassage) {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 90_000)
-  try {
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: configuration.model,
-        voice: configuration.voice,
-        instructions: narrationInstructionsFor(passage.id),
-        response_format: configuration.responseFormat,
-        speed: 1,
-        input: passage.text,
-      }),
-    })
-    if (!response.ok) {
-      const requestId = response.headers.get('x-request-id')
-      const retryAfter = Number(response.headers.get('retry-after') ?? 0)
-      throw new SpeechRequestError(
-        `Speech generation failed with HTTP ${response.status}${requestId ? ` (${requestId})` : ''}`,
-        response.status === 429 || response.status >= 500,
-        Number.isFinite(retryAfter) ? retryAfter * 1_000 : 0,
-      )
-    }
-    return new Uint8Array(await response.arrayBuffer())
-  } catch (error) {
-    if (error instanceof SpeechRequestError) throw error
-    throw new SpeechRequestError(error instanceof Error ? error.message : 'Speech request failed.', true)
-  } finally {
-    clearTimeout(timeout)
+function safeModelRelativePath(relativePath: string) {
+  if (
+    relativePath.length === 0
+    || path.isAbsolute(relativePath)
+    || relativePath.includes('\\')
+    || relativePath.split('/').some((segment) => segment === '' || segment === '.' || segment === '..')
+  ) throw new Error(`Unsafe narration model path: ${relativePath}.`)
+  return relativePath
+}
+
+async function fileSha256(filePath: string) {
+  return sha256(new Uint8Array(await fs.readFile(filePath)))
+}
+
+async function ensurePinnedModelSnapshot() {
+  for (const descriptor of configuration.modelFiles) {
+    const relativePath = safeModelRelativePath(descriptor.path)
+    const destination = path.join(modelRoot, relativePath)
+    if (await fileSha256(destination).catch(() => '') === descriptor.sha256) continue
+    const encodedPath = relativePath.split('/').map(encodeURIComponent).join('/')
+    const source = `https://huggingface.co/${configuration.model}/resolve/${configuration.modelRevision}/${encodedPath}?download=true`
+    const response = await fetch(source, { redirect: 'follow' })
+    if (!response.ok) throw new Error(`Could not download pinned Kokoro asset ${relativePath}: HTTP ${response.status}.`)
+    const bytes = new Uint8Array(await response.arrayBuffer())
+    if (sha256(bytes) !== descriptor.sha256) throw new Error(`Pinned Kokoro asset ${relativePath} failed its configured checksum.`)
+    await atomicWrite(destination, bytes)
+  }
+  return modelRoot
+}
+
+async function requireSelectedEmmaAudition() {
+  const receipt = narrationVoiceSelectionReceipt
+  if (
+    receipt.approvalScope !== 'speaker-selection-only'
+    || receipt.model !== configuration.model
+    || receipt.modelRevision !== configuration.modelRevision
+    || receipt.runtime !== configuration.runtime
+    || receipt.runtimeVersion !== configuration.runtimeVersion
+    || receipt.quantization !== configuration.quantization
+    || receipt.voice !== configuration.voice
+    || receipt.speed !== configuration.speed
+    || !receipt.doesNotApprove.includes('representative voice-pilot listening')
+  ) throw new Error('The Emma speaker-selection receipt does not match this narration configuration.')
+  const auditionPath = path.resolve(projectRoot, receipt.auditionPath)
+  const allowedRoot = `${path.join(projectRoot, 'docs', 'narration', 'voice-selection')}${path.sep}`
+  if (!auditionPath.startsWith(allowedRoot) || await fileSha256(auditionPath).catch(() => '') !== receipt.auditionSha256) {
+    throw new Error('The exact Emma audition selected by the project owner is unavailable or failed its checksum.')
   }
 }
 
-async function withRetry<T>(operation: () => Promise<T>, attempts = 4): Promise<T> {
-  let latestError: unknown
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      return await operation()
-    } catch (error) {
-      latestError = error
-      if (error instanceof SpeechRequestError && !error.retryable) break
-      if (attempt === attempts) break
-      const retryAfter = error instanceof SpeechRequestError ? error.retryAfterMs : 0
-      await new Promise((resolve) => setTimeout(resolve, Math.max(retryAfter, 700 * 2 ** (attempt - 1))))
+async function readIsolatedRuntimePackage(runtimePackagePath: string) {
+  try {
+    return JSON.parse(await fs.readFile(runtimePackagePath, 'utf8')) as { version?: string }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error(`The isolated narration runtime is not installed. Run "${narrationRuntimeInstallCommand}" from the project root.`)
     }
+    throw error
   }
-  throw latestError
+}
+
+async function loadSpeechEngine() {
+  await requireSelectedEmmaAudition()
+  const runtimeRoot = path.join(narrationToolchainRoot, 'node_modules', configuration.runtime)
+  const runtimePackagePath = path.join(runtimeRoot, 'package.json')
+  const runtimePackage = await readIsolatedRuntimePackage(runtimePackagePath)
+  if (runtimePackage.version !== configuration.runtimeVersion) throw new Error(`Expected ${configuration.runtime}@${configuration.runtimeVersion}.`)
+  const voicePath = path.join(runtimeRoot, 'voices', `${configuration.voice}.bin`)
+  if (await fileSha256(voicePath).catch(() => '') !== configuration.voiceFileSha256) throw new Error('The pinned Emma voice data failed its checksum.')
+  const snapshot = await ensurePinnedModelSnapshot()
+  const runtimeEntry = path.join(runtimeRoot, 'dist', 'kokoro.js')
+  const runtime = await import(pathToFileURL(runtimeEntry).href) as KokoroRuntimeModule
+  const engine = await runtime.KokoroTTS.from_pretrained(snapshot, {
+    dtype: configuration.quantization,
+    device: configuration.device,
+  })
+  const voice = engine.voices[configuration.voice]
+  if (voice.language !== configuration.voiceLocale || voice.gender !== configuration.voiceGenderCatalogLabel) {
+    throw new Error('The Kokoro runtime catalogue no longer identifies bf_emma as the configured British female voice.')
+  }
+  return { engine, TextSplitterStream: runtime.TextSplitterStream }
+}
+
+function float32Wave(samples: Float32Array, sampleRateHz: number) {
+  const bytes = new Uint8Array(44 + samples.length * 4)
+  const view = new DataView(bytes.buffer)
+  const ascii = (offset: number, value: string) => {
+    for (let index = 0; index < value.length; index += 1) view.setUint8(offset + index, value.charCodeAt(index))
+  }
+  ascii(0, 'RIFF')
+  view.setUint32(4, bytes.length - 8, true)
+  ascii(8, 'WAVE')
+  ascii(12, 'fmt ')
+  view.setUint32(16, 16, true)
+  view.setUint16(20, 3, true)
+  view.setUint16(22, 1, true)
+  view.setUint32(24, sampleRateHz, true)
+  view.setUint32(28, sampleRateHz * 4, true)
+  view.setUint16(32, 4, true)
+  view.setUint16(34, 32, true)
+  ascii(36, 'data')
+  view.setUint32(40, samples.length * 4, true)
+  for (let index = 0; index < samples.length; index += 1) view.setFloat32(44 + index * 4, samples[index] ?? 0, true)
+  return bytes
+}
+
+function concatenateSamples(chunks: readonly Float32Array[]) {
+  const output = new Float32Array(chunks.reduce((total, chunk) => total + chunk.length, 0))
+  let offset = 0
+  for (const chunk of chunks) {
+    output.set(chunk, offset)
+    offset += chunk.length
+  }
+  return output
+}
+
+function assertExactSegmentText(passageText: string, spokenSegments: readonly string[], passageId = 'passage') {
+  if (spokenSegments.length === 0 || spokenSegments.join(' ') !== passageText) {
+    throw new Error(`${passageId} could not be segmented without changing its exact manuscript text.`)
+  }
+}
+
+async function synthesisePassage(
+  runtime: { engine: KokoroEngine; TextSplitterStream: new () => NarrationTextSplitter },
+  passage: NarrationPassage,
+) {
+  const { engine } = runtime
+  if (passage.text.length <= 320) {
+    const audio = await engine.generate(passage.text, { voice: configuration.voice, speed: configuration.speed })
+    return float32Wave(audio.audio, audio.sampling_rate)
+  }
+
+  const splitter = new runtime.TextSplitterStream()
+  splitter.push(passage.text)
+  splitter.close()
+  const chunks: Float32Array[] = []
+  const spokenSegments: string[] = []
+  let sampleRateHz = 0
+  for await (const segment of engine.stream(splitter, { voice: configuration.voice, speed: configuration.speed })) {
+    spokenSegments.push(segment.text)
+    chunks.push(segment.audio.audio)
+    sampleRateHz ||= segment.audio.sampling_rate
+  }
+  assertExactSegmentText(passage.text, spokenSegments, passage.id)
+  if (chunks.length === 0 || sampleRateHz <= 0) throw new Error(`${passage.id} produced no audio samples.`)
+  return float32Wave(concatenateSamples(chunks), sampleRateHz)
 }
 
 async function runPool<T>(items: readonly T[], concurrency: number, worker: (item: T, index: number) => Promise<void>) {
@@ -381,7 +503,9 @@ async function main() {
   if (pilot && (limitArg || sectionArg)) throw new Error('--pilot cannot be combined with --limit or --section.')
   const limit = Math.max(1, numberArgument('--limit=', Number.POSITIVE_INFINITY))
   const sectionId = sectionArg?.slice('--section='.length)
-  const concurrency = Math.min(6, Math.max(1, Math.floor(numberArgument('--concurrency=', pilot ? 2 : 4))))
+  const requestedConcurrency = Math.min(6, Math.max(1, Math.floor(numberArgument('--concurrency=', 1))))
+  if (requestedConcurrency !== 1) process.stdout.write('Kokoro local inference uses one checksum-pinned engine; concurrency is fixed at 1.\n')
+  const concurrency = 1
   const fullRun = !pilot && !limitArg && !sectionArg
   const pilotIds = new Set<string>(narrationPilotPassageIds)
   const selected = (pilot
@@ -392,15 +516,10 @@ async function main() {
     throw new Error('The configured voice-pilot passages no longer match this manuscript.')
   }
   if (selected.length === 0) throw new Error('No narration passages matched the requested scope.')
-  for (const passage of selected) if (passage.text.length > 4096) throw new Error(`${passage.id} exceeds the Speech API 4,096-character limit.`)
-
-  await requireSelectedNarrationComparison(projectRoot)
   const configurationHash = sha256(JSON.stringify(configuration))
   const { manuscriptHash } = manuscriptIdentity(configurationHash)
   const pilotProfileHash = pilot ? '' : await requireApprovedPilot(configurationHash, manuscriptHash)
-  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.length < 16) {
-    throw new Error('The production OPENAI_API_KEY is absent or is not a valid OpenAI API credential. Update it in Vercel before generating narration.')
-  }
+  const speechRuntime = await loadSpeechEngine()
 
   await fs.mkdir(assetRoot, { recursive: true })
   await fs.mkdir(workRoot, { recursive: true })
@@ -430,7 +549,7 @@ async function main() {
       return
     }
 
-    const rawBytes = await withRetry(() => requestSpeech(passage))
+    const rawBytes = await synthesisePassage(speechRuntime, passage)
     const bytes = await normaliseAudio(rawBytes, passage.id)
     const audioHash = sha256(bytes)
     const filename = safeFilename(globalIndex, passage.id, audioHash)
@@ -471,6 +590,7 @@ async function main() {
       edition: configuration.edition,
       model: configuration.model,
       voice: configuration.voice,
+      provenance: narrationGenerationProvenance,
       configurationHash,
       manuscriptHash,
       generatedAt: new Date().toISOString(),
@@ -498,6 +618,7 @@ async function main() {
     edition: configuration.edition,
     model: configuration.model,
     voice: configuration.voice,
+    provenance: narrationGenerationProvenance,
     disclosure: narrationDisclosure,
     configurationHash,
     manuscriptHash,
@@ -525,4 +646,22 @@ async function main() {
   else if (fullRun) process.exitCode = 1
 }
 
-await main()
+const entryPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : ''
+if (import.meta.url === entryPath) {
+  try {
+    await main()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown narration-generation failure.'
+    process.stderr.write(`Narration generation failed: ${message}\n`)
+    process.exitCode = 1
+  }
+}
+
+export {
+  assertExactSegmentText,
+  concatenateSamples,
+  float32Wave,
+  narrationRuntimeInstallCommand,
+  readIsolatedRuntimePackage,
+  safeModelRelativePath,
+}

@@ -8,6 +8,7 @@ import {
   narrationDisclosure,
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
+  narrationGenerationProvenance,
   narrationPassageHashMaterial,
   narrationPilotApprovalConfirmations,
   narrationPilotPassageIds,
@@ -104,7 +105,7 @@ function assertTechnicalQcShape(entry: NarrationManifestEntry, passage: Narratio
     ? [45, 240]
     : words < 20
       ? [90, 195]
-      : [115, 175]
+      : [100, 180]
   const finite = [
     entry.durationSeconds,
     qc.durationExpectedSeconds,
@@ -257,6 +258,7 @@ function assertReleaseCore(manifest: CandidateManifest | NarrationManifest) {
     manifest.edition !== narrationEditionConfiguration.edition
     || manifest.model !== narrationEditionConfiguration.model
     || manifest.voice !== narrationEditionConfiguration.voice
+    || JSON.stringify(manifest.provenance) !== JSON.stringify(narrationGenerationProvenance)
   ) {
     throw new Error('Narration edition metadata does not match the pinned configuration.')
   }
@@ -303,8 +305,7 @@ async function verifyEntries(
   })
 }
 
-async function approvePilot() {
-  const approver = requireApprovalFlags(narrationPilotApprovalConfirmations)
+async function verifyPilot() {
   const manifest = await readJson<NarrationPilotManifest>(pilotManifestPath, 'Narration voice pilot')
   const expected = expectedManuscript()
   const expectedPilot = narrationPilotPassageIds.map((id) => expected.passages.find(({ passage }) => passage.id === id)).filter((item): item is { passage: NarrationPassage; textHash: string } => Boolean(item))
@@ -316,6 +317,7 @@ async function approvePilot() {
     || manifest.edition !== narrationEditionConfiguration.edition
     || manifest.model !== narrationEditionConfiguration.model
     || manifest.voice !== narrationEditionConfiguration.voice
+    || JSON.stringify(manifest.provenance) !== JSON.stringify(narrationGenerationProvenance)
     || expectedPilot.length !== narrationPilotPassageIds.length
     || manifest.passageCount !== expectedPilot.length
     || manifest.passages.length !== expectedPilot.length
@@ -324,6 +326,13 @@ async function approvePilot() {
   }
   assertEntrySequence(manifest.passages, expectedPilot)
   await verifyEntries(manifest.passages, expectedPilot, false)
+  process.stdout.write(`Verified pending voice pilot: ${manifest.passageCount} technically valid samples; no human approval was recorded.\n`)
+  return { manifest, expected }
+}
+
+async function approvePilot() {
+  const approver = requireApprovalFlags(narrationPilotApprovalConfirmations)
+  const { manifest, expected } = await verifyPilot()
   const pilotProfileHash = sha256(narrationPilotProfileMaterial(manifest))
   const approval: NarrationPilotApproval = {
     schemaVersion: 1,
@@ -412,9 +421,11 @@ async function verifyRelease(lightweight: boolean) {
 async function main() {
   const approve = process.argv.includes('--approve')
   const approvePilotMode = process.argv.includes('--approve-pilot')
+  const verifyPilotMode = process.argv.includes('--verify-pilot')
   const lightweight = process.argv.includes('--lightweight')
-  if (Number(approve) + Number(approvePilotMode) > 1) throw new Error('Choose either --approve or --approve-pilot.')
-  if (lightweight && (approve || approvePilotMode)) throw new Error('Approval always requires full local FFmpeg verification; remove --lightweight.')
+  if (Number(approve) + Number(approvePilotMode) + Number(verifyPilotMode) > 1) throw new Error('Choose one of --approve, --approve-pilot or --verify-pilot.')
+  if (lightweight && (approve || approvePilotMode || verifyPilotMode)) throw new Error('Pilot and approval checks require full local FFmpeg verification; remove --lightweight.')
+  if (verifyPilotMode) return verifyPilot()
   if (approvePilotMode) return approvePilot()
   if (approve) return approveRelease()
   return verifyRelease(lightweight)

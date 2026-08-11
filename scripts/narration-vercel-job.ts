@@ -1160,6 +1160,9 @@ async function main() {
     await cleanupDisposableDeployments(projectRoot, cleanupJobId)
     return
   }
+  if (narrationEditionConfiguration.provider === 'local-open-weight-inference') {
+    throw new Error('The disposable OpenAI/Vercel narration generator is retired for edition 2026.2. Run narration:pilot and narration:generate locally; bf_emma is not an OpenAI voice.')
+  }
   const options = await parseOptions()
   if (options.worker) await remoteWorker(options)
   else await localJob(options)

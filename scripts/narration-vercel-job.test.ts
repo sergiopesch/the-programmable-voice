@@ -27,7 +27,6 @@ import {
   assertNoLiveSecretInFile,
   canonicalProject,
   cleanupDisposableDeployments,
-  comparisonPrerequisiteProblems,
   copyFileIntoStage,
   copyNarrationInputs,
   deploymentArguments,
@@ -160,15 +159,6 @@ describe('disposable Vercel narration staging', () => {
     await expect(fs.access(path.join(stage, 'public/audio/narration', narrationEditionAssetDirectory, `9999-orphan-${'a'.repeat(64)}.mp3`))).rejects.toMatchObject({ code: 'ENOENT' })
     expect(temporaryVercelIgnoreEntries).toContain('.vercel')
     expect(temporaryVercelIgnoreEntries.some((entry) => entry.includes('.narration-work') || entry.includes('public/audio/narration'))).toBe(false)
-  })
-
-  it('blocks a remote pilot locally when the selected comparison voice differs from configuration', async () => {
-    const root = await temporaryRoot()
-    const anotherVoice = narrationBritishVoiceComparison.candidates.find(({ voice }) => voice !== narrationEditionConfiguration.voice)!.voice
-    await writeComparisonApproval(root, anotherVoice)
-    await expect(comparisonPrerequisiteProblems(root)).resolves.toEqual([
-      expect.stringMatching(/approved comparison selected candidate/),
-    ])
   })
 
   it('exports only audio referenced by the completed pilot manifest', async () => {

@@ -7,6 +7,7 @@ import {
   narrationDisclosure,
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
+  narrationGenerationProvenance,
   narrationPassageHashMaterial,
   narrationReleaseApprovalConfirmations,
 } from '../src/data/narrationEdition'
@@ -84,6 +85,7 @@ function approvedNarrationManifest() {
     edition: narrationEditionConfiguration.edition,
     model: narrationEditionConfiguration.model,
     voice: narrationEditionConfiguration.voice,
+    provenance: narrationGenerationProvenance,
     disclosure: narrationDisclosure,
     configurationHash,
     manuscriptHash,

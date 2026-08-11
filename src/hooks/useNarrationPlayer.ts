@@ -3,6 +3,7 @@ import {
   narrationDisclosure,
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
+  narrationGenerationProvenance,
   narrationPassageHashMaterial,
 } from '../data/narrationEdition'
 import type { NarrationPassage } from '../lib/narration'
@@ -158,6 +159,7 @@ async function loadManifest(passages: readonly NarrationPassage[], signal?: Abor
     || manifest.edition !== narrationEditionConfiguration.edition
     || manifest.model !== narrationEditionConfiguration.model
     || manifest.voice !== narrationEditionConfiguration.voice
+    || JSON.stringify(manifest.provenance) !== JSON.stringify(narrationGenerationProvenance)
     || manifest.generationScope.mode !== 'full'
     || manifest.generationScope.requestedPassageCount !== expected.length
     || manifest.passageCount !== expected.length

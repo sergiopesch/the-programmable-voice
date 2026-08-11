@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-08-11T17:41:50Z",
+  "purpose": "British female narrator audition; not approved for production",
+  "passageId": "passage:fdn-tinfoil-wax-cylinder:block-10-callout-title",
+  "text": "Return becomes possible. Playback makes absence feel present, but no medium returns an untouched past. It creates a new event from a selective, ageing trace. The duty to preserve a voice therefore includes the duty to preserve its provenance, limits and human authority.",
+  "provider": "local open-weight inference",
+  "model": "onnx-community/Kokoro-82M-v1.0-ONNX",
+  "modelRevision": "1939ad2a8e416c0acfeecc08a694d14ef25f2231",
+  "runtime": "kokoro-js@1.2.1",
+  "quantization": "q8",
+  "voice": "bf_emma",
+  "cataloguedLanguage": "en-gb",
+  "cataloguedGender": "Female",
+  "speed": 0.86,
+  "output": {
+    "file": "kokoro-bf-emma-diagnostic-2026-08-11.mp3",
+    "sha256": "899956afe3852838bb4de3c3205ac29242d7a562a8937e57652deb271f59de18",
+    "codec": "mp3",
+    "sampleRateHz": 44100,
+    "channels": 1,
+    "bitRateKbps": 160,
+    "durationSeconds": 18.4,
+    "integratedLufs": -18.8,
+    "loudnessRangeLu": 2.2,
+    "truePeakDbfs": -1.9
+  }
+}
