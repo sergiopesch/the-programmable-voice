@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "approvedAt": "2026-08-11T20:18:10.779Z",
+  "approvedBy": "project owner",
+  "checklistVersion": "2026.2",
+  "configurationHash": "14cb1a5d9d18a4b58e16ddec5b10e51424d47dd0c32dd089aeb4c3e8baccc394",
+  "manuscriptHash": "ca4bd959a5b1236454c4ab7c03816b9e3d0e582fc7b69d961a731eb6df109f5e",
+  "pilotProfileHash": "ca3ba97c5b6fe099b998f3ef7b5abf190db5a4a18fc172f840ec9aec56a5d135",
+  "passageIds": [
+    "passage:opening:section-title",
+    "passage:fdn-string-tension:block-5-paragraph",
+    "passage:fdn-string-tension:block-6-paragraph",
+    "passage:fdn-music-before-machines:block-4-paragraph",
+    "passage:fdn-memory-without-recording:block-8-paragraph",
+    "passage:fdn-machines-imagine-speech:block-2-paragraph",
+    "passage:fdn-machines-imagine-speech:block-3-paragraph",
+    "passage:fdn-machines-imagine-speech:block-4-paragraph",
+    "passage:fdn-machines-imagine-speech:block-5-paragraph",
+    "passage:fdn-tinfoil-wax-cylinder:block-8-paragraph",
+    "passage:media-tape-editable-time:block-2-paragraph",
+    "passage:media-counting-waveform:block-0-paragraph",
+    "passage:media-counting-waveform:block-2-paragraph",
+    "passage:trust-after-voice:block-4-callout-title"
+  ],
+  "confirmations": [
+    "all pilot samples listened to in full",
+    "the same adult woman is recognisable across every pilot clip",
+    "the accent is consistently natural contemporary Southern British English",
+    "the delivery is consistently warm, thoughtful and intimate",
+    "pace, pauses and sentence cadence remain measured and intelligible",
+    "perceived level and tonal balance remain consistent between clips",
+    "sampled names, dates, abbreviations and technical terms are correct"
+  ]
+}

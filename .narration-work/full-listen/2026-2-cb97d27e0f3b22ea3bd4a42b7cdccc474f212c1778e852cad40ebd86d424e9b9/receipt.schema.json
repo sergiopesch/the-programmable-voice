@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "The Programmable Voice full-listen receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "releaseId",
+    "reviewManifestSha256",
+    "packageChecksumsSha256",
+    "orderedPassageProfileSha256",
+    "passageCount",
+    "completedAt",
+    "completedBy",
+    "confirmations"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "narration-full-listen-receipt"
+    },
+    "releaseId": {
+      "const": "2026-2-cb97d27e0f3b22ea3bd4a42b7cdccc474f212c1778e852cad40ebd86d424e9b9"
+    },
+    "reviewManifestSha256": {
+      "const": "0fbdf41a86c6b4aaf7b83c0d5cb02df5f7e34d7e43eda563f738e2a456abfe87"
+    },
+    "packageChecksumsSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "orderedPassageProfileSha256": {
+      "const": "d33e9bee93abdb5d003d456ec0742b9dc3c5b4b78e754f21ab5f8c6f3817abd4"
+    },
+    "passageCount": {
+      "const": 625
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "confirmations": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "the checksum-bound candidate was listened to once, in manifest order, from the first passage through the last, without skips or substitutions, using the review player or M3U"
+        },
+        {
+          "const": "every listed passage received an accept-or-defect decision for speaker continuity, cadence, level and pronunciation before this receipt was recorded"
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    }
+  }
+}

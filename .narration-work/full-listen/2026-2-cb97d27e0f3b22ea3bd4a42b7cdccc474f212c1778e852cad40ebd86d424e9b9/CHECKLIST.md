@@ -1,0 +1,890 @@
+# Full-edition narration listening checklist
+
+Release: `2026-2-cb97d27e0f3b22ea3bd4a42b7cdccc474f212c1778e852cad40ebd86d424e9b9`
+Ordered passage profile: `d33e9bee93abdb5d003d456ec0742b9dc3c5b4b78e754f21ab5f8c6f3817abd4`
+Runtime: 3h 35m 3s across 625 passages.
+
+Disclosure: This recorded narration is AI-generated, not a human voice. It was generated once for this edition and is never recreated during playback.
+
+Before listening, run `npm run narration:verify-candidate` from the repository root. Treat the package files as immutable; keep progress notes in a separate file or printed copy.
+
+For the real application player, run `npm run dev` and open `http://127.0.0.1:5173/?narration-review=1`. The development-only banner must remain visible. `listen.m3u8` is the portable exact-order companion; never reorder, shuffle, substitute or skip files.
+
+For every passage, check speaker continuity, British accent, warmth, cadence, perceived level and pronunciation. Record any defect before continuing. Separately test continuous hand-off and saved-position resume on Safari, iOS and a backgrounded player before final approval.
+
+Every passage-local mastering override is a mandatory transition check: replay both adjacent hand-offs at a fixed listening level, then check the method-specific artefacts listed for that passage.
+
+## Priority attention
+
+Reading notes: 68; spoken normalisations: 53; multi-rule or multi-occurrence plans: 32; passage-local mastering overrides: 2; below ordinary level: 2; near a CPS bound: 2; known QC passages: 7.
+
+- **0046** `passage:fdn-string-tension:block-4-list-item-3` — Known cadence review (#46): 182.5 WPM prompted the pacing audit; confirm the long single-sentence list item remains articulated at 17.381 CPS.
+- **0056** `passage:fdn-rooms-membranes-resonances:block-1-heading` — Known cadence review (#56): the 13-word question reports 235.2 WPM because short function words inflate WPM; confirm warm, unhurried question cadence at 18.094 CPS.
+- **0086** `passage:fdn-music-before-machines:block-11-list-item-2` — Measured pace 19.655 CPS is 0.345 CPS from the upper 20 CPS bound; listen for unnaturally slow or rushed delivery. Known cadence review (#86): 19.655 CPS sits 0.345 CPS below the 20 CPS upper bound; listen for rushed phrasing.
+- **0146** `passage:fdn-machines-imagine-speech:block-12-list-item-0` — Measured integrated loudness -21.2 LUFS is below the ordinary -20.5 LUFS floor; compare perceived level with adjacent passages. Known level review (#146): -21.2 LUFS on a 2.361 s peak-limited phrase (-2.5 dBTP) is below the ordinary floor; compare it directly with neighbouring clips.
+- **0385** `passage:templates-to-probabilities:block-2-heading` — Measured pace 19.586 CPS is 0.414 CPS from the upper 20 CPS bound; listen for unnaturally slow or rushed delivery. Known cadence remediation (#385): the visible question was reordered after its former reading failed at 21.1 CPS. Confirm the opening phrase and comma create a natural, unhurried question at 19.586 CPS without an artificial pause or shifted emphasis.
+- **0453** `passage:conversation-becomes-stream:block-2-heading` — Known cadence remediation (#453): the visible turn-taking question was rewritten after its former reading failed at 20.5 CPS. Confirm the speak-and-wait contrast and em-dash hinge sound warm and deliberate at 18.388 CPS, not rushed, jerky or theatrical.
+- **0472** `passage:access-restoration-agency:block-2-heading` — Passage-local mastering override codec-compensated-single-pass-loudnorm (loudnorm-codec-compensated-single-pass-2026.2-24khz-48kbps) uses a -1.25 dBTP pre-encode target to compensate for MP3 peak and loudness behaviour. Compare both adjacent hand-offs at a fixed listening level for a level or timbre step, and listen for codec ringing, softened consonant attacks or other peak-compensation artefacts. Measured integrated loudness -20.6 LUFS is below the ordinary -20.5 LUFS floor; compare perceived level with adjacent passages.
+- **0506** `passage:air-again:block-2-heading` — Known cadence remediation (#506): the visible comma was changed to an em dash after the former reading failed at 20.5 CPS. Confirm an audible two-beat thesis question at 18.098 CPS without an overlong or artificial pause.
+- **0509** `passage:air-again:block-5-heading` — Passage-local mastering override post-normalisation-gain-limiter (loudnorm-post-gain-limiter-2026.2-24khz-48kbps) applies 2.0 dB after ordinary normalisation, then limit=0.8413951416451951 (-1.50 dBFS), attack=5 ms and release=50 ms; measured maximum gain reduction is 1.5 dB with 0.04 LU integrated cost. Compare both adjacent hand-offs at a fixed listening level, and listen for flattened or clipped consonant attacks, pumping, breathing or audible release-tail modulation.
+
+Only after every box is complete, record the immutable private receipt:
+
+```bash
+npm run narration:record-full-listen -- --listener="Listener name" --confirm-full-listen-complete
+```
+
+## Ordered passages
+
+- [ ] 0001 `passage:opening:section-title` — 8.245 s — `adcbb968fb302959edeedfa8b52cb514f7df35cf6cf1ba573a9e2fd643967d94`
+- [ ] 0002 `passage:opening:block-0-heading` — 1.320 s — `bc138e4ff0a62f8cc555e8f74f928f44c56f2499d2012d56e2f0827eafdde5c0`
+- [ ] 0003 `passage:opening:block-1-paragraph` — 18.318 s — `5d4628f043ab83d385acd0241e46706888a22fe18d3efde042c38832914308aa`
+- [ ] 0004 `passage:opening:block-2-paragraph` — 37.763 s — `5bb3bfd2b4bf3dd4e382e3ef41f73a8c6385b1c826a00fd8d5685f097648b666`
+- [ ] 0005 `passage:fdn-disturbance-world:section-title` — 5.786 s — `dce8d586c06cbbf75030311a395f3ed23486a0fbec396707a5ca942e737790cb`
+- [ ] 0006 `passage:fdn-disturbance-world:block-0-paragraph` — 34.823 s — `a5879ce8f89623858cb58e05e830b92eba50b70108459d9e751e59750645846b`
+- [ ] 0007 `passage:fdn-disturbance-world:block-1-heading` — 2.438 s — `3c7a7934930893315c8056e9649148b167d4d2b5cd15a1ec64f83105124733e4`
+- [ ] 0008 `passage:fdn-disturbance-world:block-2-paragraph` — 36.845 s — `5b8af19d1694debcd20a21958ccaff5a8f7a46bd4efcff4dc185b67a5b2f79b4`
+- [ ] 0009 `passage:fdn-disturbance-world:block-3-figure-title` — 14.348 s — `7c07b5574dfc6b9229e25a4208f569e9cf3923a07fb9ec4a8a2fb7652124430f`
+- [ ] 0010 `passage:fdn-disturbance-world:block-4-list-title` — 1.206 s — `8bda3563e32dda8fb08a40019aa7159771c28f560d0e389459edbcb41a7a4ead`
+- [ ] 0011 `passage:fdn-disturbance-world:block-4-list-item-0` — 9.018 s — `2a03f151db57553aa0d29d66e1a0a505c0287e385bb0ac4977fc17d32fd0d77e`
+- [ ] 0012 `passage:fdn-disturbance-world:block-4-list-item-1` — 7.984 s — `34d836bfc00f5c9435163bb5465bfd56125d7aec3be8f5768050479f65081062` — attention: reading-note, spoken-normalisation
+  - Reading note: Read the equation v = fλ as “v equals f lambda”.
+  - Visible manuscript: "Wavelength is the distance between equivalent points in successive cycles. Wave speed links the two through v = fλ."
+  - Replacement plan: "v = fλ" → "vee equals eff lambda" × 1
+  - Exact spoken text: "Wavelength is the distance between equivalent points in successive cycles. Wave speed links the two through vee equals eff lambda."
+- [ ] 0013 `passage:fdn-disturbance-world:block-4-list-item-2` — 12.138 s — `9fc69850f7a43940843e9b05365c6d37cb7c3f4cf9445dfe590a4293e7b54fea`
+- [ ] 0014 `passage:fdn-disturbance-world:block-4-list-item-3` — 7.208 s — `81122f9fbc3dfc96e23824dd6ad47d4f2762532f3158dbdb5ecc5f2e27fc92bf`
+- [ ] 0015 `passage:fdn-disturbance-world:block-5-paragraph` — 30.706 s — `1f1000ec316f1ce1f287759053c523f8e72e0116c2a9d4086d2c032e9a44bbf7`
+- [ ] 0016 `passage:fdn-disturbance-world:block-6-paragraph` — 35.163 s — `79ba2b0b8f04dffb6b6f2ad62704b24087afa3532a9281826b08c5feb566a1cd`
+- [ ] 0017 `passage:fdn-disturbance-world:block-7-paragraph` — 38.330 s — `fa4b2781c0a7d29b3e0975a89473a8bc2dec418f11de22b87d179c47a43aacce`
+- [ ] 0018 `passage:fdn-disturbance-world:block-8-paragraph` — 33.152 s — `0852b8198c08b3a3b2d6f54b46513d1c3af1cb38720aea5d13b2dcd9903fefc1`
+- [ ] 0019 `passage:fdn-disturbance-world:block-9-callout-title` — 18.061 s — `0a47bdfabac4a411d0ff683dd3869851ec9ac0eccb430945bd3408a3946ddb1b`
+- [ ] 0020 `passage:fdn-disturbance-world:block-10-paragraph` — 17.992 s — `ef78436f579744bc0d6f00b3e1798250338a9e0e4f2a0a87ab0a2301592fff82`
+- [ ] 0021 `passage:fdn-listening-body:section-title` — 5.759 s — `ee9bfda597cbf30d946f854b15d8f32c2e66b36d85d76780b79da675f30bb94c`
+- [ ] 0022 `passage:fdn-listening-body:block-0-paragraph` — 37.786 s — `5526748e22a9350d36ca7b8c0f7dc791cdad6633b73880a807836f1687a82883`
+- [ ] 0023 `passage:fdn-listening-body:block-1-heading` — 3.262 s — `2f704b5765539c4118eb84f67c6f7335ae96f432efd50753251cbe8e8eecf341`
+- [ ] 0024 `passage:fdn-listening-body:block-2-paragraph` — 42.438 s — `e5508fd842d3188d34ea0f565fc0616414547a7b036433d2a1fc1fd960021925`
+- [ ] 0025 `passage:fdn-listening-body:block-3-figure-title` — 14.584 s — `1e871ebc0c8d68f6d727e0c972dba029b2fd516fce5938845f119b985369f5ae`
+- [ ] 0026 `passage:fdn-listening-body:block-4-paragraph` — 36.315 s — `2df6dedc68d347dfc2ee04cfa73d2a915f4ca43603c3a4abcf6002c649466cf7`
+- [ ] 0027 `passage:fdn-listening-body:block-5-paragraph` — 35.886 s — `8826221ad96667a5dac5a58371e618453a00f48f8d91f0ec40de3eb0924559d8`
+- [ ] 0028 `passage:fdn-listening-body:block-6-paragraph` — 36.976 s — `9c399c4bef30092b14ce0aa7bf2d41effadd4b4185be4421860a08b757fb9edd`
+- [ ] 0029 `passage:fdn-listening-body:block-7-list-title` — 0.893 s — `f806811d590af64f19731972db92686c2f37c550b58cc3e38bb9d9781c28e79a`
+- [ ] 0030 `passage:fdn-listening-body:block-7-list-item-0` — 3.826 s — `92294d8e807a0b253190d0abdb0708a18e260ebf5a86120748587cc322c965b2`
+- [ ] 0031 `passage:fdn-listening-body:block-7-list-item-1` — 4.711 s — `769c889d236f674586eca98595ce132deeb9c24da296048b49ed37ba11beb3e5`
+- [ ] 0032 `passage:fdn-listening-body:block-7-list-item-2` — 5.709 s — `c2404e1af291eff01fbb7edd56b3d32195d6d7352c60b6f4a552725a3a61e4a9`
+- [ ] 0033 `passage:fdn-listening-body:block-7-list-item-3` — 5.098 s — `75617f4f7fdc0b03b9f6ba7a855d423dd612101097b8702b1deabbf719fcf394`
+- [ ] 0034 `passage:fdn-listening-body:block-8-paragraph` — 36.867 s — `da78381e6a98ded534e69dac945b436f8741397813cceabdf9858bb8cb14b04b`
+- [ ] 0035 `passage:fdn-listening-body:block-9-callout-title` — 16.479 s — `f846eae90a945a93bdbb7ff93300ea928d0f6501c13244e85b9a41da7ebc690f`
+- [ ] 0036 `passage:fdn-listening-body:block-10-paragraph` — 15.923 s — `46bb4700d8654196f83b18275ef5027c926d88c002bb555e879817e36323ef7c`
+- [ ] 0037 `passage:fdn-string-tension:section-title` — 6.277 s — `ddc4cee5f3f547ec393602a7e281a705bc17ae7f45ab0f680cdba80456cc733f`
+- [ ] 0038 `passage:fdn-string-tension:block-0-paragraph` — 31.838 s — `73399d142881bb819532d6ff71377123db7221d76e93c1553d0092451564fac6`
+- [ ] 0039 `passage:fdn-string-tension:block-1-heading` — 3.158 s — `a41517cca5b6c7dfdd4e1924e7ea4858d48e8aeff9d1b727172ae2b0750ae303`
+- [ ] 0040 `passage:fdn-string-tension:block-2-paragraph` — 37.960 s — `02b132dfb91df8fadbe2b2f631be57349de20e6c8eaef88bbcfacf8e2c6cda8f`
+- [ ] 0041 `passage:fdn-string-tension:block-3-figure-title` — 14.460 s — `927e0aad46d8d0db6782f04884f121344c2399c393647cec394da93e401bf8aa`
+- [ ] 0042 `passage:fdn-string-tension:block-4-list-title` — 1.206 s — `8bda3563e32dda8fb08a40019aa7159771c28f560d0e389459edbcb41a7a4ead`
+- [ ] 0043 `passage:fdn-string-tension:block-4-list-item-0` — 3.864 s — `6ab1a75fe8183ddaaf2b91b008b9c1efd240cdca3d2bc3cd498e24be3eef0301`
+- [ ] 0044 `passage:fdn-string-tension:block-4-list-item-1` — 5.533 s — `618341c9681a4b5dbaafa8f7332575dc147f8526766bfb5d8b4b0b4db8979a48`
+- [ ] 0045 `passage:fdn-string-tension:block-4-list-item-2` — 7.309 s — `90a7da71ae9d9dc04e30452fc393ef7f1367a18b25ce440329b72a895a8adb76`
+- [ ] 0046 `passage:fdn-string-tension:block-4-list-item-3` — 6.904 s — `b0f7580d3447ccacc6dde392ed5a4597a22b8e42382cfe6e8a89f72a74961091` — attention: known-qc-46
+- [ ] 0047 `passage:fdn-string-tension:block-5-paragraph` — 40.807 s — `862d65eec03b82d06f9219c7e721bd343a7f6bfc6a24ce5278fa3a41602ac797` — attention: reading-note
+  - Reading note: Pronounce al-Farabi as al fah-RAH-bee.
+- [ ] 0048 `passage:fdn-string-tension:block-6-paragraph` — 39.526 s — `af97aba41352a5cc0ab1842e53d5b4b933d44f760fee522e32602c7a7262c24a` — attention: reading-note
+  - Reading note: Pronounce Marin Mersenne in the French manner as mah-RAN mehr-SENN.
+- [ ] 0049 `passage:fdn-string-tension:block-7-paragraph` — 39.714 s — `cacd5662eff0acc00929452cee1c8cb01a632e8fa343d2e5ca0c759638ffda03` — attention: reading-note
+  - Reading note: Pronounce Mersenne: mehr-SENN.
+- [ ] 0050 `passage:fdn-string-tension:block-8-paragraph` — 33.837 s — `2712b131af3f3b013eebdb554e8dbdf47c61d391594bc0ffcdec7bf4b16e1bc1`
+- [ ] 0051 `passage:fdn-string-tension:block-9-paragraph` — 34.208 s — `c4f17582cefae13487d5e5e1c7060c22d3ed81b1c78e79969776e55d621e402d`
+- [ ] 0052 `passage:fdn-string-tension:block-10-callout-title` — 15.418 s — `cf253b402dba1c121f35b5774ce22c6c51ad50de221f485b81c0b203a31d9743`
+- [ ] 0053 `passage:fdn-string-tension:block-11-paragraph` — 16.754 s — `100a4eec0ff40d32a18183d9536453fa6e9a4be7b008bb83b7e4b66453a7c2f7`
+- [ ] 0054 `passage:fdn-rooms-membranes-resonances:section-title` — 6.994 s — `5ecd4c0b779d57ad3de70868fa374b428d535a30cbcecbbd551312db8ba8fd4c`
+- [ ] 0055 `passage:fdn-rooms-membranes-resonances:block-0-paragraph` — 29.181 s — `8ceba37fb44bc6d1e4131751636ca1888af334976d5e8a266fe399c8e50e63e0`
+- [ ] 0056 `passage:fdn-rooms-membranes-resonances:block-1-heading` — 3.316 s — `f78b9842e1088058ff4030379c7dfe4f424548855a725944bbcb8b02a26496a4` — attention: known-qc-56
+- [ ] 0057 `passage:fdn-rooms-membranes-resonances:block-2-paragraph` — 41.124 s — `0e89612f4b07418ae3da6c0cd43d15d07a95fe488069a5ad4fd826728db2f5c9`
+- [ ] 0058 `passage:fdn-rooms-membranes-resonances:block-3-paragraph` — 36.243 s — `60ba77786efb0d6fba3275d1f21d1bd8c4185be3a17e7ca519107e42020e45fa`
+- [ ] 0059 `passage:fdn-rooms-membranes-resonances:block-4-figure-title` — 13.130 s — `95027cfda02c5544dceab0859aa3b92372dd94c7e7024e1a81cc0480c5b74542`
+- [ ] 0060 `passage:fdn-rooms-membranes-resonances:block-5-paragraph` — 37.139 s — `cfe77426b528c88828d0412aff1385bef70dbf58ea619e82ad873f50dbe182d6`
+- [ ] 0061 `passage:fdn-rooms-membranes-resonances:block-6-paragraph` — 32.612 s — `e03bdc69fa43a797a9ec491e7922672ba3c21b13e38dc9213e821aa830666504`
+- [ ] 0062 `passage:fdn-rooms-membranes-resonances:block-7-paragraph` — 39.570 s — `b4693497872680bd4302d970c5c4ba22078bf4b175c9909651ad9fa00c54e789`
+- [ ] 0063 `passage:fdn-rooms-membranes-resonances:block-8-list-title` — 1.582 s — `c9ea6e63ff51681f8c157237aef49efa066d2709c63138e2744071f4255dc747`
+- [ ] 0064 `passage:fdn-rooms-membranes-resonances:block-8-list-item-0` — 3.597 s — `b59271bdbdb2520823405e65b0faec4c8c6cc1b579f5a0cf0e1e7b5a9e557720`
+- [ ] 0065 `passage:fdn-rooms-membranes-resonances:block-8-list-item-1` — 2.712 s — `dc47518086c1bed8c8b496b5d222c6d7bc12ee36aae9fab989498b4222ee3034`
+- [ ] 0066 `passage:fdn-rooms-membranes-resonances:block-8-list-item-2` — 3.904 s — `f1ce2019773c8dbce989e56df415082d8e92318bbcfd9a4afcca62fa914140c3`
+- [ ] 0067 `passage:fdn-rooms-membranes-resonances:block-8-list-item-3` — 3.619 s — `d7b213803de0c45dc4f478a0032131a8e00d2caf5462dd342d4c7f1a0f0dec9e`
+- [ ] 0068 `passage:fdn-rooms-membranes-resonances:block-8-list-item-4` — 4.706 s — `6715b815f2a1a1cb2dde11590972c94b7ec3cfdec770612a91d499610dbda336`
+- [ ] 0069 `passage:fdn-rooms-membranes-resonances:block-9-callout-title` — 15.436 s — `b6e6ef1d7c0182db90eed70efccb3d3bd4b836eee8e9c953d8c10e037b629735`
+- [ ] 0070 `passage:fdn-rooms-membranes-resonances:block-10-paragraph` — 24.243 s — `94cf0859c64898411b95b5dca969b4a594d606fb56649112027471ddc787b6d9`
+- [ ] 0071 `passage:fdn-music-before-machines:section-title` — 7.054 s — `4bc0d505122578d98f542e7e44263d39d2adf735e20d300e16b1af665a1ebeab`
+- [ ] 0072 `passage:fdn-music-before-machines:block-0-paragraph` — 38.288 s — `3c5e6cab30c7c4bcc4895f8e0ab3ac5a8fba5bdba901111d1b047dcba25ae1d7`
+- [ ] 0073 `passage:fdn-music-before-machines:block-1-heading` — 4.376 s — `549ba006f7383314315698b587b7988046b21d4de69367432963433dc836b2fe`
+- [ ] 0074 `passage:fdn-music-before-machines:block-2-paragraph` — 36.348 s — `cd1b4b9a215bda487b1cc5cb8776f121f674ad4c216afdaa3c8d5de5fc3919f1`
+- [ ] 0075 `passage:fdn-music-before-machines:block-3-paragraph` — 39.768 s — `72a184aa2459fde2f095844b8ff1e144863ea2e0f7bfa65745bbbae358e0cac7`
+- [ ] 0076 `passage:fdn-music-before-machines:block-4-paragraph` — 40.230 s — `d3f91a64020f4e6c06d6ef3d897959bf4da3d46da644e93228046b1e6a82994e` — attention: reading-note
+  - Reading note: Pronounce Jiahu as JYAH-hoo, in two syllables.
+- [ ] 0077 `passage:fdn-music-before-machines:block-5-paragraph` — 35.191 s — `8bf7766e3ddb5c67ce9e72b9ee8beca494f2e34e8ef731c41ebcaf70834e7a6e`
+- [ ] 0078 `passage:fdn-music-before-machines:block-6-paragraph` — 32.690 s — `2ee7086c219fc20336ac1efb36d8c9ba5ec526e33e7e138c5828473c5595eedb`
+- [ ] 0079 `passage:fdn-music-before-machines:block-7-paragraph` — 39.760 s — `7d638235a0c5ecd8e90e1116221b7854ffcadf483d1788991e32899f2b254c1f`
+- [ ] 0080 `passage:fdn-music-before-machines:block-8-paragraph` — 38.911 s — `3bcc47c1e2d32a16b67843201edc2a8ecf3fc357d1866b4690b4576f28458b7f`
+- [ ] 0081 `passage:fdn-music-before-machines:block-9-paragraph` — 42.103 s — `07033065f2f818bdfcf6fdafd56461f89b5f0f532b811c9b17208dd5c94b88e0`
+- [ ] 0082 `passage:fdn-music-before-machines:block-10-paragraph` — 42.116 s — `e3e8ca27b6c6cbd881a0300831dce37e1528d29530b8cf6d851e4c5bff662fa0`
+- [ ] 0083 `passage:fdn-music-before-machines:block-11-list-title` — 2.006 s — `c7499963d64787e083485b4693af7f781ba4a9598d6f64814943e3a536486706`
+- [ ] 0084 `passage:fdn-music-before-machines:block-11-list-item-0` — 6.770 s — `03e9d78eb82a08c391b473670855982ee61f769e24cc668185d13120b0c702e0`
+- [ ] 0085 `passage:fdn-music-before-machines:block-11-list-item-1` — 5.165 s — `3287965ea157f576ce2fbe21686fb6a03ead4742e2a71df40611eea1911a9990`
+- [ ] 0086 `passage:fdn-music-before-machines:block-11-list-item-2` — 5.037 s — `342b3c6914288769421d9351719307c1e4eebbade034398eab8eb352603a4ff4` — attention: near-character-pacing-bound, known-qc-86
+- [ ] 0087 `passage:fdn-music-before-machines:block-11-list-item-3` — 8.258 s — `004929457cf3148deb5e588b26d4b23ebb98ee5d1256901c52ec013c287e6127`
+- [ ] 0088 `passage:fdn-music-before-machines:block-12-callout-title` — 14.162 s — `b576da1c2506f7bfdca515e46fc3caae0492668f702337f6205a5d3784618811`
+- [ ] 0089 `passage:fdn-music-before-machines:block-13-paragraph` — 17.298 s — `8a9854954df6663e2d2eb890b8e0766f831c6d111fd5afc33daee9a23ee5684a`
+- [ ] 0090 `passage:fdn-instrument-we-grow:section-title` — 7.284 s — `98d2b3fb1263ec1e0fe04ad9cb917a0c21a5ebcd25b4896eb8ec1e517919caa9`
+- [ ] 0091 `passage:fdn-instrument-we-grow:block-0-paragraph` — 30.561 s — `b558446603b7f84648c3cd26a31bdbd17e020217e8442a54dba8ccfa44831175`
+- [ ] 0092 `passage:fdn-instrument-we-grow:block-1-heading` — 2.990 s — `96f5d34650f4d556790382012be540adc602a8f0d09657ab1da807b22571633e`
+- [ ] 0093 `passage:fdn-instrument-we-grow:block-2-paragraph` — 38.302 s — `c4ce5786f685bc9bff29f685a1979cb1216326de5a0b5813cc295052ec742e3d`
+- [ ] 0094 `passage:fdn-instrument-we-grow:block-3-figure-title` — 15.003 s — `59ec95f1d63bb660eb8d09d095d311c1b22e72f2afed26f014ca965eb9438b17`
+- [ ] 0095 `passage:fdn-instrument-we-grow:block-4-paragraph` — 40.244 s — `199290b0325219afcb293d84855565414e1d27df8120e447a5f0c9e3b50966e0`
+- [ ] 0096 `passage:fdn-instrument-we-grow:block-5-paragraph` — 39.143 s — `f5c24d27fb567e75beb8f4faaa9b987f2e9a159b56c1acc443ab10a6e585588a`
+- [ ] 0097 `passage:fdn-instrument-we-grow:block-6-list-title` — 0.893 s — `f806811d590af64f19731972db92686c2f37c550b58cc3e38bb9d9781c28e79a`
+- [ ] 0098 `passage:fdn-instrument-we-grow:block-6-list-item-0` — 3.800 s — `5b1e82b2a76eb23e904fecd4a098ee2d05dbcd07a3809c11fb62a2f291881761`
+- [ ] 0099 `passage:fdn-instrument-we-grow:block-6-list-item-1` — 6.880 s — `d08c48a0dfdcf7280b2ac26053a0708e8412d4ac82e198243261795de03ca076`
+- [ ] 0100 `passage:fdn-instrument-we-grow:block-6-list-item-2` — 4.722 s — `613b301db2fc4659741d14380851a32ed43543b5ff2dee4d7eb49b5ba25ee46b`
+- [ ] 0101 `passage:fdn-instrument-we-grow:block-6-list-item-3` — 4.437 s — `c7ef2671411a4491172ef8cd052364b141ee093096e7020dea69b9bc87e7fbcb`
+- [ ] 0102 `passage:fdn-instrument-we-grow:block-6-list-item-4` — 5.250 s — `fa900676be08e36ad6651c7e7ab62d2b6932b93269a780505a95dc66b80d634c`
+- [ ] 0103 `passage:fdn-instrument-we-grow:block-7-paragraph` — 38.452 s — `e6edf0f8245bebbe7d75a0dc534fa205d1cfa81a27e21cede5590eee66bc6db7`
+- [ ] 0104 `passage:fdn-instrument-we-grow:block-8-paragraph` — 40.143 s — `5dce9b53303daef36f9f1e754b2b0a8fe72f6b1459a76521bfeb193bd7a9910e`
+- [ ] 0105 `passage:fdn-instrument-we-grow:block-9-callout-title` — 15.777 s — `7b67a9a7abd7254ef99fcee23017e95e75cfdead3cbee13eb4b24e194960319e`
+- [ ] 0106 `passage:fdn-instrument-we-grow:block-10-paragraph` — 17.912 s — `6cacdecd265bac2fc169585346c4cb1f8135e3c74463ac83046c54b61bd54f19`
+- [ ] 0107 `passage:fdn-memory-without-recording:section-title` — 6.607 s — `257d8dd3a17d8eb004b997180cc6e9fbc0e5953883b259dc1404bfff6a7d84a3`
+- [ ] 0108 `passage:fdn-memory-without-recording:block-0-paragraph` — 27.830 s — `15168a3d191afef845b86bf04285e5334e41219ee1b91f01981d4904ac0b3b38`
+- [ ] 0109 `passage:fdn-memory-without-recording:block-1-heading` — 3.691 s — `dd5509c541310c2b4c2333b1557badce00dd92ab0aeeec0037ee008a2cfb47d5`
+- [ ] 0110 `passage:fdn-memory-without-recording:block-2-paragraph` — 37.653 s — `3bdb2df877a1706813fdfe1953e78a705b527efbc9ea687adb2a86767dc9a96c`
+- [ ] 0111 `passage:fdn-memory-without-recording:block-3-paragraph` — 31.455 s — `a8ed8f8048c620122dcb27723f4bb9afdba741868cb45721f53640b165d4ca9b`
+- [ ] 0112 `passage:fdn-memory-without-recording:block-4-list-title` — 2.271 s — `be84844dccf3ea067c0ab937960aa0e3cbd24b296de2d4a45f5471940fab2dd7`
+- [ ] 0113 `passage:fdn-memory-without-recording:block-4-list-item-0` — 5.811 s — `113711b3b4cec63e78a9ccfec097fd4384e82e1e77799c90a892ab594e2cf30b`
+- [ ] 0114 `passage:fdn-memory-without-recording:block-4-list-item-1` — 3.814 s — `6a6e7570d532899045f48a79f714731ce9d1243fa2f6f220790f9a4fb7750005`
+- [ ] 0115 `passage:fdn-memory-without-recording:block-4-list-item-2` — 4.293 s — `de0f4324023bdc0b2127b1f9b77b2598a0a13eed92cdd9dfd82a992996ef147d`
+- [ ] 0116 `passage:fdn-memory-without-recording:block-4-list-item-3` — 5.709 s — `02aca7a457f9974725f152c17c3edd2b64e0735212063e756c85bb8ac3a15b0f`
+- [ ] 0117 `passage:fdn-memory-without-recording:block-4-list-item-4` — 5.324 s — `d37799b025fb2d31babcf7f83ab31e7362dffd5077059119b850082fd5676f3e`
+- [ ] 0118 `passage:fdn-memory-without-recording:block-5-heading` — 2.552 s — `9a264000d260f43a04f12aedc880682b0e470275836afb3171b1182047ee871b`
+- [ ] 0119 `passage:fdn-memory-without-recording:block-6-paragraph` — 43.305 s — `cb0750242181dc835b2f09f60905c85a2970c74a472deec9cb0cf5e935985c6d`
+- [ ] 0120 `passage:fdn-memory-without-recording:block-7-paragraph` — 39.943 s — `d334a11fb57047a8c1bdbec5eed3c657b73fe393ad24eaaa7d99b6d948eb2840`
+- [ ] 0121 `passage:fdn-memory-without-recording:block-8-paragraph` — 44.026 s — `d5480f2e169de2a0522f39b70cc3f4a86d448eb647d9a3fd570370e794ca8737` — attention: reading-note
+  - Reading note: Pronounce Yorùbá as yaw-roo-BAH and dùndún as doon-DOON, without anglicising the written accents.
+- [ ] 0122 `passage:fdn-memory-without-recording:block-9-paragraph` — 38.221 s — `f4f34dfda81d6136ae10a84aac0eb02e3b30eb01c1a3d624a32b7815ce2d6f0c`
+- [ ] 0123 `passage:fdn-memory-without-recording:block-10-paragraph` — 37.293 s — `f64459a5b18bc0a7be9a235080edfe35eadaa7b973989500970a42771974e2a6`
+- [ ] 0124 `passage:fdn-memory-without-recording:block-11-heading` — 3.399 s — `b54b554df28c64940564817bec4b239729b9d4e6404e4a9379eae2ed5b732f50`
+- [ ] 0125 `passage:fdn-memory-without-recording:block-12-paragraph` — 31.469 s — `08b27da83c5feab9cab28998cc31b4e6e51967fa312c84c03df8beffb607b6ea`
+- [ ] 0126 `passage:fdn-memory-without-recording:block-13-paragraph` — 35.585 s — `4726a8f84475e4878a8b168daca9ac659166058d6df0df6d5b2a4e97409b142e`
+- [ ] 0127 `passage:fdn-memory-without-recording:block-14-paragraph` — 34.929 s — `281b2e953c7d0c2240bfe88242c45ee2526faefbf862c2e053a4a9a1c9205f56`
+- [ ] 0128 `passage:fdn-memory-without-recording:block-15-paragraph` — 42.675 s — `40f407fbc0ee1c77d535c19c90a9cd2a03fa5cd617b5f08783c94ecca7be780b`
+- [ ] 0129 `passage:fdn-memory-without-recording:block-16-paragraph` — 40.864 s — `288b5bea0b2f0ab7e9dbe2144136abafba4edd3ed99932cdb0b6ed7b9875680e`
+- [ ] 0130 `passage:fdn-memory-without-recording:block-17-callout-title` — 17.608 s — `d331480a007c4a85c4e89aabd7d3668d6614e1589bbbfdcc18bacccafe48c4a8`
+- [ ] 0131 `passage:fdn-memory-without-recording:block-18-paragraph` — 16.850 s — `d0ce326732268e4f9e0b5d2f81d3e519368fb65d01f7df803ab784f0088d57bb`
+- [ ] 0132 `passage:fdn-machines-imagine-speech:section-title` — 7.903 s — `1feead82b52d09653b67f5d9bd3fc96e1cc44174f9ca6bd70722aebff2cfffe1`
+- [ ] 0133 `passage:fdn-machines-imagine-speech:block-0-paragraph` — 28.932 s — `fda8e756779671cd8b46d5f16a3cf18a7b5385e49374eb7e451beba19a3fc173`
+- [ ] 0134 `passage:fdn-machines-imagine-speech:block-1-heading` — 2.697 s — `02bce021e3beb5cab6bea21b29da169f445edcde8b9ce925ec0f5acd2d52c439`
+- [ ] 0135 `passage:fdn-machines-imagine-speech:block-2-paragraph` — 34.624 s — `a4078085b9d339ff06c30aa1437fd4ef215514ec592c5cb457041136fa78e681` — attention: reading-note
+  - Reading note: Pronounce Prātiśākhya as praa-tee-SHAAKH-yuh and Śikṣā as SHIK-shaa.
+- [ ] 0136 `passage:fdn-machines-imagine-speech:block-3-paragraph` — 35.951 s — `389b3ef872fe4d5f22f20d39d67ddf84302a7003a6975a7bd3404a0edd64aa94` — attention: reading-note
+  - Reading note: Pronounce Qurʾānic as koo-RAH-nik.
+- [ ] 0137 `passage:fdn-machines-imagine-speech:block-4-paragraph` — 40.284 s — `3aca2c4daaf28ec85ed2c8235458951df010166dd7e4d9c997b212eb0557e786`
+- [ ] 0138 `passage:fdn-machines-imagine-speech:block-5-paragraph` — 51.602 s — `1a1bea92cc79b47b62df40f46a1a11e7fc9c522ddb9dc188b0a95c8fe90d7221`
+- [ ] 0139 `passage:fdn-machines-imagine-speech:block-6-heading` — 4.238 s — `5bffa82323a70f549eafe0b83e109aab8ddb1b19e9dd6d39ecdf915c00967ef2`
+- [ ] 0140 `passage:fdn-machines-imagine-speech:block-7-paragraph` — 40.463 s — `40b3b47ab021a5d19c2e0b7de4ace638bc9226ff98ae5dfcca47a1d6ccd3e0c5`
+- [ ] 0141 `passage:fdn-machines-imagine-speech:block-8-paragraph` — 33.254 s — `85b07419acc8f2ae3df334024ff6c0c2a2e6a2a51bc03f3e5794a971862cb1f2`
+- [ ] 0142 `passage:fdn-machines-imagine-speech:block-9-paragraph` — 38.357 s — `1307122dc8dbeb801ed5cd9b564e8f86e4a76a3aa8933c38ee0a1a604dbfa440`
+- [ ] 0143 `passage:fdn-machines-imagine-speech:block-10-paragraph` — 39.592 s — `45848d37101a1d3158c3f2ac25e9cecede0f0dafba8c1dff579f6b1b339bdfc6`
+- [ ] 0144 `passage:fdn-machines-imagine-speech:block-11-figure-title` — 15.186 s — `fed4819a2ae62bedd578bce5d33447b24c4346f55d6473f6b39f09ec85e95e10`
+- [ ] 0145 `passage:fdn-machines-imagine-speech:block-12-list-title` — 0.893 s — `f806811d590af64f19731972db92686c2f37c550b58cc3e38bb9d9781c28e79a`
+- [ ] 0146 `passage:fdn-machines-imagine-speech:block-12-list-item-0` — 2.361 s — `16c504e069ddfe480184aa7dee452028ed592c8104824e446b16a8fa60d4b133` — attention: below-ordinary-loudness-floor, known-qc-146
+- [ ] 0147 `passage:fdn-machines-imagine-speech:block-12-list-item-1` — 2.188 s — `f48492c1608c3f5f15600c9e86b0d1901bb9b32eaceb877b5308c399020dde37`
+- [ ] 0148 `passage:fdn-machines-imagine-speech:block-12-list-item-2` — 2.867 s — `a0e4bf4d1f186b6aa6f92bcfcc9e08c84f64a56b169315bbc854ce9f1648ec32`
+- [ ] 0149 `passage:fdn-machines-imagine-speech:block-12-list-item-3` — 3.558 s — `9c18c78da0c55d209b01cafebcfe63d8c00c28718af3d1cd5673f321034f017e`
+- [ ] 0150 `passage:fdn-machines-imagine-speech:block-12-list-item-4` — 5.469 s — `f0c7a2b1713725c1751a512d5c2c4f67a94e61318c0768ca2089d77ca3054562`
+- [ ] 0151 `passage:fdn-machines-imagine-speech:block-13-paragraph` — 33.173 s — `48f636f3a186796e596758800d78b4ebb34d694966cf0cf302e0bf2fda76ee71`
+- [ ] 0152 `passage:fdn-machines-imagine-speech:block-14-paragraph` — 35.193 s — `e6f4374c0956005d74901a7eb028489b148826db9d690e343a03981b9a2eb502`
+- [ ] 0153 `passage:fdn-machines-imagine-speech:block-15-callout-title` — 15.560 s — `49c7e9732eae4fd212b10dc609ace8dce01635255b13d24c9b7823a38b0d633f`
+- [ ] 0154 `passage:fdn-machines-imagine-speech:block-16-paragraph` — 13.246 s — `404c1fb2f437eac8067f90ebe8f17d13ffa77842929513e46628312979aa9f69`
+- [ ] 0155 `passage:fdn-sound-draws-itself:section-title` — 5.892 s — `312ed2683350c9d549dffd4a4a8c745eea24d9a7c5bbf13c8fd5c2ccecaf0193`
+- [ ] 0156 `passage:fdn-sound-draws-itself:block-0-paragraph` — 31.706 s — `9c9b72715c381ef5524e8882f4440a259a9b3241bd899e16410e5fe8c43838f6`
+- [ ] 0157 `passage:fdn-sound-draws-itself:block-1-heading` — 3.442 s — `448c0abcf1745e2da074b8d2e349895e29136cf5819dc737c390f0a06125510b`
+- [ ] 0158 `passage:fdn-sound-draws-itself:block-2-paragraph` — 35.426 s — `992be627e4b3e5c6e0ae38992779ec7f2f5feb220f8518d7adedb71e8b74bbe9`
+- [ ] 0159 `passage:fdn-sound-draws-itself:block-3-paragraph` — 39.812 s — `d33e4db039105a8b4f1e63e0dab53f2bf0e8f1877788b08aa17fef25c656c7b3`
+- [ ] 0160 `passage:fdn-sound-draws-itself:block-4-paragraph` — 29.692 s — `abc5b860a69787eda1965209091475000d43d3fa80488477f570a8ad67298154`
+- [ ] 0161 `passage:fdn-sound-draws-itself:block-5-figure-title` — 15.448 s — `30a48cc35b63fa203e4f3f2386abd3933675506e8f302154335d691ca453a593`
+- [ ] 0162 `passage:fdn-sound-draws-itself:block-6-paragraph` — 36.362 s — `27d707398836b4b388e6a743695b3ba0f3ef8834bb969457049b035d03c9a5d8`
+- [ ] 0163 `passage:fdn-sound-draws-itself:block-7-paragraph` — 39.292 s — `d476a31db48378df02509e5206650964f3101681b1449801796ef55d00990f94`
+- [ ] 0164 `passage:fdn-sound-draws-itself:block-8-list-title` — 2.463 s — `5488472773e07c7ca643a6c33a4e6086d7be67965fb3856012fd7fd8aa9280a3`
+- [ ] 0165 `passage:fdn-sound-draws-itself:block-8-list-item-0` — 2.610 s — `142ca808fcaf884a43ce1716c5c0fb9fbb15f8fc5047b3259c47034242ab26b5`
+- [ ] 0166 `passage:fdn-sound-draws-itself:block-8-list-item-1` — 2.483 s — `68f9e9bf148f5e3a6a671c61ab419450ff0a7fbb0d6b6e614df869c86107c220`
+- [ ] 0167 `passage:fdn-sound-draws-itself:block-8-list-item-2` — 4.103 s — `a8ab44cc4174e3634c9638adc7acaf7a7bade94b6533d4c282ba6ef6b817510b`
+- [ ] 0168 `passage:fdn-sound-draws-itself:block-8-list-item-3` — 3.453 s — `414dc592c1628e72942293375273e7090aae1de8f3cbc24498441ae80f3fa606`
+- [ ] 0169 `passage:fdn-sound-draws-itself:block-8-list-item-4` — 4.797 s — `3ddfeabcae440944623588437999f48cafd6c9c48b22eca7503e380c03a7f1f4`
+- [ ] 0170 `passage:fdn-sound-draws-itself:block-9-paragraph` — 29.423 s — `31ffcb81ba1787534440943792de15a84c7b1152a47cc63f4cd646e91e1959e1`
+- [ ] 0171 `passage:fdn-sound-draws-itself:block-10-callout-title` — 15.031 s — `6b094f7e2241aaf41767197feca2bcfe529acd07924a36455dd0f3712d63a816`
+- [ ] 0172 `passage:fdn-sound-draws-itself:block-11-paragraph` — 12.693 s — `7853823113025a5e08435a8f0d9377e1308d00c3ce0882666ab161bf11e2778b`
+- [ ] 0173 `passage:fdn-tinfoil-wax-cylinder:section-title` — 7.826 s — `c029a15ae7c64799dbea120d956b114fc4028767a26d213cdafcbbf88fe30382`
+- [ ] 0174 `passage:fdn-tinfoil-wax-cylinder:block-0-paragraph` — 31.147 s — `867e02ff129c54ccfc431cc3e98c32346ccb4cd302526aa3acb1ae7b81875c46`
+- [ ] 0175 `passage:fdn-tinfoil-wax-cylinder:block-1-heading` — 4.470 s — `4552d140b30e904019df791109421c1768a62a98bd6d6a0072339385b64c927d`
+- [ ] 0176 `passage:fdn-tinfoil-wax-cylinder:block-2-paragraph` — 37.274 s — `4a00ec0168c4e39e95a1742e7855a8a2aeb4f5fb84051bbac68665a812c55de2`
+- [ ] 0177 `passage:fdn-tinfoil-wax-cylinder:block-3-figure-title` — 13.375 s — `e6b82d9903b11106ee0ce51f92345d4624c5cd6bf2fdb25e51284bf3fefc3d14`
+- [ ] 0178 `passage:fdn-tinfoil-wax-cylinder:block-4-paragraph` — 38.444 s — `b5efcfd39184b59675b2a2d6bee5cec1833338e10d3ce01c93de3b06b0bc2a7b`
+- [ ] 0179 `passage:fdn-tinfoil-wax-cylinder:block-5-paragraph` — 35.052 s — `42d597c4b18e35903b0289b23f4e29e3a862f8a8c0ceb2ac476a017f3a53d120`
+- [ ] 0180 `passage:fdn-tinfoil-wax-cylinder:block-6-paragraph` — 36.589 s — `e768eea92bea0d8bd8e60228a1fb021795435b29cf4fd9137baebe0b609ced7f`
+- [ ] 0181 `passage:fdn-tinfoil-wax-cylinder:block-7-list-title` — 1.237 s — `54e1bd7d6f5632df9860d3f2b867aa84e7aad901ba8721eda8433af1a24df006`
+- [ ] 0182 `passage:fdn-tinfoil-wax-cylinder:block-7-list-item-0` — 4.114 s — `3b2ca277a46129c49558f63fbaf060f65f8f191d6950d456e3f1c51418fcb3b4`
+- [ ] 0183 `passage:fdn-tinfoil-wax-cylinder:block-7-list-item-1` — 4.642 s — `9c9cb67b22acf039e56457c33fb2db254b17b511032691b02d3d90a708d92547`
+- [ ] 0184 `passage:fdn-tinfoil-wax-cylinder:block-7-list-item-2` — 6.281 s — `9e1a9e2ddf18adab020918fa508fd043600a6d0af8047ca3db8e591b2878d29f`
+- [ ] 0185 `passage:fdn-tinfoil-wax-cylinder:block-7-list-item-3` — 8.218 s — `85abdfe56b530d6a9a05c1d0d46d15c19f47e94d213c6facef85d3f3d12e47ce`
+- [ ] 0186 `passage:fdn-tinfoil-wax-cylinder:block-8-paragraph` — 42.093 s — `0cd8221cc90a7fbb12d5f46af22cc611a91d31f5a9bbd0e273b0e28e427a3cbb` — attention: reading-note
+  - Reading note: Pronounce Passamaquoddy: pass-uh-muh-KWOD-ee.
+- [ ] 0187 `passage:fdn-tinfoil-wax-cylinder:block-9-paragraph` — 29.652 s — `15f810ff4c92101ad340c3949ab225bada673b94b0970225253cbe6789a49caf`
+- [ ] 0188 `passage:fdn-tinfoil-wax-cylinder:block-10-callout-title` — 17.093 s — `40127789d81cf8956ba40f467c9023b40589769b9429f52d41ef8867babc7ee5`
+- [ ] 0189 `passage:fdn-tinfoil-wax-cylinder:block-11-paragraph` — 23.238 s — `1efd6e5c859efd593efcbeea948d6b69677bf8f46180c943fc4fce320384cd12`
+- [ ] 0190 `passage:media-disc-shellac:section-title` — 8.608 s — `589caec8bf3e9a9d02d3f32d2470fee17b6fac99464a25a11e1c10a17a2fdbf3`
+- [ ] 0191 `passage:media-disc-shellac:block-0-paragraph` — 33.530 s — `cdabed8dca8b7c427c9c96e093204825fe0c1f2c829eed75524b993e639b1b66`
+- [ ] 0192 `passage:media-disc-shellac:block-1-heading` — 3.381 s — `757b49b2900a5d769a719bb907cc745881d86d551a9a376cc5d4b782390a2daf`
+- [ ] 0193 `passage:media-disc-shellac:block-2-paragraph` — 39.293 s — `6e529edae7c548427bed4eccd065c08650084c97cf10c6b5e08a5be4fc30fa6b`
+- [ ] 0194 `passage:media-disc-shellac:block-3-figure-title` — 15.560 s — `47dacff666b9d0dc658316714f1752d20694cb9be971dd794f7a5ebc61afdd84` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Performance → wax matrix → metal stamper → pressed record. The groove is both a signal and a manufacturing surface. A matrix number identifies the recorded take; a stamper makes saleable copies without asking the performers to repeat it."
+  - Replacement plan: "→" → "to" × 3
+  - Exact spoken text: "Performance to wax matrix to metal stamper to pressed record. The groove is both a signal and a manufacturing surface. A matrix number identifies the recorded take; a stamper makes saleable copies without asking the performers to repeat it."
+- [ ] 0195 `passage:media-disc-shellac:block-4-paragraph` — 37.982 s — `e1ae2162aec3e14dbc4fee1103da480d123c613651e1fbeae12c9afbcd4a273b`
+- [ ] 0196 `passage:media-disc-shellac:block-5-paragraph` — 36.728 s — `3498b4891647fb0503e28689fc8a697f4155f2ab70d6aeddf78193703c3c19ce`
+- [ ] 0197 `passage:media-disc-shellac:block-6-heading` — 1.454 s — `49aa602b182b843c4af400a3d04cbcf1a4a90ae42f99883dda2922dfe8fcf06f`
+- [ ] 0198 `passage:media-disc-shellac:block-7-paragraph` — 38.236 s — `54c471e068225423ba93c61fbf654a7a7283ece6cef4154dd3c5542b796c00e0`
+- [ ] 0199 `passage:media-disc-shellac:block-8-paragraph` — 54.952 s — `b4ba8d86aa9809c1249795827edaed1f68b51c40d0805f8acad96d60822c8810`
+- [ ] 0200 `passage:media-disc-shellac:block-9-paragraph` — 77.104 s — `9a7bbd89f9c327430395ab5d11e7e97c7a37df5742095c5f0b417c8395b0473c`
+- [ ] 0201 `passage:media-disc-shellac:block-10-paragraph` — 36.233 s — `60db36ac3bae9253c2a028404abd50a8e80df832c4a56c58e9cc30bb84c21f17`
+- [ ] 0202 `passage:media-disc-shellac:block-11-callout-title` — 13.443 s — `c222ecfc337711289f6e309c95e5881ddb6275db214d3f27725e239c4655a48b`
+- [ ] 0203 `passage:media-disc-shellac:block-12-heading` — 2.793 s — `71d108ddce2bb169044f8f6e7ac0cd8fd00c3c25036955bdcf172397c39bf954`
+- [ ] 0204 `passage:media-disc-shellac:block-13-paragraph` — 38.711 s — `5809b8ec2dba2dfd8d18bb47f9747fa89eb0906154e4b2aa718539955eb0cd74`
+- [ ] 0205 `passage:media-disc-shellac:block-14-paragraph` — 29.090 s — `ce98471ac23f1eab3f32e5c52bc59d5f7738ea6c07df87953bbcff58949512c6`
+- [ ] 0206 `passage:media-before-hello:section-title` — 6.487 s — `8d59481b1f6f73c5635a8f6c24445b1837f4062ff388ac19fab3b0ad66afe544`
+- [ ] 0207 `passage:media-before-hello:block-0-paragraph` — 60.731 s — `fc016c5bc7836a9dc4fae1a0b6838e6462a87d08f1175b991b4390da27909fd1`
+- [ ] 0208 `passage:media-before-hello:block-1-heading` — 2.830 s — `6b86b2db10590129aa1b506f1f6b65e529453cddccdcc21e18942a9ef1c26c80`
+- [ ] 0209 `passage:media-before-hello:block-2-paragraph` — 35.773 s — `1f3080edc4e47785c546c37c22336d07e295c653b268351c3e5d404c69025fac`
+- [ ] 0210 `passage:media-before-hello:block-3-figure-title` — 13.382 s — `97d23ad44acd0f5def5175bd5bfc50ef9694f63578d96145149a1852178587dc`
+- [ ] 0211 `passage:media-before-hello:block-4-paragraph` — 44.392 s — `b1f7b00e8b02546f485a077e3ebfe09ff25eb86ff9378bb005fe4376df861312`
+- [ ] 0212 `passage:media-before-hello:block-5-paragraph` — 43.749 s — `a05ea6e8162512f23d2cdf0d7d59ab54c4de0c687fc5880b178632233510d2ff`
+- [ ] 0213 `passage:media-before-hello:block-6-heading` — 1.509 s — `5cfbb2445c12413fa243fdf96946b02cbf077661cf37ef69848002acbc5c9ce1`
+- [ ] 0214 `passage:media-before-hello:block-7-paragraph` — 40.895 s — `7ba7c00a334a44fff9501544d0c8ef89aea09d41b3c445fd57cf6e2294e46003`
+- [ ] 0215 `passage:media-before-hello:block-8-paragraph` — 38.908 s — `a7f729fef081e22428c6f27a24dd8d5548e46fb7a84dac76e7a2514451fe49e7`
+- [ ] 0216 `passage:media-before-hello:block-9-callout-title` — 15.684 s — `fb92f8dca7c00dd89e27a67c86791bd808f6845e7f2717b023ddaafc86d64780`
+- [ ] 0217 `passage:media-before-hello:block-10-heading` — 3.213 s — `766ac56dc66f8e3b8b3dd1472bad256e9bd3fe7f0a0934691bc20f7d84af0223`
+- [ ] 0218 `passage:media-before-hello:block-11-paragraph` — 39.086 s — `04550d975002aa0ef3d30f38e4a53263d6e0c6c8a54192678160de65b48fb052`
+- [ ] 0219 `passage:media-before-hello:block-12-paragraph` — 17.323 s — `6bcc506be98e73de9d9d11ab2814083d40e75ee13bb415e03c07f6e36a9c5481`
+- [ ] 0220 `passage:media-telephone-network:section-title` — 8.975 s — `a3ba63b3eec3e955432ee954eba508bbefea4e4fb90568e6e2d3ff84d527df28`
+- [ ] 0221 `passage:media-telephone-network:block-0-paragraph` — 35.234 s — `aa59eac3aaa382cc30c818b0f764ff3f7e3b4e5966aa00b62d2aeca59b6e54dc`
+- [ ] 0222 `passage:media-telephone-network:block-1-heading` — 4.413 s — `3115ee3ea8dfbec5ea2a88c47c68ea712c18359ed6d80844dc10055800571e2c`
+- [ ] 0223 `passage:media-telephone-network:block-2-paragraph` — 38.296 s — `858f4c1ade3228a32d20df12af1c094e79671244be0146fd2807f6e41a74dcab`
+- [ ] 0224 `passage:media-telephone-network:block-3-paragraph` — 41.956 s — `d8fb18e22f4f366399c5c987c2792d739826774b6c0e12e26aa6faf3d90a14e2`
+- [ ] 0225 `passage:media-telephone-network:block-4-figure-title` — 14.598 s — `8ea7195de374d6eda0478a789a8e562fc46beb1a9deaaa243b32d026ba6421b2` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Subscriber → local loop → exchange → trunk → exchange → subscriber. Switching makes a temporary path through shared infrastructure. The voice signal and the information used to establish its route are related, but they are not the same thing."
+  - Replacement plan: "→" → "to" × 5
+  - Exact spoken text: "Subscriber to local loop to exchange to trunk to exchange to subscriber. Switching makes a temporary path through shared infrastructure. The voice signal and the information used to establish its route are related, but they are not the same thing."
+- [ ] 0226 `passage:media-telephone-network:block-5-heading` — 1.805 s — `96dfe6b1b3b9dc00fbf399df35787b99d7dbdf0edd37e8d9e14227de6b88560e`
+- [ ] 0227 `passage:media-telephone-network:block-6-paragraph` — 44.092 s — `db7a52008cab6301fb186903a45e177b5184e1b74053552db7d3d5719adf0ffa`
+- [ ] 0228 `passage:media-telephone-network:block-7-paragraph` — 36.940 s — `a468ce5129a0877ffc57e072742a2684e436034c1bb76658fd15b23d510e5202`
+- [ ] 0229 `passage:media-telephone-network:block-8-paragraph` — 42.996 s — `43b30f1f4f831ffbae55763ff6303f8ac5314e6b9afb84b793c22836d92713c6`
+- [ ] 0230 `passage:media-telephone-network:block-9-paragraph` — 40.957 s — `5777297cd665610bfc43db2d1a3113dbff0db69b008eb3066b610761301097f5`
+- [ ] 0231 `passage:media-telephone-network:block-10-paragraph` — 39.374 s — `c0aef8aa4c70bf49aad630d8bc9806fb9223c0aff7bbaad7e25598d2dbb349da`
+- [ ] 0232 `passage:media-telephone-network:block-11-callout-title` — 12.605 s — `e349d180ca249ca663a30cf7f8f8f0d4dfdc206532cfe6a9dfd7588a4b4d3711`
+- [ ] 0233 `passage:media-telephone-network:block-12-heading` — 2.638 s — `52b4bb3b7e25867f97e8ac38f94f4bec4bab2e5e0e218baac8a4428349ef8940`
+- [ ] 0234 `passage:media-telephone-network:block-13-paragraph` — 39.949 s — `c2c48d861d324e73f108ec0410625fc0f9bd32202c5f856d1ff2b146629f2e2f`
+- [ ] 0235 `passage:media-telephone-network:block-14-paragraph` — 16.664 s — `deeb514dc7a090e2683a3816a3d0267899da0263dbda1d70578cfe7b72c1694e`
+- [ ] 0236 `passage:media-electric-studio:section-title` — 8.594 s — `ee592a9c256681a8ba6aae394b5fecc17889be5b6311e420c0e76cc6315c9c98`
+- [ ] 0237 `passage:media-electric-studio:block-0-paragraph` — 37.415 s — `4eadbe4b19257a4fc801fa569d9ab148c97625f55f6543893c32f8575a2a0008`
+- [ ] 0238 `passage:media-electric-studio:block-1-heading` — 3.798 s — `034ead164e4e7535909d1953c21ad6b6d2db157952dcaa82298bba40fb7c3d59`
+- [ ] 0239 `passage:media-electric-studio:block-2-paragraph` — 38.186 s — `43a2a9a15c4e8f5c39e93e18e4604e7591cbbf46d5371f088cd84f30b116323b`
+- [ ] 0240 `passage:media-electric-studio:block-3-figure-title` — 15.728 s — `be2a635794adf61716ac8118b29f953ffd3ec50362de2e68ab0de1d986954ece` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Air → microphone → amplifier → cutter → groove. Electrical recording inserts adjustable gain and routing between performance and master disc. The diagram is a causal chain, not a promise that every studio used the same microphone or circuit."
+  - Replacement plan: "→" → "to" × 4
+  - Exact spoken text: "Air to microphone to amplifier to cutter to groove. Electrical recording inserts adjustable gain and routing between performance and master disc. The diagram is a causal chain, not a promise that every studio used the same microphone or circuit."
+- [ ] 0241 `passage:media-electric-studio:block-4-paragraph` — 41.498 s — `237e2421384b8e18f2685655e52c219f287057d296c30a7c0918f4a52f8289e6`
+- [ ] 0242 `passage:media-electric-studio:block-5-paragraph` — 56.196 s — `b711af69bd68dce4b3a67f62943d401261077351c385d91ddfe8961748dd8c0a`
+- [ ] 0243 `passage:media-electric-studio:block-6-heading` — 2.421 s — `0772947002da818ffadccc7dc15aceee26e668d35c8be17d83fe07cce802c6ad`
+- [ ] 0244 `passage:media-electric-studio:block-7-paragraph` — 38.867 s — `eaee059f97ab3f3daffa2988b5ff2080554094aa0535609ee7962f1df63d2d91`
+- [ ] 0245 `passage:media-electric-studio:block-8-paragraph` — 37.063 s — `d74476aa10897496c40938ff7790bf2401728bbae2da344e4690503ac99d3692`
+- [ ] 0246 `passage:media-electric-studio:block-9-paragraph` — 33.087 s — `6c51d747c29a8939ae3adfaf3be04a56d9e3807933c11d78ccb4b1760c12fe22`
+- [ ] 0247 `passage:media-electric-studio:block-10-callout-title` — 12.467 s — `d9354fe7d280d6125d5ffb48a88dac969ef6a5d26f483f412e245bce2c97f9b5`
+- [ ] 0248 `passage:media-electric-studio:block-11-heading` — 3.266 s — `fcda063192c867b484d43d549826c3dd88d8ae1078069cc6c730668e298a20b2`
+- [ ] 0249 `passage:media-electric-studio:block-12-paragraph` — 35.787 s — `9bc68b08bb414cb1516ef482360b8e5c352384ae3b3f2bbfea19c7ec0cd4edb1`
+- [ ] 0250 `passage:media-electric-studio:block-13-paragraph` — 14.292 s — `a52fdfd36d03ba0a9c442e838392c5421b0208ff0ca46843dcea263fa7bf560d`
+- [ ] 0251 `passage:media-broadcast-voice:section-title` — 8.109 s — `d792966d594477aab4dc76a5e0d1f438a410f26ba4051be6d4446647c288ed5c`
+- [ ] 0252 `passage:media-broadcast-voice:block-0-paragraph` — 37.139 s — `61ea31945575050eb27abf172155ef7b8b5290f4927f3a80a768889df34bdfaf`
+- [ ] 0253 `passage:media-broadcast-voice:block-1-heading` — 4.227 s — `847026eca8368022b2e3be87468e448de9126b7491d91b47f089223f1004c0b7`
+- [ ] 0254 `passage:media-broadcast-voice:block-2-paragraph` — 40.241 s — `c96a092c2172431f352934bab27fdfbb2997433c9b93a230fa56d0d7aa8b17ff`
+- [ ] 0255 `passage:media-broadcast-voice:block-3-figure-title` — 12.242 s — `cacd2cf446acc3dbf13c4e0d4b36ae2b4bbda4e95a2b8e1e8fdca5454c1e9809`
+- [ ] 0256 `passage:media-broadcast-voice:block-4-paragraph` — 46.127 s — `df62e5a114c83b0b065d6657417fd685a3cb7cb44e639014fc62eb23cb719caf`
+- [ ] 0257 `passage:media-broadcast-voice:block-5-paragraph` — 56.478 s — `9eb3c76a00a701c33b827dfe4b858a0d3e66a2021bc1d825d08524be55bf490b`
+- [ ] 0258 `passage:media-broadcast-voice:block-6-heading` — 2.688 s — `eb0173d770e9c31c2d4988801a9fe797e3b90ce3e834a159f9eccc7d3b43acee`
+- [ ] 0259 `passage:media-broadcast-voice:block-7-paragraph` — 42.012 s — `2b9935008c90860697fefbbcbbed49bdf804be82417496c692cb926cdbd09aa1`
+- [ ] 0260 `passage:media-broadcast-voice:block-8-paragraph` — 37.226 s — `4b5eec1495157da313973e617bfc8f0322280bd5736ec61daa6302e20c0f9e03`
+- [ ] 0261 `passage:media-broadcast-voice:block-9-paragraph` — 39.242 s — `086e0adb86b5acf27ce668022a30b8bdacc44ee15f7a038522e032caddfb4144`
+- [ ] 0262 `passage:media-broadcast-voice:block-10-callout-title` — 12.238 s — `531bdc8ede2d0d6abdd5e3df37b9866b6b065f524893372b416ad8df30d2aa22`
+- [ ] 0263 `passage:media-broadcast-voice:block-11-heading` — 3.085 s — `910083cf5fd8c7e6e3e2e217b7ec6afd20b3450f7cda978e8c8500be50ead7cb`
+- [ ] 0264 `passage:media-broadcast-voice:block-12-paragraph` — 42.325 s — `d713de7b8291bc3e7aed7e60eed75212608389fe446c54d297cd6295e7a24aa2`
+- [ ] 0265 `passage:media-broadcast-voice:block-13-paragraph` — 13.730 s — `2d6ca04ab994adb9b544f70e8b0cf5c469ff70a614869be98e3c951a66e9c691`
+- [ ] 0266 `passage:media-record-culture:section-title` — 8.522 s — `fd075ec0708f3a5abfe9324145f3de101665d211009813aaacb0826dd54e1b0b`
+- [ ] 0267 `passage:media-record-culture:block-0-paragraph` — 33.291 s — `1b0c61b3928ac90334e5fb7f09d201a1338666352ee518ab910e9c72481d1ae7`
+- [ ] 0268 `passage:media-record-culture:block-1-heading` — 3.965 s — `bfbc4d9288a46b94738023694edd79027dbe75ed70883b3d7fff12c58b35109c`
+- [ ] 0269 `passage:media-record-culture:block-2-paragraph` — 45.485 s — `6715010e3aed5c5222c2d1c0d51d192a0fee68ca7db687ad9d302d38ed12f900` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read 33⅓ rpm as “thirty-three and a third R-P-M”, 45 rpm as “forty-five R-P-M”, and spell out PVC and RCA.
+  - Visible manuscript: "Columbia introduced its microgroove long-playing record in June 1948. A twelve-inch disc turning at 33⅓ rpm could hold roughly an album-length programme across two sides, while PVC was quieter and less brittle than the shellac compound it displaced. RCA Victor answered in 1949 with the seven-inch 45 rpm single and record-changing system. For a time buyers faced incompatible speeds and machines. The eventual coexistence of LP and 45 shows formats specialising: extended works and curated albums on one, concentrated songs and jukebox circulation on the other."
+  - Replacement plan: "33⅓ rpm" → "thirty-three and a third R-P-M" × 1; "PVC" → "P-V-C" × 1; "RCA" → "R-C-A" × 1; "45 rpm" → "forty-five R-P-M" × 1
+  - Exact spoken text: "Columbia introduced its microgroove long-playing record in June 1948. A twelve-inch disc turning at thirty-three and a third R-P-M could hold roughly an album-length programme across two sides, while P-V-C was quieter and less brittle than the shellac compound it displaced. R-C-A Victor answered in 1949 with the seven-inch forty-five R-P-M single and record-changing system. For a time buyers faced incompatible speeds and machines. The eventual coexistence of LP and 45 shows formats specialising: extended works and curated albums on one, concentrated songs and jukebox circulation on the other."
+- [ ] 0270 `passage:media-record-culture:block-3-figure-title` — 12.213 s — `dafaf363c15ad77f628ac56c194e184dbfd3d18bc64099eb54c9afb1934767a6`
+- [ ] 0271 `passage:media-record-culture:block-4-paragraph` — 40.156 s — `0d268713ed51b26827c7a2d02866f25b6804902b0d462e35ddf869f77bf06f2d`
+- [ ] 0272 `passage:media-record-culture:block-5-paragraph` — 39.717 s — `dafab7cba75cf11928fdbdf518fe648b74be3ac0e5721fc09c1517a2ffe3d72f` — attention: reading-note, spoken-normalisation
+  - Reading note: Read 45/45 as “forty-five forty-five”.
+  - Visible manuscript: "Stereo adds two channels to one groove. In the widely adopted 45/45 system, the two groove walls are cut along axes tilted in opposite directions. Their combined motion can be decoded into left and right signals while retaining useful compatibility with mono records and pickups. Stereo is not literally a three-dimensional scene trapped in plastic. It is two coordinated signals from which loudspeakers and a listener infer placement, width and ambience. Microphone arrangement, mixing and mastering decide what that field means."
+  - Replacement plan: "45/45" → "forty-five forty-five" × 1
+  - Exact spoken text: "Stereo adds two channels to one groove. In the widely adopted forty-five forty-five system, the two groove walls are cut along axes tilted in opposite directions. Their combined motion can be decoded into left and right signals while retaining useful compatibility with mono records and pickups. Stereo is not literally a three-dimensional scene trapped in plastic. It is two coordinated signals from which loudspeakers and a listener infer placement, width and ambience. Microphone arrangement, mixing and mastering decide what that field means."
+- [ ] 0273 `passage:media-record-culture:block-6-heading` — 1.815 s — `24849aee8fc27e47b428629a0c0880ebec9408a23403527d7aadfad8e918bba5`
+- [ ] 0274 `passage:media-record-culture:block-7-paragraph` — 38.912 s — `99e5642cff5178d9774cfc757a1c0879ea26e13dfd15f7db3173c27a0a95885f`
+- [ ] 0275 `passage:media-record-culture:block-8-paragraph` — 38.461 s — `83e487d4eb50090ce3881a0be0ca6e0a7bbd80bff8f4feaad98ead87985cb6c3`
+- [ ] 0276 `passage:media-record-culture:block-9-paragraph` — 33.186 s — `ec87341788c58d5e799627ed7a08c2b29bfbc5384aa2aef7334f63122fd68543`
+- [ ] 0277 `passage:media-record-culture:block-10-callout-title` — 14.018 s — `5683416a4156c9d075c0181df888d4af0cbdc9dfc7ff5c2e236758e9c4a44719`
+- [ ] 0278 `passage:media-record-culture:block-11-heading` — 2.658 s — `13521969f4644c70dbd3e08b9ed4690bf6d1712843c3f577d65fc86c36731cc7`
+- [ ] 0279 `passage:media-record-culture:block-12-paragraph` — 37.603 s — `b9542fb30fb9a816790fc2053b4a8441ec010d7d9cb782d4394be6f2db899729`
+- [ ] 0280 `passage:media-record-culture:block-13-paragraph` — 19.255 s — `75c328f39ff07d194e82aeaef9ce13387582f34c6cf930b029e9030fa3d4e3be`
+- [ ] 0281 `passage:media-tape-editable-time:section-title` — 7.289 s — `c1790a57d926c4ede6a2e479ddb77651b0d45f44a0c8cdeac1a89c53097d10da`
+- [ ] 0282 `passage:media-tape-editable-time:block-0-paragraph` — 33.890 s — `643572595eb8d5b09e94ed072aa67ef35e39343ffbc8dac1a201f2b2eb69dee3`
+- [ ] 0283 `passage:media-tape-editable-time:block-1-heading` — 4.322 s — `33cf6df83149c571ac1bc0dd1855a0833be31b625e06f7ea853ea6077e0bd00b`
+- [ ] 0284 `passage:media-tape-editable-time:block-2-paragraph` — 47.093 s — `76e43d6b0f0c827662d0530c1f6c85e0befc3df4e26b93eed7f2f9448d10d67e` — attention: reading-note
+  - Reading note: Pronounce Valdemar Poulsen with Poulsen as POWL-sen.
+- [ ] 0285 `passage:media-tape-editable-time:block-3-figure-title` — 11.532 s — `7c8f6a19abf95af77c5c1817fb1147db33dc5b67395d55dfe7be6bab3b0d7653` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Erase → record → replay. Tape speed turns time into distance. Separate magnetic heads can remove an old pattern, write a new one and read it back while the flexible carrier keeps moving."
+  - Replacement plan: "→" → "to" × 2
+  - Exact spoken text: "Erase to record to replay. Tape speed turns time into distance. Separate magnetic heads can remove an old pattern, write a new one and read it back while the flexible carrier keeps moving."
+- [ ] 0286 `passage:media-tape-editable-time:block-4-paragraph` — 42.663 s — `d1a377310ab20e823d53f3f29e6caf56235c3a92907cf0c82328f79ccefa5cd8`
+- [ ] 0287 `passage:media-tape-editable-time:block-5-heading` — 2.193 s — `ced31776fb17a09d7943dfa72f1365fd636d97238b4a2723a006cf3ed880f4d5`
+- [ ] 0288 `passage:media-tape-editable-time:block-6-paragraph` — 40.060 s — `7b83c9f4a1948fbc7ac51c73e9a542d5d6289ba8a8f2bbfe4b7c30909761e0c3`
+- [ ] 0289 `passage:media-tape-editable-time:block-7-paragraph` — 36.988 s — `ec48c962556c7418131a1b5602cf7aedaac090aa7b6e9476fda3a928ceb8c417`
+- [ ] 0290 `passage:media-tape-editable-time:block-8-paragraph` — 36.519 s — `c5f87d3117d22ad5a83bb2970f930db2325dd57e5f40b684d8ea0d669754181f`
+- [ ] 0291 `passage:media-tape-editable-time:block-9-paragraph` — 40.171 s — `52abec538cb2a87c5d34b9cab62f9e2581d9a423a643811b1bfe47bdd0b8b663`
+- [ ] 0292 `passage:media-tape-editable-time:block-10-callout-title` — 10.856 s — `c0b2d5d297a72549d1470e27578d24f683cee683f93a153272d150a60f5edd40`
+- [ ] 0293 `passage:media-tape-editable-time:block-11-heading` — 3.055 s — `e50e1e281c4432db8fec5cf7d686a22ca86051fa615ea961a5186350f052285f`
+- [ ] 0294 `passage:media-tape-editable-time:block-12-paragraph` — 42.693 s — `40cfcac58f8e6c3aea6116c1235f8202e0a43327379ecac22fd5ebcf56827318`
+- [ ] 0295 `passage:media-tape-editable-time:block-13-heading` — 1.459 s — `efc825b3ca15f18f536a50cf93ce337600e5e076d7838f0ca892cd03c592e17a`
+- [ ] 0296 `passage:media-tape-editable-time:block-14-paragraph` — 33.259 s — `0a8c3388806dd9a8074338f2b6afaaf35243c2c1722c3a86c6bb1c9635330a59`
+- [ ] 0297 `passage:media-tape-editable-time:block-15-paragraph` — 36.458 s — `0851e6e55b6d27bfdd74240ebde621f7cd6396534d446c247eceea55d95c351b`
+- [ ] 0298 `passage:media-tape-editable-time:block-16-paragraph` — 15.797 s — `c080824b08965d399575ae237619f44cd60a3be5dc35e227c810dbfa867c2619`
+- [ ] 0299 `passage:media-electric-instrument:section-title` — 7.551 s — `cfacd0e95196da993aeab337c19e4d83aa94b241e97b26e6623bc1bf4e428fd6`
+- [ ] 0300 `passage:media-electric-instrument:block-0-paragraph` — 35.619 s — `5d754641873c87114a52c5df30a63a3c3bf0409f7cbc6e61ef84af358e299b52`
+- [ ] 0301 `passage:media-electric-instrument:block-1-heading` — 4.370 s — `91c777aa71708fccc0c4e24e5deeca8ccc816b7914885696bbd9e931f8662d20`
+- [ ] 0302 `passage:media-electric-instrument:block-2-paragraph` — 35.845 s — `238b4daadfbfd9eaeee0333d3ca06d68e551e9a1b9de6588f88e8da50b8f0ef8`
+- [ ] 0303 `passage:media-electric-instrument:block-3-figure-title` — 17.661 s — `1809f0f1edcf65d5d33df313ed0bfc846189ffca361dfbd3981a0077458901df` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Controller → oscillator → filter → amplifier → loudspeaker. This subtractive-synthesis path begins with an electrically generated waveform and shapes its spectrum and level. Real instruments may add noise, modulation, several oscillators, feedback and many alternative routes."
+  - Replacement plan: "→" → "to" × 4
+  - Exact spoken text: "Controller to oscillator to filter to amplifier to loudspeaker. This subtractive-synthesis path begins with an electrically generated waveform and shapes its spectrum and level. Real instruments may add noise, modulation, several oscillators, feedback and many alternative routes."
+- [ ] 0304 `passage:media-electric-instrument:block-4-paragraph` — 36.052 s — `468e4be19d81b54a737173c044a4d77cee61618a8b5d0f933d1eba5bbc7d7c03`
+- [ ] 0305 `passage:media-electric-instrument:block-5-heading` — 2.029 s — `3e6b7e1b9dece4b6a15d5b228c316988f53a60fa264a8d649002c6871a3c54e5`
+- [ ] 0306 `passage:media-electric-instrument:block-6-paragraph` — 51.185 s — `c59f2cbef4fda1077c7c78a7794dcaffb0938e10f6ec03dbbb1438a16c74f135`
+- [ ] 0307 `passage:media-electric-instrument:block-7-paragraph` — 43.940 s — `5db340bb2cbb680beb523b72cc28804930ac3392c4cd261b0cbb651308990aa3`
+- [ ] 0308 `passage:media-electric-instrument:block-8-paragraph` — 41.131 s — `894060c14bc7c2e40814d58aca2dbd5a4978cf0c0d2695ecf70036c9a358fb1f`
+- [ ] 0309 `passage:media-electric-instrument:block-9-paragraph` — 49.220 s — `b53b306095eff6c911e31424cc39ce9ba1771ba91c49a2e9f9cb88a503f9fb17`
+- [ ] 0310 `passage:media-electric-instrument:block-10-paragraph` — 40.389 s — `3919e6c98e7cd6b201a3c943db11c65fe1230a2bd9fe1710ab8feedef8614495`
+- [ ] 0311 `passage:media-electric-instrument:block-11-paragraph` — 39.702 s — `60eb27faae2c8ed1ed321227fc179622d649ad75f9a1d7dc4f186779d1f18d01` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read EMS as E-M-S and VCS3 as V-C-S three.
+  - Visible manuscript: "Britain’s EMS VCS3, introduced around 1969 and represented by a 1970 Science Museum example, placed three oscillators, a filter, envelope and effects in a compact wooden case. A pin matrix replaced a cabinet of patch cords. It was far more portable and comparatively affordable than large modular systems, though still an idiosyncratic instrument requiring careful tuning. Its adoption by studios and groups shows how scale and interface can matter as much as a novel circuit: an idea spreads when people can carry it into their existing work."
+  - Replacement plan: "EMS" → "E-M-S" × 1; "VCS3" → "V-C-S three" × 1
+  - Exact spoken text: "Britain’s E-M-S V-C-S three, introduced around 1969 and represented by a 1970 Science Museum example, placed three oscillators, a filter, envelope and effects in a compact wooden case. A pin matrix replaced a cabinet of patch cords. It was far more portable and comparatively affordable than large modular systems, though still an idiosyncratic instrument requiring careful tuning. Its adoption by studios and groups shows how scale and interface can matter as much as a novel circuit: an idea spreads when people can carry it into their existing work."
+- [ ] 0312 `passage:media-electric-instrument:block-12-callout-title` — 13.408 s — `781d0b3d293c132935914438637821d6cf0a8183e453f2b05d5fee75285aeea6`
+- [ ] 0313 `passage:media-electric-instrument:block-13-heading` — 3.221 s — `9a56a6115ad0dd8d571b21ed3eb981ef6a96077ac0aa3f362ef959228a8e2616`
+- [ ] 0314 `passage:media-electric-instrument:block-14-paragraph` — 39.753 s — `ad5d2c46fdfa87e7deea0c9e62f9a32dbc667b21c7c25b3b7832428b2ef2d882`
+- [ ] 0315 `passage:media-electric-instrument:block-15-paragraph` — 17.823 s — `006c66a1aede8db28ecd71fe37e7fcc4892d79cfbba21b035cfebb26bd3b6470`
+- [ ] 0316 `passage:media-counting-waveform:section-title` — 7.047 s — `4e6d43caea4948917e5cf933c4c781facda2609af2411e0eb22e26ac8fc564eb`
+- [ ] 0317 `passage:media-counting-waveform:block-0-paragraph` — 40.598 s — `5a76c0076e442f2b711f2acc410b695568f3cb4cdc3f5252376ab710b64e56af` — attention: reading-note
+  - Reading note: Pronounce SIGSALY as sig-SAL-ee, as a spoken name rather than separate letters.
+- [ ] 0318 `passage:media-counting-waveform:block-1-heading` — 1.587 s — `e42fc2795fd16efabd2283b6e036ee978562b110fb879e5eecf0d2308c06eb19`
+- [ ] 0319 `passage:media-counting-waveform:block-2-paragraph` — 31.747 s — `23753ddcb9cf29dc24a5cc6fe76b4caf26145cb78711d6c603b7881ffdfedd2d` — attention: reading-note
+  - Reading note: Pronounce Joseph Fourier with Fourier as FOO-ree-ay.
+- [ ] 0320 `passage:media-counting-waveform:block-3-paragraph` — 33.718 s — `a012152f9382c38892b6b1c5026ed5a8f6715666779c16cb7c5b150b41562b2d` — attention: reading-note
+  - Reading note: Pronounce Fourier as FOO-ree-ay.
+- [ ] 0321 `passage:media-counting-waveform:block-4-heading` — 4.025 s — `144518ca86e5981181abdbe3180bc6f986e5fe6c7faf099bb1b186d3fb132f0b`
+- [ ] 0322 `passage:media-counting-waveform:block-5-paragraph` — 48.806 s — `394d80b500565f44d48b23b54531eefcd3013f851c5a80ae2d9982095e7700d3`
+- [ ] 0323 `passage:media-counting-waveform:block-6-figure-title` — 13.582 s — `4d061b29f614eaa3866190e56b161cc372f6357a37a628db5211c2b4fddb1e2d`
+- [ ] 0324 `passage:media-counting-waveform:block-7-paragraph` — 39.302 s — `5390dc54020dc7b63c84450eb0cd49978f59a01afd7fa8ecc5eded7bcd8bf580`
+- [ ] 0325 `passage:media-counting-waveform:block-8-paragraph` — 46.571 s — `94732620501d2a79cb49e653d97a6de7badd6f02ef0f3435d56419f40f23a4dc`
+- [ ] 0326 `passage:media-counting-waveform:block-9-heading` — 1.898 s — `090950291f4fcc646f445c1638fd0a71d828b83c2c450f2264422f1b503b0247`
+- [ ] 0327 `passage:media-counting-waveform:block-10-paragraph` — 39.890 s — `9be1849b74bb90266799fb1dc521319b18d4745e0dc889bc1680dda786619199` — attention: reading-note
+  - Reading note: Pronounce SIGSALY as sig-SAL-ee, as a spoken name rather than separate letters.
+- [ ] 0328 `passage:media-counting-waveform:block-11-paragraph` — 38.121 s — `fb316ed3330973a92d8439d79078e9223ad260f3bb7536b33ea705d25a73ef43`
+- [ ] 0329 `passage:media-counting-waveform:block-12-callout-title` — 13.826 s — `87f20889c16edf435b49bd8c9324d9255a9685e275df3319d3f9abc3e3b082ae`
+- [ ] 0330 `passage:media-counting-waveform:block-13-heading` — 2.817 s — `bfa450211088fa30e2eac87649f1eaa78ed2f79d757315ba07c890ef6d8640da`
+- [ ] 0331 `passage:media-counting-waveform:block-14-paragraph` — 39.849 s — `21e76eda0277f9f7ad74f4b2e7785ac648c5b78613b01a129f15b6890a8fa4ea` — attention: reading-note, spoken-normalisation
+  - Reading note: Read the equation as “six point zero two N plus one point seven six D-B for N bits”.
+  - Visible manuscript: "For an ideal uniform quantiser driven by a full-scale sine wave, with quantisation error behaving like uncorrelated noise, the signal-to-quantisation-noise ratio is often approximated as 6.02N + 1.76 dB for N bits. It is a teaching result, not a universal measurement of a converter. Real performance also depends on analogue noise, clock jitter, linearity, level, dither, filtering and the programme. Quiet passages do not suddenly lose their frequency content; their signal sits closer to the noise and distortion floor."
+  - Replacement plan: "6.02N + 1.76 dB for N bits" → "six point zero two en plus one point seven six dee bee for en bits" × 1
+  - Exact spoken text: "For an ideal uniform quantiser driven by a full-scale sine wave, with quantisation error behaving like uncorrelated noise, the signal-to-quantisation-noise ratio is often approximated as six point zero two en plus one point seven six dee bee for en bits. It is a teaching result, not a universal measurement of a converter. Real performance also depends on analogue noise, clock jitter, linearity, level, dither, filtering and the programme. Quiet passages do not suddenly lose their frequency content; their signal sits closer to the noise and distortion floor."
+- [ ] 0332 `passage:media-counting-waveform:block-15-paragraph` — 14.523 s — `8c67379b2989975a3a324f330b636018a474086c6c436ff7bbf13e0fe9b0ea92`
+- [ ] 0333 `passage:media-studio-software:section-title` — 9.498 s — `c43f36de273fd3e906484537c046d1dfce2d637eb3006384a865d96670bafa9a`
+- [ ] 0334 `passage:media-studio-software:block-0-paragraph` — 38.441 s — `b53f456e41c016dea4699d37ab22a4fdd51b8c921accaa73e0726af61b429530` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read MUSIC I as “Music One”, IBM 704 as “I-B-M seven-oh-four”, and In the Silver Scale as the title of the piece.
+  - Visible manuscript: "At Bell Laboratories in 1957, Max Mathews wrote MUSIC I for an IBM 704; Newman Guttman used it to compose the seventeen-second In the Silver Scale. The machine did not respond like a keyboard. Instructions and numerical parameters became a batch job; computation produced a digital waveform that could later be converted to sound. The wait separated composing from hearing, but it proved a vast idea in miniature: one general-purpose computer could become many imagined instruments by changing software rather than rebuilding hardware."
+  - Replacement plan: "MUSIC I" → "Music One" × 1; "IBM 704" → "I-B-M seven-oh-four" × 1
+  - Exact spoken text: "At Bell Laboratories in 1957, Max Mathews wrote Music One for an I-B-M seven-oh-four; Newman Guttman used it to compose the seventeen-second In the Silver Scale. The machine did not respond like a keyboard. Instructions and numerical parameters became a batch job; computation produced a digital waveform that could later be converted to sound. The wait separated composing from hearing, but it proved a vast idea in miniature: one general-purpose computer could become many imagined instruments by changing software rather than rebuilding hardware."
+- [ ] 0335 `passage:media-studio-software:block-1-heading` — 5.187 s — `ab0e0d4ebc21db83f00e02cabd3a22ebd011bb990e501b67b91c1390d7aefff3`
+- [ ] 0336 `passage:media-studio-software:block-2-paragraph` — 40.003 s — `75b0745757e8b76a1c40e5623b4e241d90bb6a5330c966986b7877e3e9e945f1`
+- [ ] 0337 `passage:media-studio-software:block-3-figure-title` — 14.172 s — `5817a888f66e8410e0746812252d169abf817136f36224c5d5853e2dd06ab65f`
+- [ ] 0338 `passage:media-studio-software:block-4-paragraph` — 45.415 s — `25db0254c7aa461e747da416141cf78c445afa41925f66d7cff9ed3b5894bcd4`
+- [ ] 0339 `passage:media-studio-software:block-5-paragraph` — 37.483 s — `c0923151bd29f490bc27ea5f3e5619453ab67bf872ca9656dca56930f5f56380`
+- [ ] 0340 `passage:media-studio-software:block-6-heading` — 2.783 s — `4c2de5021d759bd1924b72d605ef4452f791e6d4ccf1ce085bb2795d3040a521`
+- [ ] 0341 `passage:media-studio-software:block-7-paragraph` — 37.463 s — `cdb853519d611771a6cb75472a4d394ef71d7b7294c8846911a44573f336e227` — attention: reading-note, spoken-normalisation
+  - Reading note: Read CMI as C-M-I.
+  - Visible manuscript: "The Australian Fairlight CMI, demonstrated from 1979, joined digital sampling, synthesis, keyboards, storage and a visual interface. A user could record a short sound, display or draw its waveform with a light pen, loop it, alter pitch and sequence events. Its memory and resolution were tiny by present standards and its price restricted access, yet musicians heard possibility in the grain and aliasing as well as in imitation. A breath, impact or orchestral fragment became playable across a keyboard and repeatable from disk."
+  - Replacement plan: "CMI" → "C-M-I" × 1
+  - Exact spoken text: "The Australian Fairlight C-M-I, demonstrated from 1979, joined digital sampling, synthesis, keyboards, storage and a visual interface. A user could record a short sound, display or draw its waveform with a light pen, loop it, alter pitch and sequence events. Its memory and resolution were tiny by present standards and its price restricted access, yet musicians heard possibility in the grain and aliasing as well as in imitation. A breath, impact or orchestral fragment became playable across a keyboard and repeatable from disk."
+- [ ] 0342 `passage:media-studio-software:block-8-paragraph` — 42.092 s — `17169d90403472d92844c3cd37978c4006abf0c9f0db5c33b42ac50bcff12fd3`
+- [ ] 0343 `passage:media-studio-software:block-9-paragraph` — 40.046 s — `a76fd6c773576206c76a70ebf48ee4e60d07f860902cfd8cdba1ea27e6bee46a`
+- [ ] 0344 `passage:media-studio-software:block-10-callout-title` — 12.190 s — `b90d9ae4c27eceedd86ce93a57aa34e8cadc47f266639f878ccc42aae6e3583f`
+- [ ] 0345 `passage:media-studio-software:block-11-heading` — 3.124 s — `73e9af98a1dedccb4e0fb3fc1c939f5aad599c049e9b18a933d73e7956950381`
+- [ ] 0346 `passage:media-studio-software:block-12-paragraph` — 39.009 s — `2e0243543b3cd5b2e345f04a6c9bec185c936cc1853518b9f97a294fffdf2055`
+- [ ] 0347 `passage:media-studio-software:block-13-paragraph` — 14.294 s — `3ca224a4d65df415efc8a38af181a7075d70a35270216887296e59c648c02945`
+- [ ] 0348 `passage:media-disc-file-stream:section-title` — 8.873 s — `8b0f797eb876daf6201dd754b2c7ac57d545c75ea872c16a803839b3dcfd9680`
+- [ ] 0349 `passage:media-disc-file-stream:block-0-paragraph` — 36.382 s — `11bc78da859bdf80b9ae6190969f12530dea49804e714d8a4ef506cbb17c3250`
+- [ ] 0350 `passage:media-disc-file-stream:block-1-heading` — 3.339 s — `b3322401ed725bc682976be30a083af2fe2abfb429d3b93195fcacacf5aa4799`
+- [ ] 0351 `passage:media-disc-file-stream:block-2-paragraph` — 40.856 s — `2d7caca2e3a43d33a44ddf178a978369765f987a18f6e516df208c33648c2741` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read PCM as P-C-M, 44.1 kHz as “forty-four point one kilohertz”, and 16-bit as “sixteen-bit”.
+  - Visible manuscript: "Compact Disc Digital Audio stores two channels of linear PCM at 44.1 kHz with 16-bit samples, plus framing, subcode and layered error detection and correction. The optical system does not “play little steps”; conversion and reconstruction filters produce a continuous output waveform within the design band. Nor is the disc indestructible. Scratches, delamination, manufacturing faults and ageing can overwhelm correction, while a player’s optics and mechanics can fail. Digital symbols improve recoverability within limits; the carrier still matters."
+  - Replacement plan: "PCM" → "P-C-M" × 1; "44.1 kHz" → "forty-four point one kilohertz" × 1; "16-bit" → "sixteen-bit" × 1
+  - Exact spoken text: "Compact Disc Digital Audio stores two channels of linear P-C-M at forty-four point one kilohertz with sixteen-bit samples, plus framing, subcode and layered error detection and correction. The optical system does not “play little steps”; conversion and reconstruction filters produce a continuous output waveform within the design band. Nor is the disc indestructible. Scratches, delamination, manufacturing faults and ageing can overwhelm correction, while a player’s optics and mechanics can fail. Digital symbols improve recoverability within limits; the carrier still matters."
+- [ ] 0352 `passage:media-disc-file-stream:block-3-figure-title` — 18.132 s — `166b1ba24ef3f0dd96f6c0de3c985ce725c989368cca19a6e781889621a21872` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "PCM master → delivery encoding → file or segment → decoder → samples. A container, codec, bitrate and master are separate choices. Two services can deliver the same codec at the same nominal rate yet sound different because their sources and encoding decisions differ."
+  - Replacement plan: "→" → "to" × 4
+  - Exact spoken text: "PCM master to delivery encoding to file or segment to decoder to samples. A container, codec, bitrate and master are separate choices. Two services can deliver the same codec at the same nominal rate yet sound different because their sources and encoding decisions differ."
+- [ ] 0353 `passage:media-disc-file-stream:block-4-paragraph` — 42.213 s — `adada6f890eadda27c23b5de735e6628b8161eb22e2e01ddcad2c60bced0e392` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read MP3 as M-P-three and MPEG-1 Audio Layer III as “M-peg One Audio Layer Three”.
+  - Visible manuscript: "MP3—MPEG-1 Audio Layer III—reduces data by combining filter-bank analysis, psychoacoustic modelling, bit allocation, quantisation and entropy coding. It does not simply delete every frequency above a threshold, remove “silence”, or preserve an agreed percentage of the original. The encoder estimates which errors are likely to be masked by stronger sound and spends limited bits accordingly. Results depend on implementation, bitrate, content and listening conditions. At too little data, pre-echo, warbling, smeared transients or a collapsed stereo image can reveal the compromise."
+  - Replacement plan: "MP3" → "M-P-three" × 1; "MPEG-1 Audio Layer III" → "M-peg One Audio Layer Three" × 1
+  - Exact spoken text: "M-P-three—M-peg One Audio Layer Three—reduces data by combining filter-bank analysis, psychoacoustic modelling, bit allocation, quantisation and entropy coding. It does not simply delete every frequency above a threshold, remove “silence”, or preserve an agreed percentage of the original. The encoder estimates which errors are likely to be masked by stronger sound and spends limited bits accordingly. Results depend on implementation, bitrate, content and listening conditions. At too little data, pre-echo, warbling, smeared transients or a collapsed stereo image can reveal the compromise."
+- [ ] 0354 `passage:media-disc-file-stream:block-5-paragraph` — 40.775 s — `e77f972f1e3bbff61ede1a99ea528603599127fe3ff68dd2a180a1bc1761c160` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read .mp3 as “dot M-P-three” and MPEG as “M-peg”.
+  - Visible manuscript: "Karlheinz Brandenburg and colleagues used Suzanne Vega’s sparsely arranged “Tom’s Diner” as a demanding reference during codec development because the exposed voice made artefacts difficult to hide. The recollection is useful precisely because it resists a mechanical story of progress: a mathematical system was tuned through repeated human listening. Fraunhofer’s team chose the .mp3 filename extension in July 1995, but the standard drew on work across several laboratories and MPEG participants. A single test song and inventor cannot stand in for that collaboration."
+  - Replacement plan: ".mp3" → "dot M-P-three" × 1; "MPEG" → "M-peg" × 1
+  - Exact spoken text: "Karlheinz Brandenburg and colleagues used Suzanne Vega’s sparsely arranged “Tom’s Diner” as a demanding reference during codec development because the exposed voice made artefacts difficult to hide. The recollection is useful precisely because it resists a mechanical story of progress: a mathematical system was tuned through repeated human listening. Fraunhofer’s team chose the dot M-P-three filename extension in July 1995, but the standard drew on work across several laboratories and M-peg participants. A single test song and inventor cannot stand in for that collaboration."
+- [ ] 0355 `passage:media-disc-file-stream:block-6-heading` — 1.613 s — `c56a788d6bcf199b3ce594f7fc78405764edccc3b30e67b18fcd879cea704041`
+- [ ] 0356 `passage:media-disc-file-stream:block-7-paragraph` — 41.344 s — `046f3bcb28c8fd37c9131948f47b5f4eaa5b6aeb3e7bf0525803020eed3c6c78`
+- [ ] 0357 `passage:media-disc-file-stream:block-8-paragraph` — 44.498 s — `11377e7490e9f81382c6e52bd2b4b1ade5d2fdfce3377b0d2550574b69a5dad3` — attention: reading-note, spoken-normalisation
+  - Reading note: Read 128 kbit/s AAC as “one hundred and twenty-eight kilobits per second A-A-C”.
+  - Visible manuscript: "Apple’s iTunes Music Store launched in the United States in April 2003 with individual downloads at 99 cents, encoded as 128 kbit/s AAC and tied to stated personal-use rules. Its importance was organisational as much as acoustic: search, purchase, library management, portable player and record-company licensing met in one interface. A paid download still behaved like a file the listener could organise. Subscription streaming would move the centre again, towards a remotely managed catalogue whose availability, version and recommendation order can change without anything leaving a shelf."
+  - Replacement plan: "128 kbit/s AAC" → "one hundred and twenty-eight kilobits per second A-A-C" × 1
+  - Exact spoken text: "Apple’s iTunes Music Store launched in the United States in April 2003 with individual downloads at 99 cents, encoded as one hundred and twenty-eight kilobits per second A-A-C and tied to stated personal-use rules. Its importance was organisational as much as acoustic: search, purchase, library management, portable player and record-company licensing met in one interface. A paid download still behaved like a file the listener could organise. Subscription streaming would move the centre again, towards a remotely managed catalogue whose availability, version and recommendation order can change without anything leaving a shelf."
+- [ ] 0358 `passage:media-disc-file-stream:block-9-paragraph` — 37.668 s — `a5761cabd0821b15503d9a8ee868e4a43b26c19339b6894467a03c414af0653f`
+- [ ] 0359 `passage:media-disc-file-stream:block-10-callout-title` — 13.583 s — `66848ce4e12653a99919dc26c11567435c77f42f36b42dca45b22c7774c227b8`
+- [ ] 0360 `passage:media-disc-file-stream:block-11-heading` — 2.962 s — `46b7875a26878149cde6d6cc625a6bbe3567b327264787d24ae537b26ef10979`
+- [ ] 0361 `passage:media-disc-file-stream:block-12-paragraph` — 40.808 s — `4dc6e29f456002100c627b3836167810cff211d0550a067724af47b29b5c2d5e`
+- [ ] 0362 `passage:media-disc-file-stream:block-13-paragraph` — 16.130 s — `d28943a68b83bddbb0307eeba8a28a8a8303de51a8f7496144e51bc37c45014f`
+- [ ] 0363 `passage:media-voice-packets:section-title` — 7.097 s — `e2840f7dc579e962d38969059cb4dbcb1768af68bbfb302c9716166339648bd0`
+- [ ] 0364 `passage:media-voice-packets:block-0-paragraph` — 32.868 s — `7038ec494e89ad201e2c116be49236cef9f5c4e290fa30d1179bd514eb55e314`
+- [ ] 0365 `passage:media-voice-packets:block-1-heading` — 3.284 s — `0dd3e48f9d371ee3cfbed2d0dd9347ffa7c69ce28b2a6033ab926d3ce86628fe`
+- [ ] 0366 `passage:media-voice-packets:block-2-paragraph` — 32.805 s — `56b8a2e8b78719c0af5024d061242032d16c6f2e289ed7b854b3f1a2489e27c4` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read TAT-1 as T-A-T one and 4 kHz as “four kilohertz”.
+  - Visible manuscript: "TAT-1 entered service on 26 September 1956 with thirty-six telephone channels spaced 4 kHz apart. It was the first transatlantic telephone cable, not the first time speech crossed the ocean: radio telephone preceded it. Cable made an international voice path steadier, but it still reserved an end-to-end circuit for the duration of a call. Capacity was counted in simultaneous conversations, and an idle pause still occupied its channel."
+  - Replacement plan: "TAT-1" → "T-A-T one" × 1; "4 kHz" → "four kilohertz" × 1
+  - Exact spoken text: "T-A-T one entered service on 26 September 1956 with thirty-six telephone channels spaced four kilohertz apart. It was the first transatlantic telephone cable, not the first time speech crossed the ocean: radio telephone preceded it. Cable made an international voice path steadier, but it still reserved an end-to-end circuit for the duration of a call. Capacity was counted in simultaneous conversations, and an idle pause still occupied its channel."
+- [ ] 0367 `passage:media-voice-packets:block-3-paragraph` — 37.172 s — `9b533e6ac3bf1fd871acaf4b4100dbab2cd29df0e66c7501e59ad60b8622523b`
+- [ ] 0368 `passage:media-voice-packets:block-4-paragraph` — 54.808 s — `36c3bac73e57346366484b632999adcadf9ca1f04f82823916e36045cd565277`
+- [ ] 0369 `passage:media-voice-packets:block-5-heading` — 4.697 s — `6ac4956988de4003079813ac72302a8352c4c1d63cbd2d03686c9d939c0adb9b`
+- [ ] 0370 `passage:media-voice-packets:block-6-paragraph` — 40.590 s — `e79e243391cbdbec95da12dd7d78d0838d2cbe503653738e1a404af0b64ac7d2` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read RFC 741 as R-F-C seven-four-one and ISI as I-S-I.
+  - Visible manuscript: "Danny Cohen’s Network Voice Protocol was first implemented in December 1973 and documented in RFC 741. It joined real-time full-duplex digital voice across heterogeneous ARPANET sites using both linear predictive coding and continuously variable slope delta modulation. The RFC’s acknowledgements name contributors at ISI, Lincoln Laboratory, Culler-Harrison and Stanford Research Institute. This was visibly collective systems work: different computers and speech coders had to agree on control and data well enough for people to talk across them."
+  - Replacement plan: "RFC 741" → "R-F-C seven-four-one" × 1; "ISI" → "I-S-I" × 1
+  - Exact spoken text: "Danny Cohen’s Network Voice Protocol was first implemented in December 1973 and documented in R-F-C seven-four-one. It joined real-time full-duplex digital voice across heterogeneous ARPANET sites using both linear predictive coding and continuously variable slope delta modulation. The RFC’s acknowledgements name contributors at I-S-I, Lincoln Laboratory, Culler-Harrison and Stanford Research Institute. This was visibly collective systems work: different computers and speech coders had to agree on control and data well enough for people to talk across them."
+- [ ] 0371 `passage:media-voice-packets:block-7-figure-title` — 13.341 s — `593c228d2b090a223b8090aeeca538e815ee3ac788d083bcf27377bee4a0aa2e` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Capture → frame → encode → packetise → route → buffer → decode → play. Both directions can operate at once. Each block contributes delay, and the network can vary the arrival time or lose packets entirely."
+  - Replacement plan: "→" → "to" × 7
+  - Exact spoken text: "Capture to frame to encode to packetise to route to buffer to decode to play. Both directions can operate at once. Each block contributes delay, and the network can vary the arrival time or lose packets entirely."
+- [ ] 0372 `passage:media-voice-packets:block-8-paragraph` — 39.043 s — `703853f566ab2a79ea5ff0656a4175561450d2a1f742e09232738a0b4c55a905` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read RTP as R-T-P and RFC 3550 as R-F-C three-five-five-zero.
+  - Visible manuscript: "The Real-time Transport Protocol, standardised in its current foundational form as RFC 3550, adds payload identification, sequence numbers and timestamps to media packets. Sequence numbers reveal gaps and help restore order; timestamps say when samples belong on the media timeline; sender and receiver reports support synchronisation and quality estimates. RTP does not reserve bandwidth, guarantee delivery or decide that a late packet should interrupt playback. It supplies timing evidence on which an application can make those decisions."
+  - Replacement plan: "RFC 3550" → "R-F-C three-five-five-zero" × 1; "RTP" → "R-T-P" × 1
+  - Exact spoken text: "The Real-time Transport Protocol, standardised in its current foundational form as R-F-C three-five-five-zero, adds payload identification, sequence numbers and timestamps to media packets. Sequence numbers reveal gaps and help restore order; timestamps say when samples belong on the media timeline; sender and receiver reports support synchronisation and quality estimates. R-T-P does not reserve bandwidth, guarantee delivery or decide that a late packet should interrupt playback. It supplies timing evidence on which an application can make those decisions."
+- [ ] 0373 `passage:media-voice-packets:block-9-paragraph` — 40.865 s — `8d7a517954d878925fb423a875ccfe7fdc94a438aa81096cfd4d621ce5ae728a` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read G.711 as “G seven eleven”, PCM as P-C-M, and kbit/s as “kilobits per second”.
+  - Visible manuscript: "A codec sets another part of the bargain. G.711 represents telephone-band speech as 8,000 companded PCM samples per second, conventionally producing 64 kbit/s before packet overhead. It is simple and has little algorithmic delay, but uses more bandwidth than specialised speech codecs. Opus can move between linear-prediction and transform techniques, narrowband speech and full-band music, short and long frames, and several forms of loss resilience. No codec is “best” without a bitrate, delay, complexity, loss pattern and listening task."
+  - Replacement plan: "G.711" → "G seven eleven" × 1; "8,000 companded PCM samples per second" → "eight thousand companded P-C-M samples per second" × 1; "64 kbit/s" → "sixty-four kilobits per second" × 1
+  - Exact spoken text: "A codec sets another part of the bargain. G seven eleven represents telephone-band speech as eight thousand companded P-C-M samples per second, conventionally producing sixty-four kilobits per second before packet overhead. It is simple and has little algorithmic delay, but uses more bandwidth than specialised speech codecs. Opus can move between linear-prediction and transform techniques, narrowband speech and full-band music, short and long frames, and several forms of loss resilience. No codec is “best” without a bitrate, delay, complexity, loss pattern and listening task."
+- [ ] 0374 `passage:media-voice-packets:block-10-heading` — 2.988 s — `d3f093eeaca8f5e99f66a0f4ce608bf859fc0bb64dde00b7754f029dc493ea6c`
+- [ ] 0375 `passage:media-voice-packets:block-11-paragraph` — 37.727 s — `70a629d9af5b008c37c8be22030f02acdad8c1929e2767a409e6680c82bce80f`
+- [ ] 0376 `passage:media-voice-packets:block-12-paragraph` — 42.159 s — `3922ed00eae7ab6cc25cde53de23c7e4fb7fbe064c9a8d1c2e9668e63166b294`
+- [ ] 0377 `passage:media-voice-packets:block-13-paragraph` — 42.224 s — `93116ffc5ae03ccea6c9db82b0502f8cdd282947f6aee2065f506d76da7db570` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read WebRTC as “Web R-T-C”, RTCPeerConnection as “R-T-C Peer Connection”, and W3C as W-three-C.
+  - Visible manuscript: "WebRTC brought a related stack into browsers. An application requests media under a permission model, negotiates compatible formats and network paths, and sends protected real-time media through an RTCPeerConnection. Echo cancellation, gain control and noise suppression may shape the microphone track before or around encoding. NAT traversal, encryption, congestion response and device choice remain part of the experience even when the page exposes one call button. The W3C API standard deliberately does not promise one fixed route, codec, quality or latency."
+  - Replacement plan: "WebRTC" → "Web R-T-C" × 1; "RTCPeerConnection" → "R-T-C Peer Connection" × 1; "W3C" → "W-three-C" × 1
+  - Exact spoken text: "Web R-T-C brought a related stack into browsers. An application requests media under a permission model, negotiates compatible formats and network paths, and sends protected real-time media through an R-T-C Peer Connection. Echo cancellation, gain control and noise suppression may shape the microphone track before or around encoding. NAT traversal, encryption, congestion response and device choice remain part of the experience even when the page exposes one call button. The W-three-C API standard deliberately does not promise one fixed route, codec, quality or latency."
+- [ ] 0378 `passage:media-voice-packets:block-14-callout-title` — 12.668 s — `9dd5fe0a7e7930bfb28dccebe130eb2211b672b7d052fff9fc58555e03324f94`
+- [ ] 0379 `passage:media-voice-packets:block-15-heading` — 3.170 s — `b2c30e5cb09bcb8104d2796b5b7908bd1bc20eca42fe6409031555e9ff13dcdc`
+- [ ] 0380 `passage:media-voice-packets:block-16-paragraph` — 38.513 s — `1d3cff720cf8a00983bf5cb2117583c53a4a3301bb5ec1c03b43dc919154a376`
+- [ ] 0381 `passage:media-voice-packets:block-17-paragraph` — 26.741 s — `b57cdf7bc790d3f43c45c31400c0e6acdaffbee0b3964ce7fa20329e5413ac30`
+- [ ] 0382 `passage:templates-to-probabilities:section-title` — 8.359 s — `724a35730be39de5cae00fec2c85eeef8c84e58305876d1baf86636d7688082a`
+- [ ] 0383 `passage:templates-to-probabilities:block-0-heading` — 2.042 s — `d03fe23933bc81ac0dffd3aa4b3b1bae26f4e13e242485100eb1c494e26672ee`
+- [ ] 0384 `passage:templates-to-probabilities:block-1-paragraph` — 43.265 s — `db126cdb5c8342d66d03a99f30dbc8b1bc460c0c893edbf511a9fc172e2f2323`
+- [ ] 0385 `passage:templates-to-probabilities:block-2-heading` — 2.706 s — `4457a8a0cc792ed1786ba7785b8ab9a45980a61662c6039d1ff5efada00f8f6e` — attention: near-character-pacing-bound, known-qc-385
+- [ ] 0386 `passage:templates-to-probabilities:block-3-paragraph` — 41.474 s — `882987e11f1c887c34ed9f9b9cd8cc11ebbd441d3e99e838b5577ff91c04ddc9`
+- [ ] 0387 `passage:templates-to-probabilities:block-4-paragraph` — 32.062 s — `a3815fac6d76f95df12feca0513783af7b16c896ee4f2b30f6cc5b746452091a`
+- [ ] 0388 `passage:templates-to-probabilities:block-5-timeline-item-0-year` — 7.963 s — `54c4021afe9f9f94064081ec161631bf56854b9f90b53e8d4a71f832d134fc45`
+- [ ] 0389 `passage:templates-to-probabilities:block-5-timeline-item-1-year` — 6.987 s — `416d4f939019fd189b531e4adb766f980f0d3f348e1a08e32e18c155b2d316ae`
+- [ ] 0390 `passage:templates-to-probabilities:block-5-timeline-item-2-year` — 7.690 s — `a57b9af0de92ee9df16358fe937151284120b216096ee84541ac617e731f3652`
+- [ ] 0391 `passage:templates-to-probabilities:block-5-timeline-item-3-year` — 9.365 s — `5fd5294688bc2b0bfa176b4819d2ece9db0df92684d9ab04f24522d0e668cacf` — attention: reading-note, spoken-normalisation
+  - Reading note: Read HMM as H-M-M.
+  - Visible manuscript: "1989. The HMM synthesis. Rabiner’s tutorial records how probabilistic state models became a practical speech-recognition framework."
+  - Replacement plan: "HMM" → "H-M-M" × 1
+  - Exact spoken text: "1989. The H-M-M synthesis. Rabiner’s tutorial records how probabilistic state models became a practical speech-recognition framework."
+- [ ] 0392 `passage:templates-to-probabilities:block-5-timeline-item-4-year` — 7.700 s — `6d3c43bb5e3cc4f47d12ae604ece65a60cc4ebc68164f73ab2461bd99acfec43`
+- [ ] 0393 `passage:templates-to-probabilities:block-5-timeline-item-5-year` — 7.688 s — `1ba24ba7e9c293fae46c816836ba5459774e9d42ca85440c488645deffbb9880`
+- [ ] 0394 `passage:templates-to-probabilities:block-6-paragraph` — 38.352 s — `d55c71f6ef6ea396e95abae78095448f8a998324d8221e4704fe017558a4d80e`
+- [ ] 0395 `passage:templates-to-probabilities:block-7-paragraph` — 41.158 s — `897c5a58202ecfb2ac9ebf39ec757b215d78482009032e7a325bce6cd4e21eed`
+- [ ] 0396 `passage:templates-to-probabilities:block-8-paragraph` — 46.778 s — `aceb9f3d1dea1e1f655cefd32de771733dcfcd772fda9947f9d0d2dee646da0e` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read HMMs as H-M-Ms and CTC as C-T-C.
+  - Visible manuscript: "Deep learning first changed who scored those frames. In the systems surveyed in 2012, deep neural networks often replaced Gaussian mixtures while HMMs still organised time. CTC then offered a different bridge between long input and short transcript: the network emits label probabilities plus a blank symbol, and training sums over all frame-level paths that collapse to the required sequence. Exact hand-marked boundaries are unnecessary, but alignment has not vanished; it has become latent and is marginalised by the objective. Across this longer lineage, recognition moved from fixed whole-utterance templates towards models that score many possible state and alignment paths."
+  - Replacement plan: "HMMs" → "H-M-Ms" × 1; "CTC" → "C-T-C" × 1
+  - Exact spoken text: "Deep learning first changed who scored those frames. In the systems surveyed in 2012, deep neural networks often replaced Gaussian mixtures while H-M-Ms still organised time. C-T-C then offered a different bridge between long input and short transcript: the network emits label probabilities plus a blank symbol, and training sums over all frame-level paths that collapse to the required sequence. Exact hand-marked boundaries are unnecessary, but alignment has not vanished; it has become latent and is marginalised by the objective. Across this longer lineage, recognition moved from fixed whole-utterance templates towards models that score many possible state and alignment paths."
+- [ ] 0397 `passage:templates-to-probabilities:block-9-figure-title` — 16.549 s — `348bf6f02f1a682aaa4ebf18e265fc51c96cca848730bd44ebe9a80d3624fa75` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Signal path — one utterance, many paths. Waveform → short-time measurements → state or label probabilities → search or collapse → transcript. A transcript is a hypothesis chosen under a model, vocabulary and decoding rule; it is not the waveform made visible."
+  - Replacement plan: "→" → "to" × 4
+  - Exact spoken text: "Signal path — one utterance, many paths. Waveform to short-time measurements to state or label probabilities to search or collapse to transcript. A transcript is a hypothesis chosen under a model, vocabulary and decoding rule; it is not the waveform made visible."
+- [ ] 0398 `passage:templates-to-probabilities:block-10-callout-title` — 25.247 s — `57f95cc09499aaad4700db38c01cd7a9095da9e11723f6a46e5ccc74075e4df7`
+- [ ] 0399 `passage:templates-to-probabilities:block-11-paragraph` — 23.779 s — `eda38c9dce8452674cd83dc1d7d46e1a1f1425ef8a6047a5129cdab3c58e5615`
+- [ ] 0400 `passage:voder-to-neural-speech:section-title` — 8.441 s — `ddd1b2d294a4de8cd46549c0dd7714d92780945ea99c218e80a59cc770f050ad`
+- [ ] 0401 `passage:voder-to-neural-speech:block-0-heading` — 1.910 s — `e664b18a2a054cfe95d436737b6b9afa8b619d0d6219c8573061cace37ca7b09`
+- [ ] 0402 `passage:voder-to-neural-speech:block-1-paragraph` — 47.287 s — `8ff6ab078bbd9be2ee5225e285635a1f0106322963b789808508d54a47445141`
+- [ ] 0403 `passage:voder-to-neural-speech:block-2-heading` — 2.882 s — `b9cbdc8898ed7d3a6886bfae95580b4bc7bc5ca378d202942fa961586d2f7aca`
+- [ ] 0404 `passage:voder-to-neural-speech:block-3-paragraph` — 40.283 s — `cb80729798238f1a43a11d8724712ae83043d65ab17fde690df50eff02824c32`
+- [ ] 0405 `passage:voder-to-neural-speech:block-4-paragraph` — 41.572 s — `72a26de5b80ca7515df35ed141141ebc2acbfae0b3c3e9b4bee35c71d3ea49cc`
+- [ ] 0406 `passage:voder-to-neural-speech:block-5-paragraph` — 40.935 s — `5ffff9b463fe7ec6088c7adcf120b81e1dfcc528ecc07299ab0381482ac521a6`
+- [ ] 0407 `passage:voder-to-neural-speech:block-6-paragraph` — 47.153 s — `f254e95b8855f67110b5ebe1310ae997e0527d40c7c553e11f0cf768d6cb480c`
+- [ ] 0408 `passage:voder-to-neural-speech:block-7-callout-title` — 19.061 s — `3601e17830f48ddfa2a0d0c989338374a3a83def1b54cf9d484e5d1c0bf36aa7`
+- [ ] 0409 `passage:voder-to-neural-speech:block-8-paragraph` — 46.634 s — `639bb58df51e29fa96b6dcd4a631b9f594d1c178f25db66dd3b109d7b72d4877`
+- [ ] 0410 `passage:voder-to-neural-speech:block-9-figure-title` — 22.028 s — `e784e018b8e98cb79825d40083d623d565cd9b7af62e37d8b1572f8e3a303462` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Signal path — control moves into the model. Operator gestures → filter controls → sound; text → linguistic rules → acoustic parameters → sound; text plus training recordings → learned acoustic representation → learned waveform → sound. The arrows shorten on the diagram while the data and labour behind them grow."
+  - Replacement plan: "→" → "to" × 8
+  - Exact spoken text: "Signal path — control moves into the model. Operator gestures to filter controls to sound; text to linguistic rules to acoustic parameters to sound; text plus training recordings to learned acoustic representation to learned waveform to sound. The arrows shorten on the diagram while the data and labour behind them grow."
+- [ ] 0411 `passage:voder-to-neural-speech:block-10-paragraph` — 36.098 s — `3a31a73a9c269ebb39a25068cb47e868bef7291246b174001e190d258c6a42b5`
+- [ ] 0412 `passage:voder-to-neural-speech:block-11-callout-title` — 22.904 s — `34c5bd1e888f793637d9af48e37288ec48afbb2daff07157206646e2b61c3f77`
+- [ ] 0413 `passage:voder-to-neural-speech:block-12-paragraph` — 15.082 s — `00b3f084ea0ddff97a0041b84e2ea5cd4046da607c9dd528dfaa5876b557bab5`
+- [ ] 0414 `passage:whose-voice-in-data:section-title` — 8.176 s — `a8837ab13f6e339c0ef1b81f8193c68c53cb863aa47ce8bd221c776753799db3`
+- [ ] 0415 `passage:whose-voice-in-data:block-0-heading` — 1.303 s — `3e6450995910d631f67c1489c7b6a912d789920997d12cb57d4c085fb46f3c1f`
+- [ ] 0416 `passage:whose-voice-in-data:block-1-paragraph` — 40.971 s — `75ffc8c0dd23a03dacb411497058655857471b5711f2f3bc6bcc4615a52a252e`
+- [ ] 0417 `passage:whose-voice-in-data:block-2-heading` — 2.891 s — `d7985f734871c7da905808d3d3e0491dc07088be40573b8f1d6dcb0ab0c5ffda`
+- [ ] 0418 `passage:whose-voice-in-data:block-3-paragraph` — 44.266 s — `886c138d43031c90d669ac28ab67549ec9f876564293b4b7c54d55bb186c957e`
+- [ ] 0419 `passage:whose-voice-in-data:block-4-list-title` — 2.369 s — `0ce0db66cd55a87790a87ae5905e89b553a2b56972e2b6d1fad2645771b32d5c`
+- [ ] 0420 `passage:whose-voice-in-data:block-4-list-item-0` — 5.413 s — `18f1e1b075a799b3848c6ea03da8811294fb7b2de6d85042e67daf86fcf67f58`
+- [ ] 0421 `passage:whose-voice-in-data:block-4-list-item-1` — 5.943 s — `fca00bab543a20c44e8ea50f5cd46b69c4d241849f713113d57f7d319163f4de`
+- [ ] 0422 `passage:whose-voice-in-data:block-4-list-item-2` — 7.006 s — `8d9ae4679a20f9404dc0c413c817cd406e096a60002878a837791bf4170f2683`
+- [ ] 0423 `passage:whose-voice-in-data:block-4-list-item-3` — 5.882 s — `e27e9f2fbefbb897a7c32a45291f4843d489abbd0d9e4a6d551fe82542e20911`
+- [ ] 0424 `passage:whose-voice-in-data:block-5-paragraph` — 37.077 s — `74b8bb43a0f35786811fcc3e113ea36b7bfc325c22be038b3ecc0501c0fc86cf`
+- [ ] 0425 `passage:whose-voice-in-data:block-6-paragraph` — 45.111 s — `f16fc5f46c8b7df197820407b8c29973184f03ecd13ed4c1fd9de3dde218e537`
+- [ ] 0426 `passage:whose-voice-in-data:block-7-paragraph` — 44.786 s — `c1c368805805ee9e4e944bdb6b233f1c4161ab718a4af8dec5e02f4f1f7eb5b7`
+- [ ] 0427 `passage:whose-voice-in-data:block-8-callout-title` — 19.455 s — `a6aeca2a0effaf08e571d3ecd1e4a24d5c830eeaace0f0e18a994a0f8227fc03`
+- [ ] 0428 `passage:whose-voice-in-data:block-9-paragraph` — 47.310 s — `7312c84fef621b58a3ee0e00e30c3329b1c260b31627104f1fe1c6f613aa00d0` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read NIST as “nist”, US as U-S, and SP 800-63B-4 as “S-P eight hundred dash sixty-three B dash four”.
+  - Visible manuscript: "Voice biometrics demands the same restraint. NIST speaker evaluations define target detection, trial lists, conditions and error metrics; they do not describe a voiceprint that is infallibly unique. Channels, illness, ageing, short samples, noise, replay and synthesis can all change the evidence available to a deployed system. NIST’s current US federal authentication guidance goes further for its own scope: SP 800-63B-4 prohibits biometric comparison based on voice. That is not a worldwide ban on speaker research or accessibility. It is a clear warning not to make a replayable, synthesised signal carry digital-authentication authority."
+  - Replacement plan: "NIST" → "nist" × 2; "US" → "U-S" × 1; "SP 800-63B-4" → "S-P eight hundred dash sixty-three B dash four" × 1
+  - Exact spoken text: "Voice biometrics demands the same restraint. nist speaker evaluations define target detection, trial lists, conditions and error metrics; they do not describe a voiceprint that is infallibly unique. Channels, illness, ageing, short samples, noise, replay and synthesis can all change the evidence available to a deployed system. nist’s current U-S federal authentication guidance goes further for its own scope: S-P eight hundred dash sixty-three B dash four prohibits biometric comparison based on voice. That is not a worldwide ban on speaker research or accessibility. It is a clear warning not to make a replayable, synthesised signal carry digital-authentication authority."
+- [ ] 0429 `passage:whose-voice-in-data:block-10-figure-title` — 17.667 s — `85b02f01ff8c568d554800a58fef06be6607f146c15feaa0c297d36df08272e3` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Signal path — the corpus is part of the model. People and settings → recordings → consent and metadata → segmentation and labels → sampling and training → metric → deployment. Bias can enter at every arrow, and later scale does not automatically cancel an earlier omission."
+  - Replacement plan: "→" → "to" × 6
+  - Exact spoken text: "Signal path — the corpus is part of the model. People and settings to recordings to consent and metadata to segmentation and labels to sampling and training to metric to deployment. Bias can enter at every arrow, and later scale does not automatically cancel an earlier omission."
+- [ ] 0430 `passage:whose-voice-in-data:block-11-callout-title` — 16.829 s — `921aadbc621b5f9c217b3dcddd693b48c99671ec304b59de4dcac7a3b940cfc6`
+- [ ] 0431 `passage:whose-voice-in-data:block-12-paragraph` — 15.556 s — `91be1fa29aa4cee07fe1cfa1446cf07ef0d2d8de95fa7dad0e921a6c1781f458`
+- [ ] 0432 `passage:voice-becomes-tokens:section-title` — 9.080 s — `7dc2a5cf5027ba34b79ff4218c51192131973f13e2cacf34782c77c035b082ff`
+- [ ] 0433 `passage:voice-becomes-tokens:block-0-heading` — 2.290 s — `816cb209fc6aa76f51f88a64e2a6d8a6056581cefdfefb76b2b54cc016e0440e`
+- [ ] 0434 `passage:voice-becomes-tokens:block-1-paragraph` — 39.077 s — `f75ebc665623d402117da8c3c92ee85153fafa40fbb217881d5ab2be3f5c2ecd`
+- [ ] 0435 `passage:voice-becomes-tokens:block-2-heading` — 3.118 s — `b4f3d3c8960bca224cfa2901db37c8aab825eb504f9f8cc6fa918e046a5f62e1`
+- [ ] 0436 `passage:voice-becomes-tokens:block-3-paragraph` — 37.437 s — `38d539fbdaefbb128c066c1118822de79781364ce43c43369c28ad2566a88471`
+- [ ] 0437 `passage:voice-becomes-tokens:block-4-figure-title` — 17.498 s — `8bf4216909bb37801ce4a8063c668195631ef75c64235efd6debf3727b4e2cbc` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Signal path — a model-specific acoustic alphabet. Waveform → neural encoder → continuous latent → codebook indices → neural decoder → reconstructed waveform. More codebooks or a higher token rate can carry more detail, at the cost of bitrate, storage and modelling work."
+  - Replacement plan: "→" → "to" × 5
+  - Exact spoken text: "Signal path — a model-specific acoustic alphabet. Waveform to neural encoder to continuous latent to codebook indices to neural decoder to reconstructed waveform. More codebooks or a higher token rate can carry more detail, at the cost of bitrate, storage and modelling work."
+- [ ] 0438 `passage:voice-becomes-tokens:block-5-paragraph` — 40.747 s — `777fa772e2bc3b1c8e4fb85db0ebef6ca5d2ac9d75e440f74ed703bf15f8b5c1`
+- [ ] 0439 `passage:voice-becomes-tokens:block-6-paragraph` — 38.748 s — `2196c6628ce1cc6f2372671064ffcbf0c09e2bc5b21dfa3166d8ae934fb19228` — attention: reading-note, spoken-normalisation
+  - Reading note: Read VALL-E as “Valley”.
+  - Visible manuscript: "VALL-E applied the idea to text-to-speech: predict discrete codec codes conditioned on text and an acoustic prompt. Its authors reported that a three-second enrolled recording could condition speaker resemblance and aspects of the acoustic environment in their experiments. The memorable number is not a law of voice cloning; other models, voices and conditions differ. What matters is the demonstrated mechanism. If tokens preserve cues that make a reconstruction sound like someone, a generator can learn to recombine those cues for words that person never recorded."
+  - Replacement plan: "VALL-E" → "Valley" × 1
+  - Exact spoken text: "Valley applied the idea to text-to-speech: predict discrete codec codes conditioned on text and an acoustic prompt. Its authors reported that a three-second enrolled recording could condition speaker resemblance and aspects of the acoustic environment in their experiments. The memorable number is not a law of voice cloning; other models, voices and conditions differ. What matters is the demonstrated mechanism. If tokens preserve cues that make a reconstruction sound like someone, a generator can learn to recombine those cues for words that person never recorded."
+- [ ] 0440 `passage:voice-becomes-tokens:block-7-list-title` — 2.709 s — `6d193e968b783d34c3752ca2e5da50d03f4883c7a861a2471eea8dfaf6f1a253`
+- [ ] 0441 `passage:voice-becomes-tokens:block-7-list-item-0` — 7.460 s — `5f30f8ac3fe1448f24caad12183daca52b4fc7b2f96a8eebfb121068b6ab705c`
+- [ ] 0442 `passage:voice-becomes-tokens:block-7-list-item-1` — 8.384 s — `d31b63b596b20de71d18584b1fa91a8b06a1d7a0b1bdc12068fc8ee945965700`
+- [ ] 0443 `passage:voice-becomes-tokens:block-7-list-item-2` — 7.514 s — `4472f667399668b6dc2b8a856f5098e1dcc28e4cb257986d4f09f5267cbee3ae`
+- [ ] 0444 `passage:voice-becomes-tokens:block-7-list-item-3` — 7.610 s — `2ea4c7e0a45d143bba15c8332043795a190092a3196937f7f66e85be573cb3a2`
+- [ ] 0445 `passage:voice-becomes-tokens:block-7-list-item-4` — 7.898 s — `fd1a846ffecef296891dbc0d612c647f47e9d147d236cc208b7776ca888f97c4`
+- [ ] 0446 `passage:voice-becomes-tokens:block-8-paragraph` — 39.571 s — `3e7a438127110e83a50801629f0ba641b9a97a02b150198d15eb6eab55ba7ebc`
+- [ ] 0447 `passage:voice-becomes-tokens:block-9-callout-title` — 19.727 s — `c4a760118e8cdb9783a782b246ef29d5f4fbcfd1e4d814f740b27ff0eeebf680`
+- [ ] 0448 `passage:voice-becomes-tokens:block-10-callout-title` — 19.994 s — `4d083d11037225e0e232b87781039e2e96750403a34f60180ef00a50674080d3`
+- [ ] 0449 `passage:voice-becomes-tokens:block-11-paragraph` — 18.866 s — `b04f97d4a9c4a1e4b41d89150e721f731e875b03dc420072e82462240cd03a69`
+- [ ] 0450 `passage:conversation-becomes-stream:section-title` — 8.369 s — `cf4d60c376c52eb3eb58d3d0f514994f7a448c5ad7642b46348ec652ec02d302`
+- [ ] 0451 `passage:conversation-becomes-stream:block-0-heading` — 1.442 s — `c9039c486953166744fc617218ce4b89a0183629ab60686eb4a442c751849c16`
+- [ ] 0452 `passage:conversation-becomes-stream:block-1-paragraph` — 33.555 s — `2f52f59ca7ac702976abcc55ea8b446d25462d799feccf6c73193d7a03bf0f24`
+- [ ] 0453 `passage:conversation-becomes-stream:block-2-heading` — 2.991 s — `aa2efb9e9add70cdb784e2e35f60b11d441f0678e29cc5c6bba3e1145261bcb1` — attention: known-qc-453
+- [ ] 0454 `passage:conversation-becomes-stream:block-3-paragraph` — 42.962 s — `144d2344de78ddf6348305eece9913ddc30f1ca412931118f9953be92876bcc8` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read VAD as V-A-D.
+  - Visible manuscript: "The simplest gate is voice activity detection, or VAD: estimate whether each region contains speech rather than non-speech. Energy, spectral evidence and statistical models can help. Thresholds, prefix padding and silence duration turn those estimates into start and stop events. But silence is not completion. A person may pause to remember a name; noise may look speech-like; a quiet speaker may fall below threshold. VAD detects acoustic activity under a model. Turn-taking requires a further prediction about intention, syntax, prosody, context and social convention."
+  - Replacement plan: "VAD" → "V-A-D" × 2
+  - Exact spoken text: "The simplest gate is voice activity detection, or V-A-D: estimate whether each region contains speech rather than non-speech. Energy, spectral evidence and statistical models can help. Thresholds, prefix padding and silence duration turn those estimates into start and stop events. But silence is not completion. A person may pause to remember a name; noise may look speech-like; a quiet speaker may fall below threshold. V-A-D detects acoustic activity under a model. Turn-taking requires a further prediction about intention, syntax, prosody, context and social convention."
+- [ ] 0455 `passage:conversation-becomes-stream:block-4-paragraph` — 40.652 s — `a6e2537973248b344ed0cd8e20479cc131b64c31d9c331cabb0dc239cefa2b3c`
+- [ ] 0456 `passage:conversation-becomes-stream:block-5-list-title` — 2.163 s — `9c441974eff0a0084286bc20e912f2f08d02a3fd569b4e2166c769349c1af3f1`
+- [ ] 0457 `passage:conversation-becomes-stream:block-5-list-item-0` — 7.045 s — `dd27cd14fb7d805e3fc3d98dbbd5d1de78556ea7a0bcdf84138d99f46ff0381d`
+- [ ] 0458 `passage:conversation-becomes-stream:block-5-list-item-1` — 6.810 s — `acb92b277f13c2dbe02c4ca180946c7d2d374685fe2380dacafa8e24bd48274d`
+- [ ] 0459 `passage:conversation-becomes-stream:block-5-list-item-2` — 4.457 s — `a5db5891e4ef91a1d326e43ed62fca8704d25721c611fe060a5baf97839d52cc`
+- [ ] 0460 `passage:conversation-becomes-stream:block-5-list-item-3` — 9.285 s — `7fd05e9dfc4f6f3771c511d172434a741548e6343cf1b6ad9dcafcda66c46526`
+- [ ] 0461 `passage:conversation-becomes-stream:block-5-list-item-4` — 4.804 s — `d408ff4a67dff31977f84d1015ec194bd56f75860d9b94561f1a1419e95cb8b4`
+- [ ] 0462 `passage:conversation-becomes-stream:block-6-paragraph` — 40.597 s — `9917809c352c755e8047f5773580accb5ac8b2281a268003d663b953fa91d1f7`
+- [ ] 0463 `passage:conversation-becomes-stream:block-7-figure-title` — 25.863 s — `23cdf6daaa873bd1fb53ff0465e88c52780c2007e049982c5c541c4e5131e70b`
+- [ ] 0464 `passage:conversation-becomes-stream:block-8-paragraph` — 47.903 s — `7e6db6b628c77cd45cfe2b4e361acb09be0633a0fedeb2cf2d4029f2e98c4ced` — attention: reading-note, spoken-normalisation
+  - Reading note: Read VAD as V-A-D.
+  - Visible manuscript: "As documented on 10 August 2026, several commercial API families expose pieces of this control problem. OpenAI’s Realtime reference describes server and semantic VAD plus an option to interrupt an ongoing response when speech starts. Google’s Live API documentation describes bidirectional audio, configurable activity detection and barge-in, while marking parts of the service as preview. Amazon’s Nova documentation describes a persistent bidirectional stream carrying audio and structured events. These are vendor descriptions of interfaces that can change; they do not establish which service listens most naturally or works best for a particular population."
+  - Replacement plan: "VAD" → "V-A-D" × 1
+  - Exact spoken text: "As documented on 10 August 2026, several commercial API families expose pieces of this control problem. OpenAI’s Realtime reference describes server and semantic V-A-D plus an option to interrupt an ongoing response when speech starts. Google’s Live API documentation describes bidirectional audio, configurable activity detection and barge-in, while marking parts of the service as preview. Amazon’s Nova documentation describes a persistent bidirectional stream carrying audio and structured events. These are vendor descriptions of interfaces that can change; they do not establish which service listens most naturally or works best for a particular population."
+- [ ] 0465 `passage:conversation-becomes-stream:block-9-callout-title` — 28.530 s — `e1180a6e1cc4288a615b7a153cf38cb165e4f2d2ac26df17c9ee06e895e5b32f`
+- [ ] 0466 `passage:conversation-becomes-stream:block-10-paragraph` — 34.082 s — `4054e9e674df8820eeb3092a4e254e6ac088bb13d5b4665808b4a21ef3d69a39` — attention: reading-note, spoken-normalisation
+  - Reading note: Read AAC as A-A-C.
+  - Visible manuscript: "Timing is also an access and power question. A system that repeatedly cuts in can make a stammer, dysarthria, second language, cognitive pause or AAC-mediated utterance seem like failure. Always-listening streams can capture bystanders and intimate background sound. A humane design offers adjustable turn controls, visible listening state, push-to-talk and text alternatives; it makes interruption repairable and keeps consequential actions outside automatic turn prediction."
+  - Replacement plan: "AAC-mediated" → "A-A-C-mediated" × 1
+  - Exact spoken text: "Timing is also an access and power question. A system that repeatedly cuts in can make a stammer, dysarthria, second language, cognitive pause or A-A-C-mediated utterance seem like failure. Always-listening streams can capture bystanders and intimate background sound. A humane design offers adjustable turn controls, visible listening state, push-to-talk and text alternatives; it makes interruption repairable and keeps consequential actions outside automatic turn prediction."
+- [ ] 0467 `passage:conversation-becomes-stream:block-11-callout-title` — 19.466 s — `c4a14a099022ccc6b9f8bb7086f8a211f998068e0e86294f84166f181bf0b742`
+- [ ] 0468 `passage:conversation-becomes-stream:block-12-paragraph` — 18.487 s — `299a89532bf8ba4ad3a7849eb3b7d6ede0b67db29d50857af0bc3b5dedae0625`
+- [ ] 0469 `passage:access-restoration-agency:section-title` — 9.520 s — `043eabf627c6d5c36cc35e510a2e2aeb2d0d4e1693a0d4dd55cf4b9dbaf0d6cf`
+- [ ] 0470 `passage:access-restoration-agency:block-0-heading` — 2.189 s — `68d992f554d0b53b41a1000f00a1fb49705c451fabe0cb259704f8d055cc45ad`
+- [ ] 0471 `passage:access-restoration-agency:block-1-paragraph` — 37.237 s — `f8f734b662f492e5e3574ce8419bd4758bafeb5328527ff504fbe9caab42eaa2`
+- [ ] 0472 `passage:access-restoration-agency:block-2-heading` — 2.783 s — `72135fe8f394a2889fd73d871c7a42bfa473bdec1103b2cbbc10e4d63d91394f` — attention: passage-normalisation-override, below-ordinary-loudness-floor
+- [ ] 0473 `passage:access-restoration-agency:block-3-paragraph` — 37.794 s — `1a26608eaf24555bce0ab6c8fa1fe68ff5e07358ea92b66582a6bdea701f1c50`
+- [ ] 0474 `passage:access-restoration-agency:block-4-paragraph` — 40.267 s — `54c0b215829053c0e1b9d0327d6b69d6145b2d88510c5e1f41717b9a84653328`
+- [ ] 0475 `passage:access-restoration-agency:block-5-paragraph` — 42.268 s — `24f25418a81710e8ae598bd1512b25567ae14a044c7d67e08b08c2a04d15177c` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read W3C as W-three-C and WHO as W-H-O.
+  - Visible manuscript: "Hearing is equally diverse. Captions, full transcripts, sign-language interpretation, visual alerts, hearing technologies and audio customisation solve different problems for different people and settings. A 2015 W3C Working Group Note observes that synchronised captions are not sufficient for everyone; an independently available transcript can support people who need more time or another rendering. WHO’s people-centred account likewise places communication needs and local context above one device. “Audio on” and “audio off” are not the two human states."
+  - Replacement plan: "W3C" → "W-three-C" × 1; "WHO" → "W-H-O" × 1
+  - Exact spoken text: "Hearing is equally diverse. Captions, full transcripts, sign-language interpretation, visual alerts, hearing technologies and audio customisation solve different problems for different people and settings. A 2015 W-three-C Working Group Note observes that synchronised captions are not sufficient for everyone; an independently available transcript can support people who need more time or another rendering. W-H-O’s people-centred account likewise places communication needs and local context above one device. “Audio on” and “audio off” are not the two human states."
+- [ ] 0476 `passage:access-restoration-agency:block-6-callout-title` — 26.226 s — `33dedb0177b049af922e102e6e206c444d1090e11cd09309736568b36e5be8f8`
+- [ ] 0477 `passage:access-restoration-agency:block-7-paragraph` — 48.243 s — `c489850ef6faa0972e86d3fab759a602965a34102c1a15adbe119ad18478901d` — attention: reading-note, spoken-normalisation
+  - Reading note: Read ALS as A-L-S.
+  - Visible manuscript: "Restorative speech neuroprostheses move the input boundary closer to intended articulation. In two 2023 Nature studies, implanted interfaces decoded neural activity associated with attempted speech for individual participants with severe speech impairment. One study reported large-vocabulary text decoding for a participant with ALS; another produced text, synthesised audio and facial-avatar control, including experimental personalisation towards the participant’s pre-injury voice. These are remarkable participant-specific clinical-trial results. They are not consumer products, guarantees for other bodies or devices that read unrestricted private thought."
+  - Replacement plan: "ALS" → "A-L-S" × 1
+  - Exact spoken text: "Restorative speech neuroprostheses move the input boundary closer to intended articulation. In two 2023 Nature studies, implanted interfaces decoded neural activity associated with attempted speech for individual participants with severe speech impairment. One study reported large-vocabulary text decoding for a participant with A-L-S; another produced text, synthesised audio and facial-avatar control, including experimental personalisation towards the participant’s pre-injury voice. These are remarkable participant-specific clinical-trial results. They are not consumer products, guarantees for other bodies or devices that read unrestricted private thought."
+- [ ] 0478 `passage:access-restoration-agency:block-8-figure-title` — 18.234 s — `ce6acf88255e6de9d8f101e4d35c5f53017400d5e21fe9d46d48491ffbcedae0` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Signal path — intention must retain an exit. Attempted speech or access movement → sensor → decoder → candidate text or audio → user correction/approval → communication. The correction and approval path is part of the communication system, not an optional safety panel."
+  - Replacement plan: "→" → "to" × 5
+  - Exact spoken text: "Signal path — intention must retain an exit. Attempted speech or access movement to sensor to decoder to candidate text or audio to user correction/approval to communication. The correction and approval path is part of the communication system, not an optional safety panel."
+- [ ] 0479 `passage:access-restoration-agency:block-9-paragraph` — 39.743 s — `85399aadd830512b4e1c81f65fde1cc10319a65d1a9b3e40267c3f3ebbc4f4d9`
+- [ ] 0480 `passage:access-restoration-agency:block-10-paragraph` — 28.505 s — `6840ea4747db2339041afc823f0d590b6150ef7e82d5b4c7f81e88bfd6c472d8` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read UN as U-N and Article 4(3) as “Article four, paragraph three”.
+  - Visible manuscript: "Participant authority is not courtesy added after invention. The UN Convention on the Rights of Persons with Disabilities centres individual autonomy; Article 4(3) requires close consultation with, and active involvement of, disabled people through their representative organisations when developing and implementing relevant legislation and policies and in other decision-making processes concerning them."
+  - Replacement plan: "UN" → "U-N" × 1; "Article 4(3)" → "Article four, paragraph three" × 1
+  - Exact spoken text: "Participant authority is not courtesy added after invention. The U-N Convention on the Rights of Persons with Disabilities centres individual autonomy; Article four, paragraph three requires close consultation with, and active involvement of, disabled people through their representative organisations when developing and implementing relevant legislation and policies and in other decision-making processes concerning them."
+- [ ] 0481 `passage:access-restoration-agency:block-11-paragraph` — 19.445 s — `30d01f6b224e80bd580d9f9fe7e2a4ed7638cf33d617763c797e5916dc41ad6d`
+- [ ] 0482 `passage:access-restoration-agency:block-12-callout-title` — 19.069 s — `2ea892c56492ed70174c429b1072feb65d0dd40799a6477608f2a07b3a75140e`
+- [ ] 0483 `passage:access-restoration-agency:block-13-paragraph` — 18.886 s — `5d6097d704ab715788d4ae2d959f6301a0b728ad383d8e06e2fdce9616f133b8`
+- [ ] 0484 `passage:consent-provenance-synthetic-self:section-title` — 10.430 s — `3e50f530d501940efd89990e584ab225dd827d63eb4595ce295897e09e1f7245`
+- [ ] 0485 `passage:consent-provenance-synthetic-self:block-0-heading` — 2.558 s — `fa888166e5c68ee07b7832910b54d51a9cd8548e9fe2676a32b08a5069e61f94`
+- [ ] 0486 `passage:consent-provenance-synthetic-self:block-1-paragraph` — 36.969 s — `cece1ad37d89526d611b6df197b846c147f7412a2f4c15de4e1764b568922d4b`
+- [ ] 0487 `passage:consent-provenance-synthetic-self:block-2-heading` — 3.037 s — `35752f28e8426dd1193adaf27df96906e33129924995c0acd38acb7a3ec27c75`
+- [ ] 0488 `passage:consent-provenance-synthetic-self:block-3-paragraph` — 37.084 s — `08515857fec8e0d5db7138162e8210b4716a63d4dc91e7d61c4f4f5d5606b7c7`
+- [ ] 0489 `passage:consent-provenance-synthetic-self:block-4-paragraph` — 38.901 s — `e539a2d060e0be6beeac20be003ff77908174853de6deaa398f2554f4edb35f6` — attention: reading-note, spoken-normalisation
+  - Reading note: Read VALL-E as “Valley”.
+  - Visible manuscript: "Neural voice cloning need not store and paste one old sentence. A codec-based model can infer speaker cues from a prompt and generate new token sequences conditioned on new text. VALL-E’s research report demonstrated the broad shape of that capability, including speaker resemblance from a short enrolled recording under its test conditions. The output is new audio assembled from learnt distributions. That makes “But the source clip was public” an inadequate ethical answer: availability of an example is not permission to construct an instrument of the person’s identity."
+  - Replacement plan: "VALL-E" → "Valley" × 1
+  - Exact spoken text: "Neural voice cloning need not store and paste one old sentence. A codec-based model can infer speaker cues from a prompt and generate new token sequences conditioned on new text. Valley’s research report demonstrated the broad shape of that capability, including speaker resemblance from a short enrolled recording under its test conditions. The output is new audio assembled from learnt distributions. That makes “But the source clip was public” an inadequate ethical answer: availability of an example is not permission to construct an instrument of the person’s identity."
+- [ ] 0490 `passage:consent-provenance-synthetic-self:block-5-list-title` — 1.677 s — `4d0e7cb240ed643e49ad4b986695c8566a0eb4f4365ab5c5a97ec8f4a2f1f17d`
+- [ ] 0491 `passage:consent-provenance-synthetic-self:block-5-list-item-0` — 6.991 s — `dc51574ce6f4c7a7ff63c228b9efe37745388212f68276a0ec43d059141555a8`
+- [ ] 0492 `passage:consent-provenance-synthetic-self:block-5-list-item-1` — 6.884 s — `b57ba31ee2af1448b0b5358fe4662ee896084cbe111a82bad90ea27d9311c44e`
+- [ ] 0493 `passage:consent-provenance-synthetic-self:block-5-list-item-2` — 6.315 s — `95dd8abe553d038896b6fb31d19361dfd65c43fff1c2e7bfab848a656c8ec162`
+- [ ] 0494 `passage:consent-provenance-synthetic-self:block-5-list-item-3` — 8.387 s — `bea941bdc8d47f09ea3b32a3fc8d6db31b5bf399723763bac1bdbeeacfd28329`
+- [ ] 0495 `passage:consent-provenance-synthetic-self:block-5-list-item-4` — 7.592 s — `3af4890e56e08f8eae3d1ffdda08c0d50171981847308bcd5b468106952038bb`
+- [ ] 0496 `passage:consent-provenance-synthetic-self:block-6-paragraph` — 35.356 s — `544ec64ec46735c0940aac095ffddc469371a08244ffd38750796bbc6b64f620` — attention: reading-note, spoken-normalisation
+  - Reading note: Read C2PA as C-two-P-A.
+  - Visible manuscript: "Provenance can make part of the chain inspectable. C2PA defines manifests containing signed assertions and cryptographic bindings to a digital asset. A conforming validator can check whether the signed material and binding validate under its trust model and can display claims about creation or editing. This is useful plumbing for audio as well as images. It can help a listener distinguish an intact declared process from an unexplained file and can carry an assertion that generative tools were involved."
+  - Replacement plan: "C2PA" → "C-two-P-A" × 1
+  - Exact spoken text: "Provenance can make part of the chain inspectable. C-two-P-A defines manifests containing signed assertions and cryptographic bindings to a digital asset. A conforming validator can check whether the signed material and binding validate under its trust model and can display claims about creation or editing. This is useful plumbing for audio as well as images. It can help a listener distinguish an intact declared process from an unexplained file and can carry an assertion that generative tools were involved."
+- [ ] 0497 `passage:consent-provenance-synthetic-self:block-7-callout-title` — 27.162 s — `67caf0ca6940c7fd67382ea1e6186f595e9d58b6b27a3e4b1f0dca9daa32c288`
+- [ ] 0498 `passage:consent-provenance-synthetic-self:block-8-paragraph` — 42.160 s — `f670562b4b572fbc9ee6749714179b1111de727469a2ebcbf64702072b6f64b7`
+- [ ] 0499 `passage:consent-provenance-synthetic-self:block-9-figure-title` — 19.562 s — `ca5e6f076baee1ae1f0b4d7e08a01b599f5b8952d48dbde67f504107168b2f79` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Signal path — from permission to playback. Enrolment evidence → scoped consent → protected voice model → authorised generation → signed provenance → channel disclosure → recipient verification. A break in one layer should narrow what the system permits, not be covered by greater acoustic realism."
+  - Replacement plan: "→" → "to" × 6
+  - Exact spoken text: "Signal path — from permission to playback. Enrolment evidence to scoped consent to protected voice model to authorised generation to signed provenance to channel disclosure to recipient verification. A break in one layer should narrow what the system permits, not be covered by greater acoustic realism."
+- [ ] 0500 `passage:consent-provenance-synthetic-self:block-10-paragraph` — 34.138 s — `a0545ae08ddf5de6afee2d5a9c88915146809a616755e01a170abd2640c20dc3` — attention: reading-note, spoken-normalisation
+  - Reading note: Read NIST as “nist”.
+  - Visible manuscript: "A voice should not serve as its own password. It travels through public rooms, broadcasts and recordings; it can be replayed and increasingly synthesised. NIST’s current federal authentication guidance prohibits voice-based biometric comparison within its covered workflows. Even where other policies permit speaker verification, the conceptual boundary remains sound: resemblance may contribute evidence, but consequential access should rest on a stronger authenticator and a separate authorisation decision."
+  - Replacement plan: "NIST" → "nist" × 1
+  - Exact spoken text: "A voice should not serve as its own password. It travels through public rooms, broadcasts and recordings; it can be replayed and increasingly synthesised. nist’s current federal authentication guidance prohibits voice-based biometric comparison within its covered workflows. Even where other policies permit speaker verification, the conceptual boundary remains sound: resemblance may contribute evidence, but consequential access should rest on a stronger authenticator and a separate authorisation decision."
+- [ ] 0501 `passage:consent-provenance-synthetic-self:block-11-callout-title` — 24.236 s — `4984d323a46493054228595b4c7955b7de0518f2d7ea19ef31f86508bf2fbd99`
+- [ ] 0502 `passage:consent-provenance-synthetic-self:block-12-paragraph` — 15.466 s — `b69904209bdb4738981c24eb6f6f7f2e54a868b3531576b512141360a3f7ccb5`
+- [ ] 0503 `passage:air-again:section-title` — 7.528 s — `67f922e7aa136defe0778adbc1ad795c1912dc51c46ec14d142cece2cbeb31dc`
+- [ ] 0504 `passage:air-again:block-0-heading` — 1.026 s — `60bfd21fd6a5a5380b0791361c1627616b3f5955afec8b2374827a76ee7551a5`
+- [ ] 0505 `passage:air-again:block-1-paragraph` — 33.271 s — `ac4152b4c5aae29d504d4b109d8ce416f68933a95537f7503c0dbc634bb23212`
+- [ ] 0506 `passage:air-again:block-2-heading` — 3.039 s — `f7c68683f427f7202447450119f9b378235c0c9dfd29f0f92d769e7021f7f3bd` — attention: known-qc-506
+- [ ] 0507 `passage:air-again:block-3-paragraph` — 40.453 s — `307366f2bdbbf6dc846de138025e611be893a3a62cc44bc9334f1bd980dcb8b5`
+- [ ] 0508 `passage:air-again:block-4-paragraph` — 26.212 s — `a391ab59b7548751b1e03274246aa91cfeddc0d5d7e26fb3cce7efc0717358b7`
+- [ ] 0509 `passage:air-again:block-5-heading` — 2.361 s — `482ee6c56c4c2dc852a81b2c69cb4e4e1de8be5197d98fea18434444dfd72c7a` — attention: passage-normalisation-override
+- [ ] 0510 `passage:air-again:block-6-paragraph` — 34.682 s — `695dcfa4b577d09a7302c3f1e706c9ecc43efcdc16bcef2794b91dc6e27c6be3`
+- [ ] 0511 `passage:air-again:block-7-paragraph` — 30.146 s — `9137973a1c0b391b51a3ed3c8d4afeeba9707a23de1b26ed6a081fc4bea62969`
+- [ ] 0512 `passage:air-again:block-8-paragraph` — 25.140 s — `e62d0b855f917c08fa6b28cfe25a2c67b3e6e18d6c8dd0658153cd1d2850afac`
+- [ ] 0513 `passage:sound-laboratory:section-title` — 6.557 s — `1b797bc2b3ea2cd9a61c41655bc0e5a45ae94d6bdf368d19dbdb8e7e99c5ec1b`
+- [ ] 0514 `passage:sound-laboratory:block-0-paragraph` — 12.902 s — `8b8d1217fc445396dacfc5f4c19ff8f635111d1334920db03e7caa86091fc106`
+- [ ] 0515 `passage:sound-laboratory:block-1-heading` — 0.866 s — `92096faf079c0d380d6ac6be1e39173c4a3359d43c7d792a7a33dc328b6c1470`
+- [ ] 0516 `passage:sound-laboratory:block-2-paragraph` — 5.803 s — `41f68ad60e1bc1e4a25e3cf0d9b536ffb560fe8fa56da1015e613e31ddf3f639`
+- [ ] 0517 `passage:sound-laboratory:block-3-figure-title` — 10.668 s — `f9571a11ffaa1d352d31e997c3f340ebeba73c9fd73553ef38db0b35478bc1ea`
+- [ ] 0518 `passage:chronology:section-title` — 5.047 s — `d1b49a6895f633dd79f5388d3c3decb9b81ad80feb13c5d47bdb7547195016f1`
+- [ ] 0519 `passage:chronology:block-0-timeline-item-0-year` — 12.269 s — `e5cbe9ccfcd11b53157659deeb7e06d434744c73ae75bfbff5fd0f354c792ace` — attention: reading-note, spoken-normalisation
+  - Reading note: Read >35,000 as “more than thirty-five thousand”.
+  - Visible manuscript: ">35,000 years ago. Palaeolithic flutes. Fragments from south-western Germany support a long musical tradition; they cannot tell us every instrument or song that once existed."
+  - Replacement plan: ">35,000 years ago" → "more than thirty-five thousand years ago" × 1
+  - Exact spoken text: "more than thirty-five thousand years ago. Palaeolithic flutes. Fragments from south-western Germany support a long musical tradition; they cannot tell us every instrument or song that once existed."
+- [ ] 0520 `passage:chronology:block-0-timeline-item-1-year` — 15.610 s — `6171ceb05542feaa91c92743b2c64284737bf81d3daee679bcc13237cc4f82a0` — attention: reading-note, spoken-normalisation
+  - Reading note: Pronounce Jiahu as JYAH-hoo; read c. as “circa” and BCE as B-C-E.
+  - Visible manuscript: "c. 7000–5700 BCE. Jiahu bone flutes. Playable crane-bone flutes from Neolithic Jiahu document carefully placed finger holes and changing musical practice without recovering the music once performed."
+  - Replacement plan: "c. 7000–5700 BCE" → "circa seven thousand to five thousand seven hundred B-C-E" × 1
+  - Exact spoken text: "circa seven thousand to five thousand seven hundred B-C-E. Jiahu bone flutes. Playable crane-bone flutes from Neolithic Jiahu document carefully placed finger holes and changing musical practice without recovering the music once performed."
+- [ ] 0521 `passage:chronology:block-0-timeline-item-2-year` — 11.900 s — `d3491c721d5c72f9e80d976c34201cb3f765e2a8bd08db19d78f4c5e21292bbb` — attention: reading-note, spoken-normalisation
+  - Reading note: Read c. as “circa” and BCE as B-C-E.
+  - Visible manuscript: "c. 2600 BCE. Lyres at Ur. Surviving instruments and archaeological contexts document sophisticated string practice without preserving the performances themselves."
+  - Replacement plan: "c. 2600 BCE" → "circa twenty-six hundred B-C-E" × 1
+  - Exact spoken text: "circa twenty-six hundred B-C-E. Lyres at Ur. Surviving instruments and archaeological contexts document sophisticated string practice without preserving the performances themselves."
+- [ ] 0522 `passage:chronology:block-0-timeline-item-3-year` — 15.254 s — `39f77c8445c057071cf13294b4bd8e7b8b6decfd310e621084215735ad912b76` — attention: reading-note, spoken-normalisation
+  - Reading note: Pronounce al-Farabi as al fah-RAH-bee; read c. as “circa” and CE as C-E.
+  - Visible manuscript: "c. 950 CE. al-Farabi’s Great Book of Music. A major Arabic treatise joins philosophy, acoustical reasoning, intervals, rhythm and practical instruments within a wider history of translated and original scholarship."
+  - Replacement plan: "c. 950 CE" → "circa nine hundred and fifty C-E" × 1
+  - Exact spoken text: "circa nine hundred and fifty C-E. al-Farabi’s Great Book of Music. A major Arabic treatise joins philosophy, acoustical reasoning, intervals, rhythm and practical instruments within a wider history of translated and original scholarship."
+- [ ] 0523 `passage:chronology:block-0-timeline-item-4-year` — 11.778 s — `b988eba98919ca2298137a4726683c6ffeac81df805fba84557e43e7f9195962` — attention: reading-note
+  - Reading note: Pronounce Mersenne: mehr-SENN.
+- [ ] 0524 `passage:chronology:block-0-timeline-item-5-year` — 17.270 s — `9004af0e0bffd4c1548520013daa791b248b3f0426ec375eb8aa62aea444a37c`
+- [ ] 0525 `passage:chronology:block-0-timeline-item-6-year` — 8.887 s — `e0599e7523d9633529c1c02d438ec7602ed3aa912b5e2fe3effcb5261d1d8884`
+- [ ] 0526 `passage:chronology:block-0-timeline-item-7-year` — 11.043 s — `89beaffda92fa619c91407c99ae0a0c814ffb2ddd4e533923b48645c72d77572`
+- [ ] 0527 `passage:chronology:block-0-timeline-item-8-year` — 13.173 s — `8730b56c833be0bf0e282c7e6c0e6a622327b16947c7d238b7c3cce025d1a918`
+- [ ] 0528 `passage:chronology:block-0-timeline-item-9-year` — 10.624 s — `d1084e1b7496d25fb04f0748338a37ac4c4a5eab3e0c0a3f25a3a1e098c7bbca`
+- [ ] 0529 `passage:chronology:block-0-timeline-item-10-year` — 10.385 s — `347fed7b808edf4bb13997c25fcd7f82d95ff205b224190a993952d8b69e1130` — attention: reading-note
+  - Reading note: Pronounce Poulsen: POWL-sen.
+- [ ] 0530 `passage:chronology:block-0-timeline-item-11-year` — 11.085 s — `74e0bc5272be423859a5bdc43de237cfb1a2323a9dadfae14cfa2cd7a466205f`
+- [ ] 0531 `passage:chronology:block-0-timeline-item-12-year` — 12.230 s — `3ccf0ecb07bd7fdb53e1c6caa5144241bbed6aa2a54256db00f4257a7daca9e1`
+- [ ] 0532 `passage:chronology:block-0-timeline-item-13-year` — 17.486 s — `96568cd6d9558ec11aa783cbc4ddd6ab0e3e18939983d27c4cbdac348acadcba`
+- [ ] 0533 `passage:chronology:block-0-timeline-item-14-year` — 10.797 s — `0a8cf6e47a6e3b9e269b3b20b0b8608fd3d434f7ca712e8740664820a1fa9968`
+- [ ] 0534 `passage:chronology:block-0-timeline-item-15-year` — 11.423 s — `3d1b7787a3deeccf6fe69210c4a4c20761199133e35067c860a7ace18e685890`
+- [ ] 0535 `passage:chronology:block-0-timeline-item-16-year` — 11.722 s — `639ae236ff135484fcf2e072ad7b889acf3da5c7a5d0c6b5cf834ddf50933707`
+- [ ] 0536 `passage:chronology:block-0-timeline-item-17-year` — 11.147 s — `c3fa4c04813dfbfd1d248425c10835db7a78aaa48040ba2883db919639011bd9`
+- [ ] 0537 `passage:chronology:block-0-timeline-item-18-year` — 11.758 s — `9c0836d41c01a1a1b995f530ad4d69a4860e66de5d9270e7d32a3487c422385f`
+- [ ] 0538 `passage:chronology:block-0-timeline-item-19-year` — 13.261 s — `6e32d3c93532f174e0714a84fa7b2104ef5b91eaaa8fe3fbbe22cb4c3936b499` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read MP3 and .mp3 as “M-P-three” and “dot M-P-three”.
+  - Visible manuscript: "1992–1995. MP3 standard and file suffix. Perceptual coding compresses digital audio; the familiar .mp3 filename arrives after the codec standard itself."
+  - Replacement plan: "MP3" → "M-P-three" × 1; ".mp3" → "dot M-P-three" × 1
+  - Exact spoken text: "1992–1995. M-P-three standard and file suffix. Perceptual coding compresses digital audio; the familiar dot M-P-three filename arrives after the codec standard itself."
+- [ ] 0539 `passage:chronology:block-0-timeline-item-20-year` — 10.563 s — `4e93d26814df32c98772554f60e5a7dad7aee6fc951c9553d5c7e776935215ce`
+- [ ] 0540 `passage:chronology:block-0-timeline-item-21-year` — 10.720 s — `73e93c32d8a2c070377cf7ff3e0c50df072ef5b4c1d27834f3ab432d1ce46f71`
+- [ ] 0541 `passage:chronology:block-0-timeline-item-22-year` — 11.191 s — `d91efc4331b8379b49100e6a287a8c3fbfd51fad66001fa8015783dc15ebe49a`
+- [ ] 0542 `passage:chronology:block-0-timeline-item-23-year` — 10.425 s — `e521c3be782d85c5e68692c1b0722c69c04ee9d4ccc2b79dade0fc7302e5e803`
+- [ ] 0543 `passage:chronology:block-0-timeline-item-24-year` — 16.912 s — `207afb2c424f0df8d0902af66ffb48541c06d27e31d6bdcbcff2266c5299c5b9` — attention: reading-note, spoken-normalisation
+  - Reading note: Read APIs as A-P-Is.
+  - Visible manuscript: "10 August 2026. A living interface, not an ending. Current voice APIs expose streaming audio, activity detection and interruption controls. These dated vendor documents describe interfaces, not permanent facts or independent quality rankings."
+  - Replacement plan: "APIs" → "A-P-Is" × 1
+  - Exact spoken text: "10 August 2026. A living interface, not an ending. Current voice A-P-Is expose streaming audio, activity detection and interruption controls. These dated vendor documents describe interfaces, not permanent facts or independent quality rankings."
+- [ ] 0544 `passage:representation-ladder:section-title` — 5.691 s — `9627e224fc9dc8e8b446fafd7801cb8444633a9849b740aa2caeea878f25cbd0`
+- [ ] 0545 `passage:representation-ladder:block-0-heading` — 1.617 s — `8ab469dcbb429f4d2d1452d0a4bb6672a2514fb4c293be25588cc837502cbbd7`
+- [ ] 0546 `passage:representation-ladder:block-1-paragraph` — 3.154 s — `53fa57ece93f189a0147dc9d1f4fe18d98fe0794eb2a952f25a51c1998033ee6`
+- [ ] 0547 `passage:representation-ladder:block-2-timeline-item-0-year` — 19.099 s — `8c0631ec86afcae7e2956a72459462a2c25771b2d7d9aaf3559aa15206f32776` — attention: reading-note, spoken-normalisation
+  - Reading note: Read c. as “circa” and BCE as B-C-E.
+  - Visible manuscript: "c. 2600 BCE. Lyre string. Tension, length and mass organise vibration into repeatable modes, but the instrument stores no performance by itself. Preserves: A repeatable physical relation between gesture and pitch. Discards: The sounded event when the vibration ends."
+  - Replacement plan: "c. 2600 BCE" → "circa twenty-six hundred B-C-E" × 1
+  - Exact spoken text: "circa twenty-six hundred B-C-E. Lyre string. Tension, length and mass organise vibration into repeatable modes, but the instrument stores no performance by itself. Preserves: A repeatable physical relation between gesture and pitch. Discards: The sounded event when the vibration ends."
+- [ ] 0548 `passage:representation-ladder:block-2-timeline-item-1-year` — 17.772 s — `95e6e148a1bca84bdf120bae8206f5b73327e96a331cc4806e4d3c05749d5264`
+- [ ] 0549 `passage:representation-ladder:block-2-timeline-item-2-year` — 17.395 s — `0d11c71ddc48ec3b52925c16492c7a8351e12c56b9a28996d88f2a7efd945a93`
+- [ ] 0550 `passage:representation-ladder:block-2-timeline-item-3-year` — 18.940 s — `3eda046172394bfc089199c3b3439403431b4bcad9a11fa2d4a2e7b9915fa660`
+- [ ] 0551 `passage:representation-ladder:block-2-timeline-item-4-year` — 16.727 s — `b2a35bef3c1c8c80fba7215a928113a03fd7425d53dad14a98373fdf7638ca3e`
+- [ ] 0552 `passage:representation-ladder:block-2-timeline-item-5-year` — 27.987 s — `49a4a774f7ed262221c174e7f81f0051f1ea1631038d8b80726f303f74cf4626` — attention: reading-note, spoken-normalisation
+  - Reading note: Read PCM as P-C-M.
+  - Visible manuscript: "1938. PCM patent lineage. Sampling measures the signal at regular instants; quantisation maps each measured amplitude to one of a finite set of numerical values. Preserves: A reproducible signal within a chosen sample rate and bit depth. Discards: Content outside the chosen band; exact input amplitudes between the available quantisation levels are rounded."
+  - Replacement plan: "PCM" → "P-C-M" × 1
+  - Exact spoken text: "1938. P-C-M patent lineage. Sampling measures the signal at regular instants; quantisation maps each measured amplitude to one of a finite set of numerical values. Preserves: A reproducible signal within a chosen sample rate and bit depth. Discards: Content outside the chosen band; exact input amplitudes between the available quantisation levels are rounded."
+- [ ] 0553 `passage:representation-ladder:block-2-timeline-item-6-year` — 19.458 s — `151f96a4df86a11ec67c19de9845219682a52ad1d9002fb9449f692eebcf8448` — attention: reading-note, spoken-normalisation
+  - Reading note: Read LP as L-P.
+  - Visible manuscript: "1948. Vinyl LP. A fine microgroove and slower rotation lengthen the listening side and reduce noise relative to common shellac releases. Preserves: An album-scale sequence with improved consumer fidelity. Discards: Perfect silence, immunity to wear and easy portability."
+  - Replacement plan: "LP" → "L-P" × 1
+  - Exact spoken text: "1948. Vinyl L-P. A fine microgroove and slower rotation lengthen the listening side and reduce noise relative to common shellac releases. Preserves: An album-scale sequence with improved consumer fidelity. Discards: Perfect silence, immunity to wear and easy portability."
+- [ ] 0554 `passage:representation-ladder:block-2-timeline-item-7-year` — 16.692 s — `56875f61f8bb11d176c308175c4eaf3453a5e91142fbbe6f6772d2a346cb1670`
+- [ ] 0555 `passage:representation-ladder:block-2-timeline-item-8-year` — 16.852 s — `066cf41fb2530e52adbb78c7309749c1c13e13af3bde26d7944d9c79c027f720`
+- [ ] 0556 `passage:representation-ladder:block-2-timeline-item-9-year` — 23.122 s — `5558155138e77e2f1a9f3bb95048296710e2dcd3d38f3812cc4590fcd9afb075` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read .mp3 as “dot M-P-three” and MPEG-1 Layer III as “M-peg One Layer Three”.
+  - Visible manuscript: "1992–1995. .mp3 file. MPEG-1 Layer III standardised perceptual compression in 1992; the .mp3 filename suffix followed in 1995. Preserves: Copyable, searchable sound at a useful size. Discards: Codec-dependent detail and, unless carried separately, historical context."
+  - Replacement plan: ".mp3" → "dot M-P-three" × 2; "MPEG-1 Layer III" → "M-peg One Layer Three" × 1
+  - Exact spoken text: "1992–1995. dot M-P-three file. M-peg One Layer Three standardised perceptual compression in 1992; the dot M-P-three filename suffix followed in 1995. Preserves: Copyable, searchable sound at a useful size. Discards: Codec-dependent detail and, unless carried separately, historical context."
+- [ ] 0557 `passage:representation-ladder:block-2-timeline-item-10-year` — 25.970 s — `7fd8951c30fcb065160ea79caef78314a23a8ca310f579937a5ccadf21067e87`
+- [ ] 0558 `passage:representation-ladder:block-3-paragraph` — 11.843 s — `ea2962ffb0d6a8e747881830499825d9ffc424fe1d94b98a3dfdc81a39ef5ddf`
+- [ ] 0559 `passage:evidence-method:section-title` — 7.538 s — `fdad7713ff1e108234cd845a8f16165e1e15de6e9b3798e1dd8107e276bb6fa7`
+- [ ] 0560 `passage:evidence-method:block-0-list-title` — 1.815 s — `5a85aceca7f80c1fca78ad1adc16ca46155f3346547852faaa04391414467817`
+- [ ] 0561 `passage:evidence-method:block-0-list-item-0` — 5.522 s — `317195f04a1a31959e73199efc2a5baa3dc8cb0410a96697cc6c76232f614617`
+- [ ] 0562 `passage:evidence-method:block-0-list-item-1` — 6.643 s — `7539f5bd60e7c28396f655deb5322e08564a989dbf652f1722950c10a18bd7c9`
+- [ ] 0563 `passage:evidence-method:block-0-list-item-2` — 5.679 s — `1844c8b60912342e7f4124253f0fd388b27843f5bcc33b36e8a5789ed2b0b24c`
+- [ ] 0564 `passage:evidence-method:block-0-list-item-3` — 5.928 s — `e41afa898f02aba643ea31dedd880e0930c8a5f23664300810954399e031e079`
+- [ ] 0565 `passage:evidence-method:block-0-list-item-4` — 9.284 s — `d20c75fa79a0f479e533ea33dfb06e8dcda94e1b08a3155a5ab2e87cd901e3d5`
+- [ ] 0566 `passage:evidence-method:block-0-list-item-5` — 5.642 s — `e1d1052d9e6d744e66661a8b75794b75ea163a1cdf46acaba738798f9d789b78`
+- [ ] 0567 `passage:evidence-method:block-0-list-item-6` — 4.086 s — `8d1a4ac4d8a5cf91b79b2f6a70f7edfaf5df4aefc84e10e4d0e7427bdbc17cd8`
+- [ ] 0568 `passage:evidence-method:block-0-list-item-7` — 6.322 s — `867795874fd7dd0edd19acdeb424b4856b3631863af5b9c2b99b7deadfa4ea65`
+- [ ] 0569 `passage:evidence-method:block-0-list-item-8` — 5.978 s — `dfb93e9e70e9ce6e9d8f7a15a5495e37989802b95045fa063d5a2fc191caa101`
+- [ ] 0570 `passage:evidence-method:block-0-list-item-9` — 3.513 s — `42ddf3879c82fa38decca18c3dd828dd873d420f078d2dc7522c62b65d5960f4`
+- [ ] 0571 `passage:evidence-method:block-0-list-item-10` — 3.638 s — `cc9249f96603ae230841e1dc12d6e884bfee17b9d27b03071c9563929c265dd4`
+- [ ] 0572 `passage:evidence-method:block-0-list-item-11` — 4.027 s — `fad44f43017fd05b5f99a7e25d0790924dbfad3d0ba7232fbff23de77e2fd1ba`
+- [ ] 0573 `passage:evidence-method:block-0-list-item-12` — 5.004 s — `beabbb60bdc30ccdf1784487face10ca1700eee240c546025f79e3bdbb0dfaa4`
+- [ ] 0574 `passage:evidence-method:block-0-list-item-13` — 3.494 s — `91f09cd05ab19799a85ae0e6adc4180e338d528583729563ce20505b4415c65f`
+- [ ] 0575 `passage:evidence-method:block-0-list-item-14` — 7.874 s — `f7ec908aa1aa4b4cfed27ccba12e57193cfb8f5b93dcc31cfcb3925c2a5cf5ce`
+- [ ] 0576 `passage:evidence-method:block-1-paragraph` — 39.065 s — `6340fca8be290f0934f33d4e5165d3bbd59396735f7b5bde09318f41f7cfd008`
+- [ ] 0577 `passage:evidence-method:block-2-callout-title` — 17.288 s — `7592af303b7f231774075c62ae2a58835c6658a2e52342548b2b1925c983746e`
+- [ ] 0578 `passage:evidence-method:block-3-heading` — 1.880 s — `e567444b54734a8ba076f1467823b6aa94824a0e92982fa5b4f6960ed001922d`
+- [ ] 0579 `passage:evidence-method:block-4-paragraph` — 19.025 s — `edfb1cbc98cc52251fc047b00ed2d7f7e4f8260441b7f0b39c50dfcb07247ccf`
+- [ ] 0580 `passage:evidence-method:block-5-glossary-item-0-term` — 13.106 s — `66429593de11027791003940aaa842299ddb260a1ec31cc5c84c6abf59bd97fb`
+- [ ] 0581 `passage:evidence-method:block-5-glossary-item-1-term` — 4.812 s — `78b9b7418cb63a648356ea51e5b336e7af2f86dd28d7ef39a702957da204d88a`
+- [ ] 0582 `passage:evidence-method:block-5-glossary-item-2-term` — 9.099 s — `52ef155695e300ee85e3f274f75adc2630e1ef6c58b7887e2e1d08d7d35ac0e9`
+- [ ] 0583 `passage:evidence-method:block-5-glossary-item-3-term` — 5.404 s — `1c9c2cb6f1d552146210cf3cfe0ff4d9d80963bcc6d891f3dfe0308ae528dd20`
+- [ ] 0584 `passage:evidence-method:block-5-glossary-item-4-term` — 7.212 s — `dbb2c7a441902ff389ff97ad6ab11d67c6ef8515478f9f590ea5c17173545a17`
+- [ ] 0585 `passage:evidence-method:block-5-glossary-item-5-term` — 9.272 s — `2c930c9a6a980b188ec3df75b57d49ebf0bff84917ad5bfc289da83e21d7b5b5`
+- [ ] 0586 `passage:evidence-method:block-5-glossary-item-6-term` — 6.530 s — `dcc8eb3415e779d570046756a4d386b148c368deabdbca12297d00931ad9d106`
+- [ ] 0587 `passage:evidence-method:block-5-glossary-item-7-term` — 5.907 s — `bbdfd6a7932127e05ba522a7ddd6999c7fd355fa3c8eed9c947005b514440f37`
+- [ ] 0588 `passage:evidence-method:block-5-glossary-item-8-term` — 5.618 s — `bc2096cb7155d735a1297bb92ea706e47aae5ea98036e21b982ea215f1d835cb`
+- [ ] 0589 `passage:evidence-method:block-5-glossary-item-9-term` — 7.394 s — `02d83b8baeb2aa1358eebaeeecfd0481ba825ece435b054f7f6cca8918641165`
+- [ ] 0590 `passage:evidence-method:block-5-glossary-item-10-term` — 6.786 s — `9be216cf4613c6667bc3872d1f68a9aedb9d267f249f5e9cb4ce2a40c1f6a7da`
+- [ ] 0591 `passage:evidence-method:block-5-glossary-item-11-term` — 9.582 s — `569faadfb4e5feed09c2877c65c5bb399fbccad9f0c16875388c37b2e3d20d05`
+- [ ] 0592 `passage:evidence-method:block-5-glossary-item-12-term` — 7.648 s — `aaece9ebd9967a160f57f314784f4c80fdb1653e7f83af4820f891c8fa106d74`
+- [ ] 0593 `passage:evidence-method:block-5-glossary-item-13-term` — 14.551 s — `1c5fb97721462084256f83a83f7792cbedee87e083e5d785c6a097862a27638d`
+- [ ] 0594 `passage:evidence-method:block-5-glossary-item-14-term` — 10.517 s — `7ec0e79e173553e543014f4c6422fd03b6763ab11c9037356a00fad501f1699f`
+- [ ] 0595 `passage:evidence-method:block-5-glossary-item-15-term` — 10.172 s — `0a0d68c6e2b8082a4f23ec8e7cc2ea4fb40b8992e8accaa5e7568091bfdc61b3`
+- [ ] 0596 `passage:evidence-method:block-5-glossary-item-16-term` — 10.091 s — `2453e29c23cb86a4baeb1ce248c560a31e6f02c9c7aae56bb66a0ba4548c35f9`
+- [ ] 0597 `passage:trust-after-voice:section-title` — 6.861 s — `d3dcc2a49c9a44159825ac060b9c8947c6e925ed68ec812ac1b7c8e9ea57a81b`
+- [ ] 0598 `passage:trust-after-voice:block-0-figure-title` — 17.978 s — `799bfef5e1a614194041e539aa3a77031ca963eb6c378e67f3a3f244317c3220` — attention: reading-note, spoken-normalisation, complex-spoken-normalisation
+  - Reading note: Read each right arrow as “to”, with a short pause between stages.
+  - Visible manuscript: "Signal path — capability stops at the action boundary. Hear → interpret → propose → show authority and consequences → confirm when appropriate → act → report result → permit correction or recovery. Fluent speech may accompany every stage, but it must not erase the stage transitions."
+  - Replacement plan: "→" → "to" × 7
+  - Exact spoken text: "Signal path — capability stops at the action boundary. Hear to interpret to propose to show authority and consequences to confirm when appropriate to act to report result to permit correction or recovery. Fluent speech may accompany every stage, but it must not erase the stage transitions."
+- [ ] 0599 `passage:trust-after-voice:block-1-paragraph` — 39.045 s — `ebdf3dcc01bba5d1ce212596f061101b1c972badd69faf5cc4864eb657e4b72b`
+- [ ] 0600 `passage:trust-after-voice:block-2-paragraph` — 34.375 s — `df0e826c446faf6bd7177b221a689390ef9446b229a13cb573f81fbbc9774546`
+- [ ] 0601 `passage:trust-after-voice:block-3-paragraph` — 43.026 s — `5bf2609e27cb44c951e676daf813a513acba535b12b2fbedabe9f053c8aa6aed`
+- [ ] 0602 `passage:trust-after-voice:block-4-callout-title` — 16.964 s — `38ed64e11b416b2ca3ec992209fdb5fb1c6a6b9d0e6316d830a44c1f427bc8d3`
+- [ ] 0603 `passage:trust-after-voice:block-5-heading` — 2.038 s — `cbafd0f4257c8f05a28cc91ece7336541c59c374f639eea281d3c997cbca352f`
+- [ ] 0604 `passage:trust-after-voice:block-6-paragraph` — 45.141 s — `411943b21b3f7dcdadf9b6bbee0e3cc2116bfa060ae1397684606e7672d81de1`
+- [ ] 0605 `passage:trust-after-voice:block-7-list-title` — 2.480 s — `70e24a5ac5f8cca3aeffb3b1f875d8f010ced360f0ce3c994e063611559937b9`
+- [ ] 0606 `passage:trust-after-voice:block-7-list-item-0` — 4.911 s — `a8398b7a0c51ed9d0c2d616a9bb6aee14fab425c8ff849282be8f95f86027cb1`
+- [ ] 0607 `passage:trust-after-voice:block-7-list-item-1` — 6.037 s — `44cd0997afd88f036f02443e0c5d12ce74d8d5ddd5a67f67222239d229de0676`
+- [ ] 0608 `passage:trust-after-voice:block-7-list-item-2` — 5.472 s — `4effa28ffaf7043c7507e453886086335f94d2c42805d83f7d882c2f5cf63607`
+- [ ] 0609 `passage:trust-after-voice:block-7-list-item-3` — 5.414 s — `aeadf2356cabc58dbafc96c6d2e13fbffb04ff397848391acec9a763cc01b243`
+- [ ] 0610 `passage:trust-after-voice:block-7-list-item-4` — 5.818 s — `b888ffeab1280f18817565aca40073e9cd043c3c52953fe3824b4e64fb04b1f5`
+- [ ] 0611 `passage:trust-after-voice:block-7-list-item-5` — 4.857 s — `4ca44a526c4432ecdffefe167c0bd58fb72408f739b4a7c0683706bc2a3cdfb7`
+- [ ] 0612 `passage:trust-after-voice:block-7-list-item-6` — 6.111 s — `700bb839bf90449a3c484adbba3b8c037f9ada068584895951e30c95f94b8eeb`
+- [ ] 0613 `passage:trust-after-voice:block-7-list-item-7` — 6.410 s — `7f8acebaea65169463e6eaf1651311ed9ad0f7fe8447b2b8968f47f1189044b2`
+- [ ] 0614 `passage:trust-after-voice:block-7-list-item-8` — 6.783 s — `406b28dd016dbdb66e4d6655430887925e8e0ef2cd24e8f1a91e0dd49f3bb62b`
+- [ ] 0615 `passage:trust-after-voice:block-8-callout-title` — 38.018 s — `89ed23e31b66fdb3f2a426421cf40024747409f5b950c8bb4b762755ffd47161`
+- [ ] 0616 `passage:trust-after-voice:block-9-list-title` — 2.516 s — `0cb7439cff36bd406497f29c0381d867ff80afbf8f14b82e8cdb4dda69146515`
+- [ ] 0617 `passage:trust-after-voice:block-9-list-item-0` — 5.762 s — `d874c7f927845f67b822e3626cdbf7f8fbe12b5e5adf2cc593a461c346044580`
+- [ ] 0618 `passage:trust-after-voice:block-9-list-item-1` — 9.423 s — `8eaa60fb122659bb50ac8e5ccbf4f2e39e94069e929932eeff22ed29fa5ce4e0`
+- [ ] 0619 `passage:trust-after-voice:block-9-list-item-2` — 9.302 s — `7e0f3756af35af3f5755fcf489fb794b9d17849c8049c3b79994392f00536ec6`
+- [ ] 0620 `passage:trust-after-voice:block-9-list-item-3` — 4.927 s — `f12bb87d36f348e6b42a83c7dd2b39bd9e1b801066bf017852b3c4939d9dfe44`
+- [ ] 0621 `passage:trust-after-voice:block-9-list-item-4` — 6.991 s — `210489238bf2af264d0e5bdc30ed69b01343763e20b1e64cad23936537d3e18e`
+- [ ] 0622 `passage:trust-after-voice:block-9-list-item-5` — 8.204 s — `2d0f3d9507dc518d0c36e6939096cf93ea32450e0a551425fbb8da84dd25a2b7`
+- [ ] 0623 `passage:trust-after-voice:block-9-list-item-6` — 15.031 s — `7bb176529f2c3e620b464db66c83e26ea502dfebbe953eb8cc52ed1f5ab4032b`
+- [ ] 0624 `passage:trust-after-voice:block-9-list-item-7` — 28.819 s — `c469aaaf3baf6cdcf59ccfd1c3de853df5b8e705c03e35d43b59688b449dce38`
+- [ ] 0625 `passage:trust-after-voice:block-9-list-item-8` — 4.587 s — `7a858a37a05b34cccf5f7e11cd849e4dd31db53f6d80cc6d7189c761b793f124`

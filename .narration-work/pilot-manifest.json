@@ -1,0 +1,374 @@
+{
+  "schemaVersion": 1,
+  "edition": "2026.2",
+  "model": "onnx-community/Kokoro-82M-v1.0-ONNX",
+  "voice": "bf_emma",
+  "provenance": {
+    "provider": "local-open-weight-inference",
+    "modelRevision": "1939ad2a8e416c0acfeecc08a694d14ef25f2231",
+    "runtime": "kokoro-js",
+    "runtimeVersion": "1.2.1",
+    "quantization": "q8",
+    "device": "cpu",
+    "sourceLicense": "Apache-2.0",
+    "sourceUrl": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX",
+    "modelFiles": [
+      {
+        "path": "config.json",
+        "sha256": "df34b4f930b23447cd4dc410fabfb42eb3f24e803e6c3f97d618fb359380a36f"
+      },
+      {
+        "path": "tokenizer.json",
+        "sha256": "77a02c8e164413299b4b4c403b14f8e0e1c1b727db4d46a09d6327b861060a34"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "sha256": "be1cb066d6ef6b074b3f15e6a6dd21ac88ff3cdaedf325f0aaed686c70f75d20"
+      },
+      {
+        "path": "onnx/model_quantized.onnx",
+        "sha256": "fbae9257e1e05ffc727e951ef9b9c98418e6d79f1c9b6b13bd59f5c9028a1478"
+      }
+    ],
+    "voiceFileSha256": "669fe0647f9dd04fcab92f1439a40eeb4c8b4ab1f82e4996fe3d918ce4a63b73",
+    "voiceLocale": "en-gb",
+    "voiceGenderCatalogLabel": "Female",
+    "speed": 0.86,
+    "output": {
+      "responseFormat": "mp3",
+      "sampleRateHz": 24000,
+      "channels": 1,
+      "bitrateKbps": 48,
+      "normalisationVersion": "loudnorm-2026.2-24khz-48kbps"
+    }
+  },
+  "configurationHash": "14cb1a5d9d18a4b58e16ddec5b10e51424d47dd0c32dd089aeb4c3e8baccc394",
+  "manuscriptHash": "ca4bd959a5b1236454c4ab7c03816b9e3d0e582fc7b69d961a731eb6df109f5e",
+  "generatedAt": "2026-08-11T20:17:55.811Z",
+  "complete": true,
+  "passageCount": 14,
+  "passages": [
+    {
+      "id": "passage:opening:section-title",
+      "sectionId": "opening",
+      "targetId": "narration-opening-header",
+      "textHash": "59f9ff642f4afe07c0bfdc70af8defa21dfdbd5018a821f5d54408c1b77f924b",
+      "url": "/audio/narration/edition-2026-2/0001-opening-section-title-adcbb968fb302959edeedfa8b52cb514f7df35cf6cf1ba573a9e2fd643967d94.mp3",
+      "sha256": "adcbb968fb302959edeedfa8b52cb514f7df35cf6cf1ba573a9e2fd643967d94",
+      "durationSeconds": 8.245,
+      "generatedAt": "2026-08-11T18:27:57.945Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 9.545,
+        "durationMeasuredSeconds": 8.245,
+        "wordsPerMinute": 152.8,
+        "integratedLoudnessLufs": -18.8,
+        "loudnessRangeLu": 0.6,
+        "truePeakDbtp": -2,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-string-tension:block-5-paragraph",
+      "sectionId": "fdn-string-tension",
+      "targetId": "narration-fdn-string-tension-block-5",
+      "textHash": "ed2216acedaf9e4338d831eebe04e8cd3e4cdc90591e08b63409022fec98fcb5",
+      "url": "/audio/narration/edition-2026-2/0047-fdn-string-tension-block-5-paragraph-862d65eec03b82d06f9219c7e721bd343a7f6bfc6a24ce5278fa3a41602ac797.mp3",
+      "sha256": "862d65eec03b82d06f9219c7e721bd343a7f6bfc6a24ce5278fa3a41602ac797",
+      "durationSeconds": 40.807,
+      "generatedAt": "2026-08-11T20:16:58.600Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 44.091,
+        "durationMeasuredSeconds": 40.807,
+        "wordsPerMinute": 142.6,
+        "integratedLoudnessLufs": -18.7,
+        "loudnessRangeLu": 2.7,
+        "truePeakDbtp": -2,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-string-tension:block-6-paragraph",
+      "sectionId": "fdn-string-tension",
+      "targetId": "narration-fdn-string-tension-block-6",
+      "textHash": "47f077e8685c894a8bd895cabbb0182703bd71e6ef75ad53fbc0d4374e823232",
+      "url": "/audio/narration/edition-2026-2/0048-fdn-string-tension-block-6-paragraph-af97aba41352a5cc0ab1842e53d5b4b933d44f760fee522e32602c7a7262c24a.mp3",
+      "sha256": "af97aba41352a5cc0ab1842e53d5b4b933d44f760fee522e32602c7a7262c24a",
+      "durationSeconds": 39.526,
+      "generatedAt": "2026-08-11T20:17:16.023Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 36.364,
+        "durationMeasuredSeconds": 39.526,
+        "wordsPerMinute": 121.4,
+        "integratedLoudnessLufs": -18.6,
+        "loudnessRangeLu": 3.6,
+        "truePeakDbtp": -1.7,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-music-before-machines:block-4-paragraph",
+      "sectionId": "fdn-music-before-machines",
+      "targetId": "narration-fdn-music-before-machines-block-4",
+      "textHash": "ea53a282fb45f24a12f7c67a5d1d6b730fd6c5e5cb960371a4d5f6331b2b76c3",
+      "url": "/audio/narration/edition-2026-2/0076-fdn-music-before-machines-block-4-paragraph-d3f91a64020f4e6c06d6ef3d897959bf4da3d46da644e93228046b1e6a82994e.mp3",
+      "sha256": "d3f91a64020f4e6c06d6ef3d897959bf4da3d46da644e93228046b1e6a82994e",
+      "durationSeconds": 40.23,
+      "generatedAt": "2026-08-11T18:28:53.518Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 40.455,
+        "durationMeasuredSeconds": 40.23,
+        "wordsPerMinute": 132.7,
+        "integratedLoudnessLufs": -18.8,
+        "loudnessRangeLu": 2.3,
+        "truePeakDbtp": -1.7,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-memory-without-recording:block-8-paragraph",
+      "sectionId": "fdn-memory-without-recording",
+      "targetId": "narration-fdn-memory-without-recording-block-8",
+      "textHash": "b4ee391593cdb112d634f9e326e7caeca8ff29bc5b6c5d5efde2f1e914e64c4a",
+      "url": "/audio/narration/edition-2026-2/0121-fdn-memory-without-recording-block-8-paragraph-d5480f2e169de2a0522f39b70cc3f4a86d448eb647d9a3fd570370e794ca8737.mp3",
+      "sha256": "d5480f2e169de2a0522f39b70cc3f4a86d448eb647d9a3fd570370e794ca8737",
+      "durationSeconds": 44.026,
+      "generatedAt": "2026-08-11T18:29:14.334Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 42.273,
+        "durationMeasuredSeconds": 44.026,
+        "wordsPerMinute": 126.7,
+        "integratedLoudnessLufs": -18.6,
+        "loudnessRangeLu": 2.8,
+        "truePeakDbtp": -2.1,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-machines-imagine-speech:block-2-paragraph",
+      "sectionId": "fdn-machines-imagine-speech",
+      "targetId": "narration-fdn-machines-imagine-speech-block-2",
+      "textHash": "7a3ac73e87f1196e1fb29dbb28b57fdfb11a5c6c2a78609dfa583bbdb1b3e479",
+      "url": "/audio/narration/edition-2026-2/0135-fdn-machines-imagine-speech-block-2-paragraph-a4078085b9d339ff06c30aa1437fd4ef215514ec592c5cb457041136fa78e681.mp3",
+      "sha256": "a4078085b9d339ff06c30aa1437fd4ef215514ec592c5cb457041136fa78e681",
+      "durationSeconds": 34.624,
+      "generatedAt": "2026-08-11T20:17:33.906Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 31.818,
+        "durationMeasuredSeconds": 34.624,
+        "wordsPerMinute": 121.3,
+        "integratedLoudnessLufs": -18.7,
+        "loudnessRangeLu": 2.9,
+        "truePeakDbtp": -2,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-machines-imagine-speech:block-3-paragraph",
+      "sectionId": "fdn-machines-imagine-speech",
+      "targetId": "narration-fdn-machines-imagine-speech-block-3",
+      "textHash": "82075c4528bc026792a16eae6aefa842edea2795537accaba8c27ca899c351e4",
+      "url": "/audio/narration/edition-2026-2/0136-fdn-machines-imagine-speech-block-3-paragraph-389b3ef872fe4d5f22f20d39d67ddf84302a7003a6975a7bd3404a0edd64aa94.mp3",
+      "sha256": "389b3ef872fe4d5f22f20d39d67ddf84302a7003a6975a7bd3404a0edd64aa94",
+      "durationSeconds": 35.951,
+      "generatedAt": "2026-08-11T20:17:50.897Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 30.909,
+        "durationMeasuredSeconds": 35.951,
+        "wordsPerMinute": 113.5,
+        "integratedLoudnessLufs": -18.6,
+        "loudnessRangeLu": 2,
+        "truePeakDbtp": -2.1,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-machines-imagine-speech:block-4-paragraph",
+      "sectionId": "fdn-machines-imagine-speech",
+      "targetId": "narration-fdn-machines-imagine-speech-block-4",
+      "textHash": "250793a8e83a4bdce63f72918e5d3792e4f8cb138f42c9da537d95472a141444",
+      "url": "/audio/narration/edition-2026-2/0137-fdn-machines-imagine-speech-block-4-paragraph-3aca2c4daaf28ec85ed2c8235458951df010166dd7e4d9c997b212eb0557e786.mp3",
+      "sha256": "3aca2c4daaf28ec85ed2c8235458951df010166dd7e4d9c997b212eb0557e786",
+      "durationSeconds": 40.284,
+      "generatedAt": "2026-08-11T18:30:08.999Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 38.636,
+        "durationMeasuredSeconds": 40.284,
+        "wordsPerMinute": 126.6,
+        "integratedLoudnessLufs": -18.7,
+        "loudnessRangeLu": 2.4,
+        "truePeakDbtp": -1.9,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-machines-imagine-speech:block-5-paragraph",
+      "sectionId": "fdn-machines-imagine-speech",
+      "targetId": "narration-fdn-machines-imagine-speech-block-5",
+      "textHash": "583b7eb8db354a7af3f6ec5f9cc6d97bf80cfd138d0d3eaa8602097bc3661b60",
+      "url": "/audio/narration/edition-2026-2/0138-fdn-machines-imagine-speech-block-5-paragraph-1a1bea92cc79b47b62df40f46a1a11e7fc9c522ddb9dc188b0a95c8fe90d7221.mp3",
+      "sha256": "1a1bea92cc79b47b62df40f46a1a11e7fc9c522ddb9dc188b0a95c8fe90d7221",
+      "durationSeconds": 51.602,
+      "generatedAt": "2026-08-11T18:30:35.458Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 49.545,
+        "durationMeasuredSeconds": 51.602,
+        "wordsPerMinute": 126.7,
+        "integratedLoudnessLufs": -18.6,
+        "loudnessRangeLu": 2.5,
+        "truePeakDbtp": -2.2,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:fdn-tinfoil-wax-cylinder:block-8-paragraph",
+      "sectionId": "fdn-tinfoil-wax-cylinder",
+      "targetId": "narration-fdn-tinfoil-wax-cylinder-block-8",
+      "textHash": "3c290fe6c038ff5b5b4af982906010d63d76b0b972f6b323bcaad5edb208c33d",
+      "url": "/audio/narration/edition-2026-2/0186-fdn-tinfoil-wax-cylinder-block-8-paragraph-0cd8221cc90a7fbb12d5f46af22cc611a91d31f5a9bbd0e273b0e28e427a3cbb.mp3",
+      "sha256": "0cd8221cc90a7fbb12d5f46af22cc611a91d31f5a9bbd0e273b0e28e427a3cbb",
+      "durationSeconds": 42.093,
+      "generatedAt": "2026-08-11T18:30:56.090Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 34.545,
+        "durationMeasuredSeconds": 42.093,
+        "wordsPerMinute": 108.3,
+        "integratedLoudnessLufs": -18.7,
+        "loudnessRangeLu": 2.2,
+        "truePeakDbtp": -2.1,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:media-tape-editable-time:block-2-paragraph",
+      "sectionId": "media-tape-editable-time",
+      "targetId": "narration-media-tape-editable-time-block-2",
+      "textHash": "f2bda2847c76f1276abf49b23ed91aa66ff47c09cb8e7f3dceb2d76b83eb8558",
+      "url": "/audio/narration/edition-2026-2/0284-media-tape-editable-time-block-2-paragraph-76e43d6b0f0c827662d0530c1f6c85e0befc3df4e26b93eed7f2f9448d10d67e.mp3",
+      "sha256": "76e43d6b0f0c827662d0530c1f6c85e0befc3df4e26b93eed7f2f9448d10d67e",
+      "durationSeconds": 47.093,
+      "generatedAt": "2026-08-11T18:31:19.423Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 43.182,
+        "durationMeasuredSeconds": 47.093,
+        "wordsPerMinute": 121,
+        "integratedLoudnessLufs": -18.3,
+        "loudnessRangeLu": 2.8,
+        "truePeakDbtp": -1.9,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:media-counting-waveform:block-0-paragraph",
+      "sectionId": "media-counting-waveform",
+      "targetId": "narration-media-counting-waveform-block-0",
+      "textHash": "5925d0d891c52022f2b8f39cf62c3cc5425254f238574deb8e68b359f6107b83",
+      "url": "/audio/narration/edition-2026-2/0317-media-counting-waveform-block-0-paragraph-5a76c0076e442f2b711f2acc410b695568f3cb4cdc3f5252376ab710b64e56af.mp3",
+      "sha256": "5a76c0076e442f2b711f2acc410b695568f3cb4cdc3f5252376ab710b64e56af",
+      "durationSeconds": 40.598,
+      "generatedAt": "2026-08-11T18:31:39.243Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 38.182,
+        "durationMeasuredSeconds": 40.598,
+        "wordsPerMinute": 124.1,
+        "integratedLoudnessLufs": -18.6,
+        "loudnessRangeLu": 3,
+        "truePeakDbtp": -2,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:media-counting-waveform:block-2-paragraph",
+      "sectionId": "media-counting-waveform",
+      "targetId": "narration-media-counting-waveform-block-2",
+      "textHash": "abe67c250e445115c05a8ab5bec4321aa6c293f8a9db0215c9c07e7b25f2943e",
+      "url": "/audio/narration/edition-2026-2/0319-media-counting-waveform-block-2-paragraph-23753ddcb9cf29dc24a5cc6fe76b4caf26145cb78711d6c603b7881ffdfedd2d.mp3",
+      "sha256": "23753ddcb9cf29dc24a5cc6fe76b4caf26145cb78711d6c603b7881ffdfedd2d",
+      "durationSeconds": 31.747,
+      "generatedAt": "2026-08-11T18:31:55.400Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 30.909,
+        "durationMeasuredSeconds": 31.747,
+        "wordsPerMinute": 128.5,
+        "integratedLoudnessLufs": -18.6,
+        "loudnessRangeLu": 2.4,
+        "truePeakDbtp": -1.3,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0.059,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    },
+    {
+      "id": "passage:trust-after-voice:block-4-callout-title",
+      "sectionId": "trust-after-voice",
+      "targetId": "narration-trust-after-voice-block-4",
+      "textHash": "ace471a509d0731b9e7389e4cf1fd14b6e1224f4b5a78e60774a8a12cc1c7a08",
+      "url": "/audio/narration/edition-2026-2/0602-trust-after-voice-block-4-callout-title-38ed64e11b416b2ca3ec992209fdb5fb1c6a6b9d0e6316d830a44c1f427bc8d3.mp3",
+      "sha256": "38ed64e11b416b2ca3ec992209fdb5fb1c6a6b9d0e6316d830a44c1f427bc8d3",
+      "durationSeconds": 16.964,
+      "generatedAt": "2026-08-11T18:32:04.583Z",
+      "qcStatus": "technical-qc-passed",
+      "technicalQc": {
+        "durationExpectedSeconds": 20.455,
+        "durationMeasuredSeconds": 16.964,
+        "wordsPerMinute": 159.2,
+        "integratedLoudnessLufs": -18.8,
+        "loudnessRangeLu": 1.6,
+        "truePeakDbtp": -2.4,
+        "leadingSilenceSeconds": 0,
+        "trailingSilenceSeconds": 0,
+        "normalisationVersion": "loudnorm-2026.2-24khz-48kbps",
+        "fullDecodePassed": true
+      }
+    }
+  ]
+}
