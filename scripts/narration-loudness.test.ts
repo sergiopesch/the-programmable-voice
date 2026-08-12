@@ -21,6 +21,24 @@ describe('narration loudness contract', () => {
     expect(narrationLoudnessIsWithinBounds(actual)).toBe(true)
   })
 
+  it('accepts the codec-compensated epilogue without relaxing the global target', () => {
+    const original = measurement({
+      durationSeconds: 2.362,
+      integratedLoudnessLufs: -21.9,
+      truePeakDbtp: -2.8,
+    })
+    const compensated = measurement({
+      durationSeconds: 2.362,
+      integratedLoudnessLufs: -19.9,
+      truePeakDbtp: -2,
+    })
+
+    expect(narrationLoudnessIsWithinBounds(original)).toBe(false)
+    expect(narrationMinimumIntegratedLoudnessLufs(compensated)).toBe(-20.5)
+    expect(compensated.targetTruePeakDbtp).toBe(-2)
+    expect(narrationLoudnessIsWithinBounds(compensated)).toBe(true)
+  })
+
   it.each([
     [2.5, -21.5],
     [3, -21],

@@ -193,6 +193,7 @@ export default function App() {
     narrationStatus: narration.status,
     catalogueStatus: narration.catalogueStatus,
     catalogueError: narration.catalogueError,
+    reviewMode: narration.reviewMode,
     narrationActive,
     evidenceOpen,
     onStartNarration: () => narration.startFromSection(activeSection.id),
@@ -235,7 +236,7 @@ export default function App() {
   const showEvidence = activeSection.kind !== 'opening'
 
   return (
-    <div className={`app-shell${narration.status !== 'idle' ? ' app-shell--narrating' : ''}`}>
+    <div className={`app-shell${narration.status !== 'idle' ? ' app-shell--narrating' : ''}${narration.reviewMode ? ' app-shell--review' : ''}`}>
       <Header
         theme={preferences.theme}
         onToggleTheme={preferences.toggleTheme}
@@ -253,6 +254,12 @@ export default function App() {
           if (lab) navigate(lab.id)
         }}
       />
+
+      {narration.reviewMode ? (
+        <div className="narration-review-banner" role="status">
+          UNRELEASED REVIEW · AI-generated
+        </div>
+      ) : null}
 
       <div className={`reader-grid reader-grid--single book-stage book-stage--${activeSection.kind}`}>
         <main
@@ -292,6 +299,7 @@ export default function App() {
       ) : null}
       <NarrationDock
         status={narration.status}
+        reviewMode={narration.reviewMode}
         passage={narration.currentPassage}
         sectionTitle={narration.currentPassage ? sectionById.get(narration.currentPassage.sectionId)?.title ?? '' : ''}
         sectionProgress={narration.sectionProgress}

@@ -9,7 +9,9 @@ import {
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
   narrationGenerationProvenance,
+  narrationNormalisationVersionFor,
   narrationPassageHashMaterial,
+  narrationPassageNormalisationOverrideFor,
   narrationPilotPassageIds,
   narrationSpokenTextFor,
   narrationVoiceSelectionReceipt,
@@ -93,6 +95,12 @@ interface KokoroRuntimeModule {
   TextSplitterStream: new () => NarrationTextSplitter
 }
 
+interface LoudnormTargetSettings {
+  integratedLoudnessLufs: number
+  loudnessRangeLu: number
+  truePeakDbtp: number
+}
+
 function sha256(value: string | Uint8Array) {
   return createHash('sha256').update(value).digest('hex')
 }
@@ -162,7 +170,81 @@ function boundarySilence(stderr: string, durationSeconds: number) {
   }
 }
 
-async function technicalQc(filePath: string, text: string): Promise<NarrationTechnicalQc> {
+function assertLoudnormTargets(settings: LoudnormTargetSettings) {
+  if (
+    !Number.isFinite(settings.integratedLoudnessLufs)
+    || !Number.isFinite(settings.loudnessRangeLu)
+    || settings.loudnessRangeLu < 0
+    || !Number.isFinite(settings.truePeakDbtp)
+  ) throw new Error('Loudnorm targets must be finite and have a non-negative loudness range.')
+}
+
+function singlePassLoudnormFilter(settings: LoudnormTargetSettings) {
+  assertLoudnormTargets(settings)
+  return [
+    `loudnorm=I=${settings.integratedLoudnessLufs}`,
+    `LRA=${settings.loudnessRangeLu}`,
+    `TP=${settings.truePeakDbtp}`,
+  ].join(':')
+}
+
+export function narrationNormalisationFilterForPassage(
+  passageId: string,
+  settings: LoudnormTargetSettings,
+) {
+  const override = narrationPassageNormalisationOverrideFor(passageId)
+  if (!override) return singlePassLoudnormFilter(settings)
+  if (override.method === 'codec-compensated-single-pass-loudnorm') {
+    if (
+      !Number.isFinite(override.preEncodeTruePeakDbtp)
+      || override.preEncodeTruePeakDbtp <= settings.truePeakDbtp
+      || override.preEncodeTruePeakDbtp >= -1
+    ) {
+      throw new Error(`Unsafe narration pre-encode true-peak compensation for ${passageId}.`)
+    }
+    return singlePassLoudnormFilter({
+      ...settings,
+      truePeakDbtp: override.preEncodeTruePeakDbtp,
+    })
+  }
+  if (override.method === 'post-normalisation-gain-limiter') {
+    const { limiter } = override
+    if (
+      !Number.isFinite(override.postNormalisationGainDb)
+      || override.postNormalisationGainDb <= 0
+      || override.postNormalisationGainDb > 3
+      || !Number.isFinite(limiter.limitLinear)
+      || limiter.limitLinear <= 0
+      || limiter.limitLinear >= 1
+      || !Number.isFinite(limiter.attackMilliseconds)
+      || limiter.attackMilliseconds <= 0
+      || limiter.attackMilliseconds > 100
+      || !Number.isFinite(limiter.releaseMilliseconds)
+      || limiter.releaseMilliseconds <= 0
+      || limiter.releaseMilliseconds > 1_000
+      || limiter.autoReleaseControl !== false
+      || limiter.autoLevel !== false
+      || limiter.latencyCompensation !== false
+    ) {
+      throw new Error(`Unsafe narration limiter configuration for ${passageId}.`)
+    }
+    return [
+      singlePassLoudnormFilter(settings),
+      `volume=${override.postNormalisationGainDb}dB`,
+      [
+        `alimiter=limit=${limiter.limitLinear}`,
+        `attack=${limiter.attackMilliseconds}`,
+        `release=${limiter.releaseMilliseconds}`,
+        'asc=false',
+        'level=false',
+        'latency=false',
+      ].join(':'),
+    ].join(',')
+  }
+  throw new Error(`Unsupported narration normalisation method for ${passageId}.`)
+}
+
+async function technicalQc(filePath: string, text: string, passageId: string): Promise<NarrationTechnicalQc> {
   const { stdout } = await execFileAsync(ffprobeBinary, [
     '-v', 'error',
     '-show_entries', 'format=duration',
@@ -232,7 +314,7 @@ async function technicalQc(filePath: string, text: string): Promise<NarrationTec
     loudnessRangeLu: reportedLoudnessRangeLu,
     truePeakDbtp: reportedTruePeakDbtp,
     ...silence,
-    normalisationVersion: normalisation.version,
+    normalisationVersion: narrationNormalisationVersionFor(passageId),
     fullDecodePassed: true,
   }
 }
@@ -245,15 +327,19 @@ async function normaliseAudio(bytes: Uint8Array, passageId: string) {
   await fs.mkdir(path.dirname(rawPath), { recursive: true })
   await fs.writeFile(rawPath, bytes)
   const settings = configuration.normalisation
+  const silenceTrimFilters = [
+    'silenceremove=start_periods=1:start_duration=0.12:start_silence=0.08:start_threshold=-50dB',
+    'areverse',
+    'silenceremove=start_periods=1:start_duration=0.25:start_silence=0.18:start_threshold=-50dB',
+    'areverse',
+  ]
   try {
+    const normalisationFilter = narrationNormalisationFilterForPassage(passageId, settings)
     await execFileAsync(ffmpegBinary, [
       '-v', 'error', '-y', '-i', rawPath,
       '-af', [
-        'silenceremove=start_periods=1:start_duration=0.12:start_silence=0.08:start_threshold=-50dB',
-        'areverse',
-        'silenceremove=start_periods=1:start_duration=0.25:start_silence=0.18:start_threshold=-50dB',
-        'areverse',
-        `loudnorm=I=${settings.integratedLoudnessLufs}:LRA=${settings.loudnessRangeLu}:TP=${settings.truePeakDbtp}`,
+        ...silenceTrimFilters,
+        normalisationFilter,
       ].join(','),
       '-map_metadata', '-1', '-vn',
       '-ar', String(settings.sampleRateHz),
@@ -433,7 +519,11 @@ async function runPool<T>(items: readonly T[], concurrency: number, worker: (ite
   await Promise.all(runners)
 }
 
-function technicalQcMatches(stored: NarrationTechnicalQc, measured: NarrationTechnicalQc) {
+export function technicalQcMatches(
+  stored: NarrationTechnicalQc,
+  measured: NarrationTechnicalQc,
+  passageId: string,
+) {
   const numericKeys = [
     'durationMeasuredSeconds',
     'wordsPerMinute',
@@ -443,7 +533,9 @@ function technicalQcMatches(stored: NarrationTechnicalQc, measured: NarrationTec
     'leadingSilenceSeconds',
     'trailingSilenceSeconds',
   ] as const
-  return stored.normalisationVersion === configuration.normalisation.version
+  const expectedNormalisationVersion = narrationNormalisationVersionFor(passageId)
+  return stored.normalisationVersion === expectedNormalisationVersion
+    && measured.normalisationVersion === expectedNormalisationVersion
     && stored.fullDecodePassed === true
     && numericKeys.every((key) => Math.abs(stored[key] - measured[key]) <= (key === 'durationMeasuredSeconds' ? 0.02 : 0.15))
 }
@@ -454,9 +546,9 @@ async function verifyStoredEntry(entry: NarrationManifestEntry, passage: Narrati
   if (!filePath.startsWith(`${assetRoot}${path.sep}`)) return false
   const bytes = new Uint8Array(await fs.readFile(filePath))
   if (sha256(bytes) !== entry.sha256 || !path.basename(filePath).includes(entry.sha256)) return false
-  const qc = await technicalQc(filePath, narrationSpokenTextFor(passage.id, passage.text))
+  const qc = await technicalQc(filePath, narrationSpokenTextFor(passage.id, passage.text), passage.id)
   return Math.abs(qc.durationMeasuredSeconds - entry.durationSeconds) <= 0.02
-    && technicalQcMatches(entry.technicalQc, qc)
+    && technicalQcMatches(entry.technicalQc, qc, passage.id)
 }
 
 function manuscriptIdentity(configurationHash: string) {
@@ -585,7 +677,7 @@ async function main() {
     const filename = safeFilename(globalIndex, passage.id, audioHash)
     const filePath = path.join(assetRoot, filename)
     await writeImmutable(filePath, bytes)
-    const qc = await technicalQc(filePath, narrationSpokenTextFor(passage.id, passage.text))
+    const qc = await technicalQc(filePath, narrationSpokenTextFor(passage.id, passage.text), passage.id)
     const entry: NarrationManifestEntry = {
       id: passage.id,
       sectionId: passage.sectionId,

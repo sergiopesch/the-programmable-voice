@@ -11,16 +11,20 @@ import {
 import {
   narrationComparisonApprovalIsComplete,
   narrationComparisonProfileMaterial,
+  narrationFullListenConfirmations,
+  narrationFullListenReceiptMaterial,
   narrationPilotApprovalIsComplete,
   narrationPilotProfileMaterial,
   narrationReleaseApprovalIsComplete,
   narrationReleaseId,
   narrationReleaseIdentityMaterial,
   narrationReleaseManifestUrl,
+  type NarrationApproval,
   type NarrationManifest,
   type NarrationComparisonApproval,
   type NarrationComparisonManifest,
   type NarrationPilotApproval,
+  type NarrationFullListenReceipt,
 } from './narrationRelease'
 
 function comparisonManifest(): NarrationComparisonManifest {
@@ -228,15 +232,70 @@ describe('narration release contracts', () => {
   })
 
   it('requires every versioned release-listening confirmation in exact order', () => {
-    const approval = {
+    const releaseId = `2026-2-${'a'.repeat(64)}`
+    const passageCount = 625
+    const receipt: NarrationFullListenReceipt = {
+      schemaVersion: 1 as const,
+      kind: 'narration-full-listen-receipt' as const,
+      releaseId,
+      reviewManifestSha256: 'b'.repeat(64),
+      packageChecksumsSha256: 'c'.repeat(64),
+      orderedPassageProfileSha256: 'd'.repeat(64),
+      passageCount,
+      completedAt: '2026-08-10T23:00:00.000Z',
+      completedBy: 'Listening editor',
+      confirmations: [...narrationFullListenConfirmations],
+    }
+    const approval: NarrationApproval = {
       approvedAt: '2026-08-11T00:00:00.000Z',
       approvedBy: 'Editorial QA',
       checklistVersion: narrationApprovalChecklistVersion,
       confirmations: narrationReleaseApprovalConfirmations.map(({ label }) => label),
+      fullListen: {
+        receiptSha256: createHash('sha256').update(narrationFullListenReceiptMaterial(receipt)).digest('hex'),
+        receipt,
+      },
     }
-    expect(narrationReleaseApprovalIsComplete(approval)).toBe(true)
-    expect(narrationReleaseApprovalIsComplete({ ...approval, confirmations: approval.confirmations.slice(1) })).toBe(false)
-    expect(narrationReleaseApprovalIsComplete({ ...approval, checklistVersion: 'old' })).toBe(false)
+    const verificationFor = (candidate: typeof approval) => ({
+      releaseId,
+      passageCount,
+      receiptSha256: createHash('sha256')
+        .update(narrationFullListenReceiptMaterial(candidate.fullListen.receipt))
+        .digest('hex'),
+    })
+    expect(narrationReleaseApprovalIsComplete(approval, verificationFor(approval))).toBe(true)
+    expect(narrationReleaseApprovalIsComplete(
+      { ...approval, confirmations: approval.confirmations.slice(1) },
+      verificationFor(approval),
+    )).toBe(false)
+    expect(narrationReleaseApprovalIsComplete({ ...approval, checklistVersion: 'old' }, verificationFor(approval))).toBe(false)
+
+    const missingEvidence = { ...approval, fullListen: undefined }
+    expect(narrationReleaseApprovalIsComplete(missingEvidence as never, verificationFor(approval))).toBe(false)
+    const tamperedReceipt = {
+      ...approval,
+      fullListen: {
+        ...approval.fullListen,
+        receipt: { ...receipt, completedBy: 'Someone else' },
+      },
+    }
+    expect(narrationReleaseApprovalIsComplete(tamperedReceipt, verificationFor(tamperedReceipt))).toBe(false)
+    const wrongCount = {
+      ...approval,
+      fullListen: {
+        ...approval.fullListen,
+        receipt: { ...receipt, passageCount: passageCount - 1 },
+      },
+    }
+    expect(narrationReleaseApprovalIsComplete(wrongCount, verificationFor(wrongCount))).toBe(false)
+    const futureReceipt = {
+      ...approval,
+      fullListen: {
+        ...approval.fullListen,
+        receipt: { ...receipt, completedAt: '2026-08-11T00:00:00.001Z' },
+      },
+    }
+    expect(narrationReleaseApprovalIsComplete(futureReceipt, verificationFor(futureReceipt))).toBe(false)
   })
 
   it('requires every voice-pilot identity and delivery confirmation', () => {

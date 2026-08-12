@@ -39,6 +39,101 @@ export const narrationEditionConfiguration = {
   ].join(' '),
 } as const
 
+interface NarrationFreshRawDiagnostic {
+  inputIntegratedLoudnessLufs: number
+  inputTruePeakDbtp: number
+  globalTargetMp3IntegratedLoudnessLufs: number
+  globalTargetMp3TruePeakDbtp: number
+  compensatedMp3IntegratedLoudnessLufs: number
+  compensatedMp3TruePeakDbtp: number
+}
+
+interface NarrationCodecCompensatedNormalisationOverride {
+  method: 'codec-compensated-single-pass-loudnorm'
+  preEncodeTruePeakDbtp: number
+  freshRawDiagnostic: NarrationFreshRawDiagnostic
+  version: string
+}
+
+interface NarrationLimitedNormalisationOverride {
+  method: 'post-normalisation-gain-limiter'
+  postNormalisationGainDb: number
+  limiter: {
+    limitLinear: number
+    attackMilliseconds: number
+    releaseMilliseconds: number
+    autoReleaseControl: false
+    autoLevel: false
+    latencyCompensation: false
+  }
+  freshRawDiagnostic: NarrationFreshRawDiagnostic
+  qualityDiagnostic: {
+    maximumGainReductionDb: number
+    integratedLoudnessCostLu: number
+  }
+  version: string
+}
+
+export type NarrationPassageNormalisationOverride =
+  | NarrationCodecCompensatedNormalisationOverride
+  | NarrationLimitedNormalisationOverride
+
+/**
+ * Passage-local mastering exceptions. These live outside the edition-wide
+ * configuration so an exceptional short clip can be corrected without
+ * changing the approved pilot or invalidating ordinary narration assets.
+ * The override itself is bound into only the affected passage digest below.
+ */
+export const narrationPassageNormalisationOverrides: Readonly<Record<string, NarrationPassageNormalisationOverride>> = {
+  'passage:access-restoration-agency:block-2-heading': {
+    method: 'codec-compensated-single-pass-loudnorm',
+    preEncodeTruePeakDbtp: -1.25,
+    freshRawDiagnostic: {
+      inputIntegratedLoudnessLufs: -19.8,
+      inputTruePeakDbtp: -0.89,
+      globalTargetMp3IntegratedLoudnessLufs: -21.36,
+      globalTargetMp3TruePeakDbtp: -2.9,
+      compensatedMp3IntegratedLoudnessLufs: -20.57,
+      compensatedMp3TruePeakDbtp: -2.26,
+    },
+    version: 'loudnorm-codec-compensated-single-pass-2026.2-24khz-48kbps',
+  },
+  'passage:air-again:block-5-heading': {
+    method: 'post-normalisation-gain-limiter',
+    postNormalisationGainDb: 2,
+    limiter: {
+      limitLinear: 0.8413951416451951,
+      attackMilliseconds: 5,
+      releaseMilliseconds: 50,
+      autoReleaseControl: false,
+      autoLevel: false,
+      latencyCompensation: false,
+    },
+    freshRawDiagnostic: {
+      inputIntegratedLoudnessLufs: -19.44,
+      inputTruePeakDbtp: 0.04,
+      globalTargetMp3IntegratedLoudnessLufs: -21.87,
+      globalTargetMp3TruePeakDbtp: -2.76,
+      compensatedMp3IntegratedLoudnessLufs: -19.91,
+      compensatedMp3TruePeakDbtp: -1.97,
+    },
+    qualityDiagnostic: {
+      maximumGainReductionDb: 1.5,
+      integratedLoudnessCostLu: 0.04,
+    },
+    version: 'loudnorm-post-gain-limiter-2026.2-24khz-48kbps',
+  },
+}
+
+export function narrationPassageNormalisationOverrideFor(passageId: string) {
+  return narrationPassageNormalisationOverrides[passageId] ?? null
+}
+
+export function narrationNormalisationVersionFor(passageId: string) {
+  return narrationPassageNormalisationOverrideFor(passageId)?.version
+    ?? narrationEditionConfiguration.normalisation.version
+}
+
 export const narrationGenerationProvenance = {
   provider: narrationEditionConfiguration.provider,
   modelRevision: narrationEditionConfiguration.modelRevision,
@@ -451,14 +546,22 @@ export function narrationInstructionsFor(passageId: string) {
 export function narrationPassageHashMaterial(configurationHash: string, passageId: string, text: string) {
   const readingNote = narrationReadingNoteFor(passageId)
   const replacements = narrationSpokenReplacementsFor(passageId)
-  if (replacements.length === 0) return `${configurationHash}\n${readingNote}\n${text}`
-  const spokenText = narrationSpokenTextFor(passageId, text)
-  return [
-    configurationHash,
-    readingNote,
-    text,
-    'spoken-normalisation-v1',
-    JSON.stringify(replacements),
-    spokenText,
-  ].join('\n')
+  const normalisationOverride = narrationPassageNormalisationOverrideFor(passageId)
+  if (replacements.length === 0 && !normalisationOverride) return `${configurationHash}\n${readingNote}\n${text}`
+  const material = [configurationHash, readingNote, text]
+  if (replacements.length > 0) {
+    const spokenText = narrationSpokenTextFor(passageId, text)
+    material.push(
+      'spoken-normalisation-v1',
+      JSON.stringify(replacements),
+      spokenText,
+    )
+  }
+  if (normalisationOverride) {
+    material.push(
+      'passage-normalisation-v1',
+      JSON.stringify(normalisationOverride),
+    )
+  }
+  return material.join('\n')
 }

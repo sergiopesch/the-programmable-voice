@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { sections } from '../data/book'
 import {
+  narrationEditionConfiguration,
+  narrationNormalisationVersionFor,
   narrationPassageHashMaterial,
+  narrationPassageNormalisationOverrideFor,
+  narrationPassageNormalisationOverrides,
   narrationPassageReadingNotes,
   narrationPassageSpokenReplacements,
   narrationPilotPassageIds,
@@ -200,6 +204,85 @@ describe('book narration units', () => {
     for (const [passageId, expectedSpeech] of examples) {
       const passage = passageById.get(passageId)!
       expect(narrationSpokenTextFor(passageId, passage.text)).toContain(expectedSpeech)
+    }
+  })
+
+  it('binds codec-compensated mastering exceptions only to their passages and leaves pilot identity unchanged', () => {
+    const passageId = 'passage:access-restoration-agency:block-2-heading'
+    const epiloguePassageId = 'passage:air-again:block-5-heading'
+    const passage = bookNarrationPassages.find((candidate) => candidate.id === passageId)!
+    const override = narrationPassageNormalisationOverrideFor(passageId)!
+
+    expect(Object.keys(narrationPassageNormalisationOverrides)).toEqual([passageId, epiloguePassageId])
+    expect(override).toEqual({
+      method: 'codec-compensated-single-pass-loudnorm',
+      preEncodeTruePeakDbtp: -1.25,
+      freshRawDiagnostic: {
+        inputIntegratedLoudnessLufs: -19.8,
+        inputTruePeakDbtp: -0.89,
+        globalTargetMp3IntegratedLoudnessLufs: -21.36,
+        globalTargetMp3TruePeakDbtp: -2.9,
+        compensatedMp3IntegratedLoudnessLufs: -20.57,
+        compensatedMp3TruePeakDbtp: -2.26,
+      },
+      version: 'loudnorm-codec-compensated-single-pass-2026.2-24khz-48kbps',
+    })
+    expect(narrationNormalisationVersionFor(passageId)).toBe(override.version)
+    expect(override.version).not.toBe(narrationEditionConfiguration.normalisation.version)
+    expect(narrationPassageHashMaterial('configuration', passageId, passage.text)).toBe([
+      'configuration',
+      narrationReadingNoteFor(passageId),
+      passage.text,
+      'passage-normalisation-v1',
+      JSON.stringify(override),
+    ].join('\n'))
+
+    const epiloguePassage = bookNarrationPassages.find((candidate) => candidate.id === epiloguePassageId)!
+    const epilogueOverride = narrationPassageNormalisationOverrideFor(epiloguePassageId)!
+    expect(epilogueOverride).toEqual({
+      method: 'post-normalisation-gain-limiter',
+      postNormalisationGainDb: 2,
+      limiter: {
+        limitLinear: 0.8413951416451951,
+        attackMilliseconds: 5,
+        releaseMilliseconds: 50,
+        autoReleaseControl: false,
+        autoLevel: false,
+        latencyCompensation: false,
+      },
+      freshRawDiagnostic: {
+        inputIntegratedLoudnessLufs: -19.44,
+        inputTruePeakDbtp: 0.04,
+        globalTargetMp3IntegratedLoudnessLufs: -21.87,
+        globalTargetMp3TruePeakDbtp: -2.76,
+        compensatedMp3IntegratedLoudnessLufs: -19.91,
+        compensatedMp3TruePeakDbtp: -1.97,
+      },
+      qualityDiagnostic: {
+        maximumGainReductionDb: 1.5,
+        integratedLoudnessCostLu: 0.04,
+      },
+      version: 'loudnorm-post-gain-limiter-2026.2-24khz-48kbps',
+    })
+    expect(narrationNormalisationVersionFor(epiloguePassageId)).toBe(epilogueOverride.version)
+    expect(epilogueOverride.version).not.toBe(narrationEditionConfiguration.normalisation.version)
+    expect(narrationPassageHashMaterial('configuration', epiloguePassageId, epiloguePassage.text)).toBe([
+      'configuration',
+      narrationReadingNoteFor(epiloguePassageId),
+      epiloguePassage.text,
+      'passage-normalisation-v1',
+      JSON.stringify(epilogueOverride),
+    ].join('\n'))
+
+    for (const pilotId of narrationPilotPassageIds) {
+      const pilotPassage = bookNarrationPassages.find((candidate) => candidate.id === pilotId)!
+      expect(narrationPassageNormalisationOverrideFor(pilotId), pilotId).toBeNull()
+      expect(narrationNormalisationVersionFor(pilotId), pilotId).toBe(narrationEditionConfiguration.normalisation.version)
+      expect(narrationPassageHashMaterial('configuration', pilotId, pilotPassage.text), pilotId).toBe([
+        'configuration',
+        narrationReadingNoteFor(pilotId),
+        pilotPassage.text,
+      ].join('\n'))
     }
   })
 

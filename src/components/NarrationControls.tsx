@@ -7,6 +7,7 @@ interface SectionListenButtonProps {
   status: NarrationStatus
   catalogueStatus: NarrationCatalogueStatus
   catalogueError: string | null
+  reviewMode: boolean
   active: boolean
   onStart: () => void
   onPause: () => void
@@ -20,6 +21,7 @@ export function SectionListenButton({
   status,
   catalogueStatus,
   catalogueError,
+  reviewMode,
   active,
   onStart,
   onPause,
@@ -31,19 +33,23 @@ export function SectionListenButton({
   const loading = active && status === 'loading'
   const resumable = active && status === 'paused'
   const retryable = active && status === 'error'
+  const preparingLabel = reviewMode ? 'Preparing unreleased review' : 'Preparing recorded edition'
+  const unavailableLabel = reviewMode ? 'Unreleased narration review unavailable' : 'Recorded edition awaiting release'
+  const loadingLabel = reviewMode ? 'Loading unreleased candidate' : 'Loading approved recording'
+  const startLabel = reviewMode ? 'Review narration from this section' : 'Listen from this section'
   const label = catalogueStatus === 'loading'
-    ? 'Preparing recorded edition'
+    ? preparingLabel
     : catalogueStatus === 'error'
-      ? 'Recorded edition awaiting release'
+      ? unavailableLabel
       : pauseable
-    ? 'Pause narration'
-    : loading
-      ? 'Loading approved recording'
-      : resumable
-      ? 'Resume narration'
-      : retryable
-        ? 'Retry narration'
-        : 'Listen from this section'
+        ? 'Pause narration'
+        : loading
+          ? loadingLabel
+          : resumable
+            ? 'Resume narration'
+            : retryable
+              ? 'Retry narration'
+              : startLabel
   const action = pauseable ? onPause : resumable ? onResume : retryable ? onRetry : onStart
 
   if (catalogueStatus === 'error') {
@@ -51,11 +57,11 @@ export function SectionListenButton({
       <span
         id={id}
         className={`listen-status ${className}`.trim()}
-        title={catalogueError ?? 'The approved recording is unavailable.'}
+        title={catalogueError ?? (reviewMode ? 'The unreleased candidate is unavailable.' : 'The approved recording is unavailable.')}
         role="status"
       >
         <SpeakerIcon />
-        <span>Narration awaiting editorial approval</span>
+        <span>{reviewMode ? 'Unreleased narration review unavailable' : 'Narration awaiting editorial approval'}</span>
       </span>
     )
   }
@@ -78,6 +84,7 @@ export function SectionListenButton({
 
 interface NarrationDockProps {
   status: NarrationStatus
+  reviewMode: boolean
   passage: NarrationPassage | null
   sectionTitle: string
   sectionProgress: { current: number; total: number }
@@ -101,17 +108,18 @@ function clock(seconds: number) {
   return `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, '0')}`
 }
 
-function statusText(status: NarrationStatus) {
-  if (status === 'loading') return 'Loading the approved recording'
-  if (status === 'speaking') return 'Playing the recorded edition'
+function statusText(status: NarrationStatus, reviewMode: boolean) {
+  if (status === 'loading') return reviewMode ? 'Loading the unreleased candidate' : 'Loading the approved recording'
+  if (status === 'speaking') return reviewMode ? 'Reviewing the unreleased candidate' : 'Playing the recorded edition'
   if (status === 'paused') return 'Paused'
-  if (status === 'error') return 'Recording unavailable'
-  if (status === 'complete') return 'Book complete'
+  if (status === 'error') return reviewMode ? 'Candidate unavailable' : 'Recording unavailable'
+  if (status === 'complete') return reviewMode ? 'Review complete' : 'Book complete'
   return 'Ready'
 }
 
 export function NarrationDock({
   status,
+  reviewMode,
   passage,
   sectionTitle,
   sectionProgress,
@@ -143,18 +151,20 @@ export function NarrationDock({
   return (
     <section
       id="narration-player"
-      className={`narration-dock narration-dock--${status}`}
-      aria-label="Recorded narration player"
+      className={`narration-dock narration-dock--${status}${reviewMode ? ' narration-dock--review' : ''}`}
+      aria-label={reviewMode ? 'Unreleased narration review player' : 'Recorded narration player'}
     >
       <div className="narration-dock__identity">
-        <span>Recorded edition</span>
-        <strong>Approved AI narration</strong>
-        <small>AI-generated, not human · generated once and editorially fixed</small>
+        <span>{reviewMode ? 'Unreleased review' : 'Recorded edition'}</span>
+        <strong>{reviewMode ? 'AI-generated candidate' : 'Approved AI narration'}</strong>
+        <small>{reviewMode ? 'Not approved · AI-generated, not human · development only' : 'AI-generated, not human · generated once and editorially fixed'}</small>
       </div>
       <div className="narration-dock__passage">
-        <span>{statusText(status)}</span>
+        <span>{statusText(status, reviewMode)}</span>
         <strong>{sectionTitle || passage?.sectionId || 'The Programmable Voice'}</strong>
-        <small className="narration-dock__mobile-disclosure">AI-generated, not human · fixed edition</small>
+        <small className="narration-dock__mobile-disclosure">
+          {reviewMode ? 'Not approved · AI-generated, not human' : 'AI-generated, not human · fixed edition'}
+        </small>
         {sectionProgress.total > 0 ? (
           <small>{String(sectionProgress.current).padStart(2, '0')} / {String(sectionProgress.total).padStart(2, '0')} passages</small>
         ) : null}

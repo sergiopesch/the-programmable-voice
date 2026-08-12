@@ -4,17 +4,27 @@ import {
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
   narrationGenerationProvenance,
+  narrationNormalisationVersionFor,
   narrationPassageHashMaterial,
 } from '../data/narrationEdition'
 import type { NarrationPassage } from '../lib/narration'
 import {
-  narrationReleaseApprovalIsComplete,
+  createNarrationSavedPosition,
+  parseNarrationSavedPosition,
+} from '../lib/narrationPosition'
+import {
+  narrationFullListenReceiptMaterial,
   narrationReleaseId,
   narrationReleaseIdentityMaterial,
   narrationReleaseManifestUrl,
   type NarrationManifest,
   type NarrationManifestEntry,
 } from '../lib/narrationRelease'
+import {
+  narrationManifestApprovalIsPlayable,
+  narrationReviewManifestUrl,
+  narrationReviewModeRequested,
+} from '../lib/narrationReview'
 
 export type { NarrationManifestEntry } from '../lib/narrationRelease'
 
@@ -37,7 +47,8 @@ interface UseNarrationPlayerOptions {
 }
 
 const MANIFEST_URL = '/audio/narration/manifest.json'
-const POSITION_KEY = 'pv:narration-position:v3'
+const RELEASED_POSITION_KEY = 'pv:narration-position:v4'
+const REVIEW_POSITION_KEY = 'pv:narration-review-position:v2'
 const INITIAL_STATE: NarrationViewState = {
   status: 'idle',
   currentIndex: null,
@@ -61,48 +72,41 @@ function passageNumberWithinSection(passages: readonly NarrationPassage[], index
   return { current, total }
 }
 
-interface SavedPosition {
-  version: 3
-  edition: string
-  passageId: string
-  currentTime: number
-}
-
-function readPosition(passages: readonly NarrationPassage[]): SavedPosition | null {
+function readPosition(
+  passages: readonly NarrationPassage[],
+  positionKey: string,
+  releaseId: string | null,
+) {
   try {
-    const stored = JSON.parse(localStorage.getItem(POSITION_KEY) ?? '{}') as Partial<SavedPosition>
-    if (
-      stored.version !== 3
-      || stored.edition !== narrationEditionConfiguration.edition
-      || typeof stored.passageId !== 'string'
-      || typeof stored.currentTime !== 'number'
-      || !Number.isFinite(stored.currentTime)
-      || stored.currentTime < 0
-      || !passages.some(({ id }) => id === stored.passageId)
-    ) return null
-    return stored as SavedPosition
+    return parseNarrationSavedPosition(
+      localStorage.getItem(positionKey),
+      narrationEditionConfiguration.edition,
+      releaseId,
+      passages.map(({ id }) => id),
+    )
   } catch {
     return null
   }
 }
 
-function savePosition(passageId: string, currentTime: number) {
+function savePosition(positionKey: string, releaseId: string | null, passageId: string, currentTime: number) {
   try {
-    const position: SavedPosition = {
-      version: 3,
-      edition: narrationEditionConfiguration.edition,
+    const position = createNarrationSavedPosition(
+      narrationEditionConfiguration.edition,
+      releaseId,
       passageId,
-      currentTime: Math.max(0, currentTime),
-    }
-    localStorage.setItem(POSITION_KEY, JSON.stringify(position))
+      currentTime,
+    )
+    if (!position) return
+    localStorage.setItem(positionKey, JSON.stringify(position))
   } catch {
     // Playback remains available when storage is blocked.
   }
 }
 
-function clearPosition() {
+function clearPosition(positionKey: string) {
   try {
-    localStorage.removeItem(POSITION_KEY)
+    localStorage.removeItem(positionKey)
   } catch {
     // Completion remains available when storage is blocked.
   }
@@ -115,16 +119,29 @@ async function sha256Hex(value: string) {
   return [...digest].map((byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-async function loadManifest(passages: readonly NarrationPassage[], signal?: AbortSignal): Promise<NarrationManifest> {
-  const response = await fetch(MANIFEST_URL, { signal, cache: 'no-cache' })
+interface ManifestLoadOptions {
+  development: boolean
+  manifestUrl: string
+  reviewMode: boolean
+  signal?: AbortSignal
+}
+
+async function loadManifest(passages: readonly NarrationPassage[], options: ManifestLoadOptions): Promise<NarrationManifest> {
+  const unavailableMessage = options.reviewMode
+    ? 'The unreleased narration candidate is not ready for review.'
+    : 'The approved recorded edition is not available yet.'
+  const integrityMessage = options.reviewMode
+    ? 'The unreleased candidate does not match this manuscript and cannot be played.'
+    : 'The recorded edition does not match this manuscript and cannot be played.'
+  const response = await fetch(options.manifestUrl, { signal: options.signal, cache: 'no-cache' })
   if (!response.ok || !response.headers.get('content-type')?.toLocaleLowerCase().includes('json')) {
-    throw new Error('The approved recorded edition is not available yet.')
+    throw new Error(unavailableMessage)
   }
   let manifest: NarrationManifest
   try {
     manifest = await response.json() as NarrationManifest
   } catch {
-    throw new Error('The approved recorded edition is not available yet.')
+    throw new Error(unavailableMessage)
   }
 
   if (
@@ -140,7 +157,7 @@ async function loadManifest(passages: readonly NarrationPassage[], signal?: Abor
     || !Array.isArray(manifest.passages)
     || manifest.passages.some((entry) => !entry || !entry.technicalQc)
   ) {
-    throw new Error('The recorded edition does not match this manuscript and cannot be played.')
+    throw new Error(integrityMessage)
   }
 
   const configurationHash = await sha256Hex(JSON.stringify(narrationEditionConfiguration))
@@ -150,12 +167,19 @@ async function loadManifest(passages: readonly NarrationPassage[], signal?: Abor
   })))
   const manuscriptHash = await sha256Hex(JSON.stringify(expected.map(({ passage, textHash }) => ({ id: passage.id, textHash }))))
   const { releaseId, releaseManifestUrl, approved, approval, ...identityFields } = manifest
+  const fullListenReceiptSha256 = approval?.fullListen?.receipt
+    ? await sha256Hex(narrationFullListenReceiptMaterial(approval.fullListen.receipt))
+    : null
   const expectedReleaseId = narrationReleaseId(manifest.edition, await sha256Hex(narrationReleaseIdentityMaterial(identityFields)))
   if (
     manifest.schemaVersion !== 1
     || !manifest.complete
-    || !approved
-    || !narrationReleaseApprovalIsComplete(approval)
+    || !narrationManifestApprovalIsPlayable({
+      approved,
+      approval,
+      passageCount: manifest.passageCount,
+      releaseId,
+    }, options.reviewMode, options.development, fullListenReceiptSha256)
     || manifest.disclosure !== narrationDisclosure
     || manifest.configurationHash !== configurationHash
     || manifest.manuscriptHash !== manuscriptHash
@@ -170,7 +194,7 @@ async function loadManifest(passages: readonly NarrationPassage[], signal?: Abor
     || releaseId !== expectedReleaseId
     || releaseManifestUrl !== narrationReleaseManifestUrl(expectedReleaseId)
   ) {
-    throw new Error('The recorded edition does not match this manuscript and cannot be played.')
+    throw new Error(integrityMessage)
   }
   for (let index = 0; index < expected.length; index += 1) {
     const { passage, textHash } = expected[index]!
@@ -184,16 +208,29 @@ async function loadManifest(passages: readonly NarrationPassage[], signal?: Abor
       || entry.qcStatus !== 'technical-qc-passed'
       || !entry.url.startsWith(`/audio/narration/${narrationEditionAssetDirectory}/`)
       || !entry.url.includes(entry.sha256)
-      || entry.technicalQc?.normalisationVersion !== narrationEditionConfiguration.normalisation.version
+      || entry.technicalQc?.normalisationVersion !== narrationNormalisationVersionFor(passage.id)
       || entry.technicalQc?.fullDecodePassed !== true
     ) {
-      throw new Error(`The approved recording for ${passage.id} failed integrity checks.`)
+      throw new Error(options.reviewMode
+        ? `The unreleased recording for ${passage.id} failed integrity checks.`
+        : `The approved recording for ${passage.id} failed integrity checks.`)
     }
   }
   return manifest
 }
 
 export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationPlayerOptions) {
+  const [runtimeMode] = useState(() => {
+    const development = import.meta.env.DEV
+    const reviewMode = development && narrationReviewModeRequested(window.location.search, development)
+    return {
+      development,
+      reviewMode,
+      manifestUrl: reviewMode ? narrationReviewManifestUrl : MANIFEST_URL,
+      positionKey: reviewMode ? REVIEW_POSITION_KEY : RELEASED_POSITION_KEY,
+    }
+  })
+  const { development, manifestUrl, positionKey, reviewMode } = runtimeMode
   const [view, setView] = useState<NarrationViewState>(INITIAL_STATE)
   const [catalogueStatus, setCatalogueStatus] = useState<NarrationCatalogueStatus>('loading')
   const [catalogueError, setCatalogueError] = useState<string | null>(null)
@@ -226,14 +263,22 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
   const ensureManifest = useCallback(() => {
     if (manifestRef.current) return Promise.resolve(manifestRef.current)
     if (!manifestPromiseRef.current) {
-      manifestPromiseRef.current = loadManifest(passagesRef.current).then((manifest) => {
+      manifestPromiseRef.current = loadManifest(passagesRef.current, {
+        development,
+        manifestUrl,
+        reviewMode,
+      }).then((manifest) => {
         manifestRef.current = manifest
         entryByIdRef.current = new Map(manifest.passages.map((entry) => [entry.id, entry]))
         setCatalogueStatus('ready')
         setCatalogueError(null)
         return manifest
       }).catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'The approved recorded edition is unavailable.'
+        const message = error instanceof Error
+          ? error.message
+          : reviewMode
+            ? 'The unreleased narration candidate is unavailable.'
+            : 'The approved recorded edition is unavailable.'
         setCatalogueStatus('error')
         setCatalogueError(message)
         throw error
@@ -242,7 +287,7 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
       })
     }
     return manifestPromiseRef.current
-  }, [])
+  }, [development, manifestUrl, reviewMode])
 
   const releaseAudioEvents = useCallback(() => {
     audioCleanupRef.current?.()
@@ -277,14 +322,23 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
       error: null,
       currentTime: 0,
       duration: 0,
-      announcement: `Preparing recorded narration for ${passage.sectionId}.`,
+      announcement: reviewMode
+        ? `Preparing the unreleased AI-generated candidate for ${passage.sectionId}.`
+        : `Preparing recorded narration for ${passage.sectionId}.`,
     }))
 
     try {
-      await ensureManifest()
+      const manifest = await ensureManifest()
       if (runId !== runIdRef.current) return
       const entry = entryByIdRef.current.get(passage.id)
-      if (!entry) return fail(`This edition has no approved recording for ${passage.id}.`, index)
+      if (!entry) {
+        return fail(
+          reviewMode
+            ? `The unreleased candidate has no recording for ${passage.id}.`
+            : `This edition has no approved recording for ${passage.id}.`,
+          index,
+        )
+      }
       await onPresentPassageRef.current(passage)
       if (runId !== runIdRef.current) return
 
@@ -296,7 +350,9 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
       audio.playbackRate = playbackRate
       preparedIndexRef.current = index
 
-      const savedPosition = resume ? readPosition(passagesRef.current) : null
+      const savedPosition = resume
+        ? readPosition(passagesRef.current, positionKey, manifest.releaseId)
+        : null
       let resumeTime = savedPosition?.passageId === passage.id ? savedPosition.currentTime : null
       const applyResumeTime = () => {
         if (resumeTime === null) return
@@ -314,7 +370,7 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
         if (indexRef.current !== index) return
         const now = Date.now()
         if (now - lastPositionWriteRef.current >= 1_000) {
-          savePosition(passage.id, audio.currentTime)
+          savePosition(positionKey, manifest.releaseId, passage.id, audio.currentTime)
           lastPositionWriteRef.current = now
         }
         setView((current) => ({ ...current, currentTime: audio.currentTime, duration: Number.isFinite(audio.duration) ? audio.duration : current.duration }))
@@ -323,16 +379,32 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
         applyResumeTime()
         setView((current) => ({ ...current, duration: Number.isFinite(audio.duration) ? audio.duration : entry.durationSeconds }))
       }
-      const onError = () => { if (runId === runIdRef.current) fail('The approved narration file could not be played.', index) }
+      const onError = () => {
+        if (runId === runIdRef.current) {
+          fail(
+            reviewMode
+              ? 'The unreleased narration file could not be played.'
+              : 'The approved narration file could not be played.',
+            index,
+          )
+        }
+      }
       const onEnded = () => {
         if (runId !== runIdRef.current) return
         const nextIndex = index + 1
         if (!passagesRef.current[nextIndex]) {
-          clearPosition()
-          setView((current) => ({ ...current, status: 'complete', activeTargetId: null, announcement: 'The recorded edition is complete.' }))
+          clearPosition(positionKey)
+          setView((current) => ({
+            ...current,
+            status: 'complete',
+            activeTargetId: null,
+            announcement: reviewMode
+              ? 'The unreleased narration review is complete.'
+              : 'The recorded edition is complete.',
+          }))
           return
         }
-        savePosition(passagesRef.current[nextIndex]!.id, 0)
+        savePosition(positionKey, manifest.releaseId, passagesRef.current[nextIndex]!.id, 0)
         void playIndexRef.current(nextIndex, runId)
       }
       audio.addEventListener('timeupdate', onTimeUpdate)
@@ -363,7 +435,9 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
         activeTargetId: passage.targetId,
         error: null,
         duration: Number.isFinite(audio.duration) ? audio.duration : entry.durationSeconds,
-        announcement: `Playing the approved recording for ${passage.sectionId}.`,
+        announcement: reviewMode
+          ? `Playing the unreleased AI-generated candidate for ${passage.sectionId}.`
+          : `Playing the approved recording for ${passage.sectionId}.`,
       }))
 
       const nextPassage = passagesRef.current[index + 1]
@@ -383,7 +457,7 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
         : error instanceof Error ? error.message : 'Recorded narration could not start.'
       fail(message, index)
     }
-  }, [ensureManifest, fail, getAudio, playbackRate, releaseAudioEvents])
+  }, [ensureManifest, fail, getAudio, playbackRate, positionKey, releaseAudioEvents, reviewMode])
 
   useEffect(() => { playIndexRef.current = playIndex }, [playIndex])
   useEffect(() => { void ensureManifest().catch(() => undefined) }, [ensureManifest])
@@ -399,12 +473,12 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
   const startFromSection = useCallback((sectionId: string) => {
     const firstIndex = passagesRef.current.findIndex((passage) => passage.sectionId === sectionId)
     if (firstIndex < 0) return
-    const stored = readPosition(passagesRef.current)
+    const stored = readPosition(passagesRef.current, positionKey, manifestRef.current?.releaseId ?? null)
     const storedIndex = stored
       ? passagesRef.current.findIndex((passage) => passage.id === stored.passageId && passage.sectionId === sectionId)
       : -1
     startAtIndex(storedIndex >= 0 ? storedIndex : firstIndex, storedIndex >= 0)
-  }, [startAtIndex])
+  }, [positionKey, startAtIndex])
 
   const pause = useCallback(() => {
     if (indexRef.current === null) return
@@ -412,9 +486,11 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
     const audio = audioRef.current
     audio?.pause()
     const passage = passagesRef.current[indexRef.current]
-    if (audio && passage) savePosition(passage.id, audio.currentTime)
+    if (audio && passage) {
+      savePosition(positionKey, manifestRef.current?.releaseId ?? null, passage.id, audio.currentTime)
+    }
     setView((current) => ({ ...current, status: 'paused', activeTargetId: passage?.targetId ?? current.activeTargetId, announcement: 'Narration paused.' }))
-  }, [])
+  }, [positionKey])
 
   const resume = useCallback(() => {
     if (indexRef.current === null) return
@@ -489,6 +565,7 @@ export function useNarrationPlayer({ passages, onPresentPassage }: UseNarrationP
     ...view,
     catalogueStatus,
     catalogueError,
+    reviewMode,
     currentPassage,
     sectionProgress,
     playbackRate,

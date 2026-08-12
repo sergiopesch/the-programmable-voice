@@ -9,8 +9,10 @@ export default defineConfig({
       'scripts/narration-loudness.test.ts',
       'scripts/narration-pacing.test.ts',
       'scripts/narration-pilot-contract.test.ts',
+      'scripts/narration-review-contract.test.ts',
       'scripts/narration-comparison-contract.test.ts',
       'scripts/narration-vercel-job.test.ts',
+      'scripts/narration-verification-parity.test.ts',
     ],
   },
 })

@@ -8,6 +8,7 @@ import {
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
   narrationGenerationProvenance,
+  narrationNormalisationVersionFor,
   narrationPassageHashMaterial,
   narrationPilotApprovalConfirmations,
   narrationPilotPassageIds,
@@ -16,10 +17,13 @@ import {
 import { sources } from '../src/data/sources'
 import { bookNarrationPassages, bookNarrationUnits } from '../src/lib/narration'
 import {
+  narrationFullListenConfirmations,
+  narrationFullListenReceiptMaterial,
   narrationPilotProfileMaterial,
   narrationReleaseId,
   narrationReleaseIdentityMaterial,
   narrationReleaseManifestUrl,
+  type NarrationFullListenReceipt,
   type NarrationManifest,
 } from '../src/lib/narrationRelease'
 
@@ -51,11 +55,11 @@ function sha256(value: string) {
   return createHash('sha256').update(value).digest('hex')
 }
 
-function approvedNarrationManifest() {
+function approvedNarrationManifest(audioRevision = 'test-audio') {
   const configurationHash = sha256(JSON.stringify(narrationEditionConfiguration))
   const passages = bookNarrationPassages.map((passage, index) => {
     const textHash = sha256(narrationPassageHashMaterial(configurationHash, passage.id, passage.text))
-    const audioHash = sha256(`test-audio-${index}`)
+    const audioHash = sha256(`${audioRevision}-${index}`)
     const durationSeconds = 31
     const words = passage.text.trim().split(/\s+/).filter(Boolean).length
     return {
@@ -77,7 +81,7 @@ function approvedNarrationManifest() {
         truePeakDbtp: -2,
         leadingSilenceSeconds: 0.08,
         trailingSilenceSeconds: 0.18,
-        normalisationVersion: narrationEditionConfiguration.normalisation.version,
+        normalisationVersion: narrationNormalisationVersionFor(passage.id),
         fullDecodePassed: true as const,
       },
     }
@@ -130,6 +134,18 @@ function approvedNarrationManifest() {
     passages,
   }
   const releaseId = narrationReleaseId(identity.edition, sha256(narrationReleaseIdentityMaterial(identity)))
+  const fullListenReceipt: NarrationFullListenReceipt = {
+    schemaVersion: 1 as const,
+    kind: 'narration-full-listen-receipt' as const,
+    releaseId,
+    reviewManifestSha256: sha256('test review manifest'),
+    packageChecksumsSha256: sha256('test package checksums'),
+    orderedPassageProfileSha256: sha256('test ordered passage profile'),
+    passageCount: passages.length,
+    completedAt: '2026-08-10T23:00:00.000Z',
+    completedBy: 'Listening editor',
+    confirmations: [...narrationFullListenConfirmations],
+  }
   return {
     ...identity,
     releaseId,
@@ -140,17 +156,23 @@ function approvedNarrationManifest() {
       approvedBy: 'Editorial QA',
       checklistVersion: narrationApprovalChecklistVersion,
       confirmations: narrationReleaseApprovalConfirmations.map(({ label }) => label),
+      fullListen: {
+        receiptSha256: sha256(narrationFullListenReceiptMaterial(fullListenReceipt)),
+        receipt: fullListenReceipt,
+      },
     },
   } satisfies NarrationManifest
 }
 
-async function installApprovedNarration(page: Page) {
-  const manifest = approvedNarrationManifest()
-  await page.route('**/audio/narration/manifest.json', (route) => route.fulfill({
-    status: 200,
-    contentType: 'application/json',
-    body: JSON.stringify(manifest),
-  }))
+function candidateNarrationManifest(audioRevision?: string) {
+  return {
+    ...approvedNarrationManifest(audioRevision),
+    approved: false,
+    approval: null,
+  } satisfies NarrationManifest
+}
+
+async function installTestAudio(page: Page) {
   await page.addInitScript(() => {
     class TestAudio extends EventTarget {
       static instances: TestAudio[] = []
@@ -169,6 +191,16 @@ async function installApprovedNarration(page: Page) {
     Object.defineProperty(window, 'Audio', { configurable: true, value: TestAudio })
     Object.defineProperty(window, '__narrationTestAudio', { configurable: true, value: TestAudio })
   })
+}
+
+async function installApprovedNarration(page: Page) {
+  const manifest = approvedNarrationManifest()
+  await page.route('**/audio/narration/manifest.json', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(manifest),
+  }))
+  await installTestAudio(page)
   return manifest
 }
 
@@ -584,6 +616,153 @@ test('released narration controls remain legible and compact on a short mobile l
       .analyze()
     expect(results.violations, `released narration player in ${theme}`).toEqual([])
   }
+})
+
+test('explicit development review plays a complete unapproved candidate with persistent disclosure', async ({ page }) => {
+  const candidate = candidateNarrationManifest()
+  let releasedManifestRequests = 0
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/audio/narration/manifest.json') releasedManifestRequests += 1
+  })
+  await page.route('**/__narration-review/candidate-manifest.json', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(candidate),
+  }))
+  await installTestAudio(page)
+
+  await page.goto('/?narration-review=1#fdn-disturbance-world')
+  const banner = page.locator('.narration-review-banner')
+  await expect(banner).toBeVisible()
+  await expect(banner).toHaveText('UNRELEASED REVIEW · AI-generated')
+  await expect(banner).not.toHaveAttribute('aria-label')
+
+  const review = page.getByRole('button', { name: 'Review narration from this section' })
+  await expect(review).toBeEnabled()
+  await review.click()
+  const player = page.getByRole('region', { name: 'Unreleased narration review player' })
+  await expect(player).toBeVisible()
+  await expect(player.getByText('AI-generated candidate', { exact: true })).toBeVisible()
+  await expect(player.getByText('Not approved · AI-generated, not human · development only')).toBeVisible()
+  await expect(player.getByText('Approved AI narration', { exact: true })).toHaveCount(0)
+  await expect.poll(() => page.evaluate(() => (
+    window as unknown as { __narrationTestAudio: { instances: { src: string }[] } }
+  ).__narrationTestAudio.instances[0]?.src)).toBe(
+    candidate.passages.find(({ sectionId }) => sectionId === 'fdn-disturbance-world')!.url,
+  )
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'auto' }))
+  await expect(banner).toBeVisible()
+  await expectNoDocumentOverflow(page)
+  expect(releasedManifestRequests).toBe(0)
+
+  const results = await new AxeBuilder({ page })
+    .include('.narration-review-banner')
+    .include('#narration-player')
+    .withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
+    .analyze()
+  expect(results.violations, 'unreleased narration review UI').toEqual([])
+})
+
+test('unreleased review resume is bound to the exact candidate release id', async ({ page }) => {
+  let candidate = candidateNarrationManifest('candidate-a')
+  const originalReleaseId = candidate.releaseId
+  const sectionPassages = candidate.passages.filter(({ sectionId }) => sectionId === 'fdn-disturbance-world')
+  await page.route('**/__narration-review/candidate-manifest.json', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(candidate),
+  }))
+  await installTestAudio(page)
+
+  await page.goto('/?narration-review=1#fdn-disturbance-world')
+  await page.getByRole('button', { name: 'Review narration from this section' }).click()
+  const player = page.getByRole('region', { name: 'Unreleased narration review player' })
+  await expect(player.getByText(/01 \/ \d+ passages/)).toBeVisible()
+  await page.evaluate(() => (
+    window as unknown as { __narrationTestAudio: { instances: EventTarget[] } }
+  ).__narrationTestAudio.instances[0]?.dispatchEvent(new Event('ended')))
+  await expect(player.getByText(/02 \/ \d+ passages/)).toBeVisible()
+  await page.evaluate(() => {
+    const audio = (
+      window as unknown as { __narrationTestAudio: { instances: ({ currentTime: number } & EventTarget)[] } }
+    ).__narrationTestAudio.instances[0]!
+    audio.currentTime = 12.5
+    audio.dispatchEvent(new Event('timeupdate'))
+  })
+  await expect.poll(() => page.evaluate(() => {
+    const value = localStorage.getItem('pv:narration-review-position:v2')
+    return value ? JSON.parse(value) as { releaseId?: string; passageId?: string } : null
+  })).toMatchObject({ releaseId: originalReleaseId, passageId: sectionPassages[1]!.id })
+
+  candidate = candidateNarrationManifest('candidate-b')
+  expect(candidate.releaseId).not.toBe(originalReleaseId)
+  const replacementFirstPassage = candidate.passages.find(({ sectionId }) => sectionId === 'fdn-disturbance-world')!
+  await page.reload()
+  await page.getByRole('button', { name: 'Review narration from this section' }).click()
+  await expect(page.getByRole('region', { name: 'Unreleased narration review player' }).getByText(/01 \/ \d+ passages/)).toBeVisible()
+  await expect.poll(() => page.evaluate(() => {
+    const audio = (
+      window as unknown as { __narrationTestAudio: { instances: { currentTime: number; src: string }[] } }
+    ).__narrationTestAudio.instances[0]
+    return audio ? { currentTime: audio.currentTime, src: audio.src } : null
+  })).toEqual({ currentTime: 0, src: replacementFirstPassage.url })
+})
+
+test('ordinary development mode rejects an unapproved candidate exposed as a release', async ({ page }) => {
+  const candidate = candidateNarrationManifest()
+  let reviewManifestRequests = 0
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname === '/__narration-review/candidate-manifest.json') reviewManifestRequests += 1
+  })
+  await page.route('**/audio/narration/manifest.json', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(candidate),
+  }))
+  await installTestAudio(page)
+
+  await page.goto('/#fdn-disturbance-world')
+  await expect(page.locator('.narration-review-banner')).toHaveCount(0)
+  const unavailable = page.getByRole('status').filter({ hasText: 'Narration awaiting editorial approval' })
+  await expect(unavailable).toBeVisible()
+  await expect(unavailable).toHaveAttribute('title', 'The recorded edition does not match this manuscript and cannot be played.')
+  expect(reviewManifestRequests).toBe(0)
+  expect(await page.evaluate(() => (
+    window as unknown as { __narrationTestAudio: { instances: unknown[] } }
+  ).__narrationTestAudio.instances.length)).toBe(0)
+})
+
+test('released narration rejects missing or tampered full-listen evidence', async ({ page }) => {
+  const approved = approvedNarrationManifest()
+  let manifestPayload: unknown = {
+    ...approved,
+    approval: approved.approval ? {
+      approvedAt: approved.approval.approvedAt,
+      approvedBy: approved.approval.approvedBy,
+      checklistVersion: approved.approval.checklistVersion,
+      confirmations: approved.approval.confirmations,
+    } : null,
+  }
+  await page.route('**/audio/narration/manifest.json', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(manifestPayload),
+  }))
+  await installTestAudio(page)
+
+  await page.goto('/#fdn-disturbance-world')
+  const unavailable = page.getByRole('status').filter({ hasText: 'Narration awaiting editorial approval' })
+  await expect(unavailable).toBeVisible()
+  await expect(unavailable).toHaveAttribute('title', 'The recorded edition does not match this manuscript and cannot be played.')
+
+  const tampered = approvedNarrationManifest()
+  tampered.approval.fullListen.receipt.completedBy = 'Someone else'
+  manifestPayload = tampered
+  await page.reload()
+  await expect(unavailable).toBeVisible()
+  expect(await page.evaluate(() => (
+    window as unknown as { __narrationTestAudio: { instances: unknown[] } }
+  ).__narrationTestAudio.instances.length)).toBe(0)
 })
 
 test('mobile section navigation follows the manuscript instead of covering it', async ({ page }) => {

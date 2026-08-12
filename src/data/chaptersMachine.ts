@@ -18,7 +18,7 @@ export const machineSections: BookSection[] = [
         text: 'Imagine a Bell Labs demonstration in the early 1950s. A man leans towards a telephone mouthpiece and says one digit. Relays settle; a lamp answers. The apparatus later remembered as AUDREY does not know what a number is. It has no childhood of counting steps, no image of five apples. It measures a narrow telephone signal and asks which stored pattern it most resembles. Contemporary reporting dressed the device as an “electronic telephone girl”; the engineering paper is plainer and more revealing: this was automatic recognition of ten spoken digits, trained to one person’s voice.',
         citations: ['mac-davis1952', 'mac-audrey1953'],
       },
-      { type: 'heading', text: 'What does it mean for a machine to recognise speech?' },
+      { type: 'heading', text: 'For a machine, what does it mean to recognise speech?' },
       {
         type: 'paragraph',
         label: 'Synthesis',
@@ -389,7 +389,7 @@ export const machineSections: BookSection[] = [
         text: 'You ask a question. The machine begins a polished answer, but the second sentence reveals a misunderstanding. You breathe in and say, “No—that is not what I meant.” A good system quietens, keeps what it actually heard and gives the floor back. A poor one either barrels through your voice or panics at a chair scrape and forgets its thought. The decisive event lasts less than a sentence. Conversation is made not only of content but of permissions negotiated in milliseconds.',
         citations: ['mac-sacks1974', 'mac-stivers2009'],
       },
-      { type: 'heading', text: 'How does a machine know when it is its turn?' },
+      { type: 'heading', text: 'How does a machine know when to speak—and when to wait?' },
       {
         type: 'paragraph',
         label: 'Established science',
@@ -661,7 +661,7 @@ export const machineSections: BookSection[] = [
         text: 'At the end of the most elaborate voice system, a small loudspeaker cone leans into the room and retreats. Air compresses, releases and reaches an ear, hearing device, microphone or wall. The journey may have crossed a neural codec, a probability model, a fibre, a tool call and a synthetic larynx, yet its public life begins again as pressure. Someone hears a sentence. They decide whether to trust it, answer it, ignore it, read the caption or ask who authorised the sound.',
         citations: ['mac-soundstream2021', 'mac-w3c-media'],
       },
-      { type: 'heading', text: 'After all these machines, what should a voice system be?' },
+      { type: 'heading', text: 'After all these machines—what should a voice system be?' },
       {
         type: 'paragraph',
         label: 'Our thesis',

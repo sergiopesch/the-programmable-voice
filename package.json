@@ -27,9 +27,13 @@
     "narration:verify-pilot": "tsx scripts/verify-narration.ts --verify-pilot",
     "narration:approve-pilot": "tsx scripts/verify-narration.ts --approve-pilot",
     "narration:generate": "tsx scripts/generate-narration.ts",
+    "narration:verify-candidate": "tsx scripts/verify-narration.ts --verify-candidate",
+    "narration:prepare-review": "tsx scripts/verify-narration.ts --prepare-full-listen",
+    "narration:record-full-listen": "tsx scripts/verify-narration.ts --record-full-listen",
     "narration:approve": "tsx scripts/verify-narration.ts --approve",
     "narration:verify": "tsx scripts/verify-narration.ts",
     "narration:verify-build": "tsx scripts/verify-narration.ts --lightweight",
+    "narration:stage-release": "tsx scripts/stage-narration-release.ts",
     "check:app": "npm run lint && npm run test && npm run build:app",
     "check": "npm run lint && npm run test && npm run narration:verify && npm run build:app"
   },

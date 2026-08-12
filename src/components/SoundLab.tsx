@@ -170,6 +170,7 @@ interface SoundLabProps {
   narrationStatus: NarrationStatus
   catalogueStatus: NarrationCatalogueStatus
   catalogueError: string | null
+  reviewMode: boolean
   narrationActive: boolean
   evidenceOpen: boolean
   sourceCount: number
@@ -186,6 +187,7 @@ export function SoundLab({
   narrationStatus,
   catalogueStatus,
   catalogueError,
+  reviewMode,
   narrationActive,
   evidenceOpen,
   sourceCount,
@@ -445,6 +447,7 @@ export function SoundLab({
             status={narrationStatus}
             catalogueStatus={catalogueStatus}
             catalogueError={catalogueError}
+            reviewMode={reviewMode}
             active={narrationActive}
             onStart={onStartNarration}
             onPause={onPauseNarration}

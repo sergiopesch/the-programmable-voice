@@ -14,6 +14,7 @@ interface OpeningProps {
   narrationStatus: NarrationStatus
   catalogueStatus: NarrationCatalogueStatus
   catalogueError: string | null
+  reviewMode: boolean
   narrationActive: boolean
   onStartNarration: () => void
   onPauseNarration: () => void
@@ -29,6 +30,7 @@ export function Opening({
   narrationStatus,
   catalogueStatus,
   catalogueError,
+  reviewMode,
   narrationActive,
   onStartNarration,
   onPauseNarration,
@@ -123,6 +125,7 @@ export function Opening({
               status={narrationStatus}
               catalogueStatus={catalogueStatus}
               catalogueError={catalogueError}
+              reviewMode={reviewMode}
               active={narrationActive}
               onStart={onStartNarration}
               onPause={onPauseNarration}

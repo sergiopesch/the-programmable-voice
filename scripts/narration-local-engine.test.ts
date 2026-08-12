@@ -4,15 +4,21 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   narrationEditionConfiguration,
+  narrationNormalisationVersionFor,
+  narrationPassageHashMaterial,
   narrationVoiceSelectionReceipt,
 } from '../src/data/narrationEdition'
+import { bookNarrationPassages } from '../src/lib/narration'
+import type { NarrationTechnicalQc } from '../src/lib/narrationRelease'
 import {
   assertExactSegmentText,
   concatenateSamples,
   float32Wave,
+  narrationNormalisationFilterForPassage,
   narrationRuntimeInstallCommand,
   readIsolatedRuntimePackage,
   safeModelRelativePath,
+  technicalQcMatches,
 } from './generate-narration'
 
 const projectRoot = path.resolve(import.meta.dirname, '..')
@@ -95,5 +101,58 @@ describe('local Emma narration contract', () => {
     expect(view.getUint16(22, true)).toBe(1)
     expect(view.getUint32(24, true)).toBe(24_000)
     expect(view.getUint32(40, true)).toBe(samples.byteLength)
+  })
+
+  it('keeps ordinary mastering exact and scopes codec compensation to passage 472', () => {
+    const ordinaryPassageId = narrationVoiceSelectionReceipt.passageId
+    expect(narrationNormalisationFilterForPassage(
+      ordinaryPassageId,
+      narrationEditionConfiguration.normalisation,
+    )).toBe('loudnorm=I=-18:LRA=7:TP=-2')
+    expect(narrationNormalisationFilterForPassage(
+      'passage:access-restoration-agency:block-2-heading',
+      narrationEditionConfiguration.normalisation,
+    )).toBe('loudnorm=I=-18:LRA=7:TP=-1.25')
+    expect(narrationNormalisationFilterForPassage(
+      'passage:air-again:block-5-heading',
+      narrationEditionConfiguration.normalisation,
+    )).toBe(
+      'loudnorm=I=-18:LRA=7:TP=-2,volume=2dB,alimiter=limit=0.8413951416451951:attack=5:release=50:asc=false:level=false:latency=false',
+    )
+  })
+
+  it('excludes the legacy passage-472 asset by both passage hash and QC version', () => {
+    const passageId = 'passage:access-restoration-agency:block-2-heading'
+    const passage = bookNarrationPassages.find((candidate) => candidate.id === passageId)!
+    const configurationHash = createHash('sha256')
+      .update(JSON.stringify(narrationEditionConfiguration))
+      .digest('hex')
+    const legacyTextHash = createHash('sha256')
+      .update(`${configurationHash}\n\n${passage.text}`)
+      .digest('hex')
+    const currentTextHash = createHash('sha256')
+      .update(narrationPassageHashMaterial(configurationHash, passage.id, passage.text))
+      .digest('hex')
+    expect(currentTextHash).not.toBe(legacyTextHash)
+
+    const overrideVersion = narrationNormalisationVersionFor(passageId)
+    const qc: NarrationTechnicalQc = {
+      durationExpectedSeconds: 3.636,
+      durationMeasuredSeconds: 2.783,
+      wordsPerMinute: 172.5,
+      integratedLoudnessLufs: -20.6,
+      loudnessRangeLu: 0,
+      truePeakDbtp: -2.3,
+      leadingSilenceSeconds: 0,
+      trailingSilenceSeconds: 0,
+      normalisationVersion: overrideVersion,
+      fullDecodePassed: true,
+    }
+    expect(overrideVersion).not.toBe(narrationEditionConfiguration.normalisation.version)
+    expect(technicalQcMatches({
+      ...qc,
+      normalisationVersion: narrationEditionConfiguration.normalisation.version,
+    }, qc, passageId)).toBe(false)
+    expect(technicalQcMatches(qc, qc, passageId)).toBe(true)
   })
 })

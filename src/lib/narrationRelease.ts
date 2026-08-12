@@ -120,11 +120,35 @@ export interface NarrationManifestEntry {
   technicalQc: NarrationTechnicalQc
 }
 
+export const narrationFullListenConfirmations = [
+  'the checksum-bound candidate was listened to once, in manifest order, from the first passage through the last, without skips or substitutions, using the review player or M3U',
+  'every listed passage received an accept-or-defect decision for speaker continuity, cadence, level and pronunciation before this receipt was recorded',
+] as const
+
+export interface NarrationFullListenReceipt {
+  schemaVersion: 1
+  kind: 'narration-full-listen-receipt'
+  releaseId: string
+  reviewManifestSha256: string
+  packageChecksumsSha256: string
+  orderedPassageProfileSha256: string
+  passageCount: number
+  completedAt: string
+  completedBy: string
+  confirmations: [...typeof narrationFullListenConfirmations]
+}
+
+export interface NarrationFullListenApprovalEvidence {
+  receiptSha256: string
+  receipt: NarrationFullListenReceipt
+}
+
 export interface NarrationApproval {
   approvedAt: string
   approvedBy: string
   checklistVersion: string
   confirmations: string[]
+  fullListen: NarrationFullListenApprovalEvidence
 }
 
 export interface NarrationManifest {
@@ -313,15 +337,99 @@ export function narrationReleaseManifestUrl(releaseId: string) {
   return `/audio/narration/releases/${releaseId}.json`
 }
 
-export function narrationReleaseApprovalIsComplete(approval: NarrationApproval | null) {
+function exactIsoTimestamp(value: unknown) {
+  return typeof value === 'string'
+    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
+    && Number.isFinite(Date.parse(value))
+    && new Date(value).toISOString() === value
+}
+
+function hasExactKeys(value: object, expectedKeys: readonly string[]) {
+  return JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expectedKeys].sort())
+}
+
+function safeHumanName(value: unknown) {
+  return typeof value === 'string'
+    && value === value.trim()
+    && value.length > 0
+    && !/[\r\n\0]/.test(value)
+}
+
+export function narrationFullListenReceiptMaterial(receipt: NarrationFullListenReceipt) {
+  return JSON.stringify(receipt)
+}
+
+export interface NarrationReleaseApprovalVerification {
+  releaseId: string
+  passageCount: number
+  receiptSha256: string
+}
+
+export function narrationFullListenApprovalEvidenceIsComplete(
+  evidence: unknown,
+  verification: NarrationReleaseApprovalVerification,
+) {
+  if (
+    !evidence
+    || typeof evidence !== 'object'
+    || !hasExactKeys(evidence, ['receiptSha256', 'receipt'])
+  ) return false
+  const candidate = evidence as Partial<NarrationFullListenApprovalEvidence>
+  const receipt = candidate.receipt
+  if (
+    typeof candidate.receiptSha256 !== 'string'
+    || !/^[a-f0-9]{64}$/.test(candidate.receiptSha256)
+    || candidate.receiptSha256 !== verification.receiptSha256
+    || !receipt
+    || typeof receipt !== 'object'
+    || !hasExactKeys(receipt, [
+      'schemaVersion',
+      'kind',
+      'releaseId',
+      'reviewManifestSha256',
+      'packageChecksumsSha256',
+      'orderedPassageProfileSha256',
+      'passageCount',
+      'completedAt',
+      'completedBy',
+      'confirmations',
+    ])
+    || receipt.schemaVersion !== 1
+    || receipt.kind !== 'narration-full-listen-receipt'
+    || receipt.releaseId !== verification.releaseId
+    || !/^[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{64}$/.test(receipt.releaseId)
+    || !/^[a-f0-9]{64}$/.test(receipt.reviewManifestSha256)
+    || !/^[a-f0-9]{64}$/.test(receipt.packageChecksumsSha256)
+    || !/^[a-f0-9]{64}$/.test(receipt.orderedPassageProfileSha256)
+    || !Number.isSafeInteger(receipt.passageCount)
+    || !Number.isSafeInteger(verification.passageCount)
+    || verification.passageCount < 1
+    || receipt.passageCount !== verification.passageCount
+    || !exactIsoTimestamp(receipt.completedAt)
+    || !safeHumanName(receipt.completedBy)
+    || !Array.isArray(receipt.confirmations)
+    || receipt.confirmations.length !== narrationFullListenConfirmations.length
+    || receipt.confirmations.some((confirmation, index) => confirmation !== narrationFullListenConfirmations[index])
+  ) return false
+  return true
+}
+
+export function narrationReleaseApprovalIsComplete(
+  approval: NarrationApproval | null,
+  verification: NarrationReleaseApprovalVerification,
+) {
   return Boolean(
     approval
-    && typeof approval.approvedBy === 'string'
-    && approval.approvedBy.trim()
+    && typeof approval === 'object'
+    && hasExactKeys(approval, ['approvedAt', 'approvedBy', 'checklistVersion', 'confirmations', 'fullListen'])
+    && exactIsoTimestamp(approval.approvedAt)
+    && safeHumanName(approval.approvedBy)
     && Array.isArray(approval.confirmations)
     && approval.checklistVersion === narrationApprovalChecklistVersion
     && approval.confirmations.length === narrationReleaseApprovalConfirmations.length
-    && narrationReleaseApprovalConfirmations.every(({ label }, index) => approval.confirmations[index] === label),
+    && narrationReleaseApprovalConfirmations.every(({ label }, index) => approval.confirmations[index] === label)
+    && narrationFullListenApprovalEvidenceIsComplete(approval.fullListen, verification)
+    && Date.parse(approval.fullListen.receipt.completedAt) <= Date.parse(approval.approvedAt),
   )
 }
 

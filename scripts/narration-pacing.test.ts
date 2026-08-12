@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { bookNarrationPassages } from '../src/lib/narration'
 import {
   narrationCharacterCount,
   narrationCharacterPacingBounds,
@@ -41,6 +42,34 @@ describe('narration pacing contract', () => {
     expect(Number(pace.toFixed(1))).toBe(19.7)
     expect(pace).toBeLessThanOrEqual(bounds.maximumCharactersPerSecond)
     expect(narrationCharacterPacingBounds('x'.repeat(160)).maximumCharactersPerSecond).toBe(18)
+  })
+
+  it('retains headroom by rejecting the rushed recognition heading', () => {
+    const rushed = 'What does it mean for a machine to recognise speech?'
+    const pace = narrationCharactersPerSecond(rushed, 2.465)
+    expect(Number(pace.toFixed(1))).toBe(21.1)
+    expect(pace).toBeGreaterThan(narrationCharacterPacingBounds(rushed).maximumCharactersPerSecond)
+  })
+
+  it('rejects the continuous rushed turn-taking question', () => {
+    const rushed = 'How does a machine know when it is its turn?'
+    const pace = narrationCharactersPerSecond(rushed, 2.149)
+    expect(Number(pace.toFixed(1))).toBe(20.5)
+    expect(pace).toBeGreaterThan(narrationCharacterPacingBounds(rushed).maximumCharactersPerSecond)
+  })
+
+  it('keeps the closing thesis hinge as two spoken beats without padding its words', () => {
+    const rushed = 'After all these machines, what should a voice system be?'
+    const revised = bookNarrationPassages.find(
+      ({ id }) => id === 'passage:air-again:block-2-heading',
+    )?.text
+    const pace = narrationCharactersPerSecond(rushed, 2.726)
+
+    expect(Number(pace.toFixed(1))).toBe(20.5)
+    expect(pace).toBeGreaterThan(narrationCharacterPacingBounds(rushed).maximumCharactersPerSecond)
+    expect(revised).toBe('After all these machines—what should a voice system be?')
+    expect(revised?.replace('—', ', ')).toBe(rushed)
+    expect(revised?.match(/\p{L}+/gu)).toEqual(rushed.match(/\p{L}+/gu))
   })
 
   it('retains meaningful hard limits for long-form speech', () => {

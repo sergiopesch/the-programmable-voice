@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { execFile } from 'node:child_process'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { isDeepStrictEqual, promisify } from 'node:util'
 import {
   narrationApprovalChecklistVersion,
@@ -9,6 +10,7 @@ import {
   narrationEditionAssetDirectory,
   narrationEditionConfiguration,
   narrationGenerationProvenance,
+  narrationNormalisationVersionFor,
   narrationPassageHashMaterial,
   narrationPilotApprovalConfirmations,
   narrationPilotPassageIds,
@@ -17,6 +19,7 @@ import {
 } from '../src/data/narrationEdition'
 import { bookNarrationPassages, type NarrationPassage } from '../src/lib/narration'
 import {
+  narrationFullListenReceiptMaterial,
   narrationPilotApprovalIsComplete,
   narrationPilotProfileMaterial,
   narrationReleaseApprovalIsComplete,
@@ -42,21 +45,49 @@ import {
   narrationReportedWordsPerMinute,
 } from './narration-pacing'
 import { narrationLoudnessIsWithinBounds } from './narration-loudness'
+import {
+  buildNarrationFullListenPackage,
+  createNarrationFullListenReceipt,
+  narrationFullListenApprovalEvidence,
+  narrationFullListenApprovalEvidenceProblems,
+  narrationFullListenReceiptProblems,
+  type NarrationFullListenApprovalEvidence,
+  type NarrationFullListenReceipt,
+} from './narration-review-contract'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
 const ffprobeBinary = process.env.FFPROBE_PATH?.trim() || 'ffprobe'
 const projectRoot = path.resolve(import.meta.dirname, '..')
 const publicRoot = path.join(projectRoot, 'public')
+const narrationAssetRoot = path.join(publicRoot, 'audio/narration', narrationEditionAssetDirectory)
 const releasePath = path.join(publicRoot, 'audio/narration/manifest.json')
 const candidatePath = path.join(projectRoot, '.narration-work/candidate-manifest.json')
 const pilotManifestPath = path.join(projectRoot, '.narration-work/pilot-manifest.json')
 const pilotApprovalPath = path.join(projectRoot, '.narration-work/pilot-approval.json')
+const fullListenRoot = path.join(projectRoot, '.narration-work/full-listen')
 
 interface CandidateManifest extends Omit<NarrationManifest, 'releaseId' | 'releaseManifestUrl' | 'generationScope'> {
   releaseId: string | null
   releaseManifestUrl: string | null
   generationScope: { mode: 'full' | 'subset'; requestedPassageCount: number }
+}
+
+interface VerifiedCandidateManifest extends CandidateManifest {
+  releaseId: string
+  releaseManifestUrl: string
+  generationScope: { mode: 'full'; requestedPassageCount: number }
+  complete: true
+  approved: false
+  approval: null
+}
+
+type NarrationApprovalWithFullListen = NonNullable<NarrationManifest['approval']> & {
+  fullListen: NarrationFullListenApprovalEvidence
+}
+
+type NarrationManifestWithFullListen = Omit<NarrationManifest, 'approval'> & {
+  approval: NarrationApprovalWithFullListen | null
 }
 
 function sha256(value: string | Uint8Array) {
@@ -68,6 +99,21 @@ async function atomicWrite(filePath: string, data: string) {
   const temporaryPath = `${filePath}.${process.pid}.${Date.now()}.tmp`
   await fs.writeFile(temporaryPath, data)
   await fs.rename(temporaryPath, filePath)
+}
+
+async function immutableWrite(filePath: string, data: string, label: string) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true })
+  const temporaryPath = `${filePath}.${process.pid}.${Date.now()}.tmp`
+  await fs.writeFile(temporaryPath, data, { flag: 'wx' })
+  try {
+    await fs.link(temporaryPath, filePath)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+    const existing = await fs.readFile(filePath, 'utf8')
+    if (existing !== data) throw new Error(`Refusing to overwrite ${label}: ${path.relative(projectRoot, filePath)}.`)
+  } finally {
+    await fs.rm(temporaryPath, { force: true })
+  }
 }
 
 async function pathExists(filePath: string) {
@@ -149,24 +195,48 @@ function assertTechnicalQcShape(entry: NarrationManifestEntry, passage: Narratio
     || qc.leadingSilenceSeconds > 0.35
     || qc.trailingSilenceSeconds < 0
     || qc.trailingSilenceSeconds > 0.5
-    || qc.normalisationVersion !== narrationEditionConfiguration.normalisation.version
+    || qc.normalisationVersion !== narrationNormalisationVersionFor(passage.id)
     || qc.fullDecodePassed !== true
   ) {
     throw new Error(`${entry.id} has incomplete or inconsistent technical-QC metadata.`)
   }
 }
 
-function resolveAudioPath(entry: NarrationManifestEntry) {
-  if (!entry.url.startsWith(`/audio/narration/${narrationEditionAssetDirectory}/`)) throw new Error(`${entry.id} has an unexpected asset URL.`)
+export function resolveAudioPath(entry: NarrationManifestEntry) {
   if (!/^[a-f0-9]{64}$/.test(entry.sha256)) throw new Error(`${entry.id} has an invalid audio checksum.`)
-  const filePath = path.resolve(publicRoot, entry.url.replace(/^\//, ''))
-  if (!filePath.startsWith(`${publicRoot}${path.sep}`)) throw new Error(`${entry.id} escapes the public asset directory.`)
-  if (!path.basename(filePath).includes(entry.sha256)) throw new Error(`${entry.id} is not addressed by its audio checksum.`)
+  const escapedDirectory = narrationEditionAssetDirectory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const match = entry.url.match(new RegExp(`^/audio/narration/${escapedDirectory}/(\\d{4}-[a-z0-9]+(?:-[a-z0-9]+)*-([a-f0-9]{64})\\.mp3)$`))
+  if (!match || match[2] !== entry.sha256) throw new Error(`${entry.id} has an unexpected or non-checksum-addressed asset URL.`)
+  const filePath = path.resolve(narrationAssetRoot, match[1])
+  if (path.dirname(filePath) !== narrationAssetRoot) throw new Error(`${entry.id} escapes the narration edition asset directory.`)
   return filePath
+}
+
+let verifiedNarrationAssetRoot: Promise<string> | undefined
+
+function requireRegularNarrationAssetRoot() {
+  verifiedNarrationAssetRoot ??= Promise.all([
+    fs.lstat(narrationAssetRoot),
+    fs.realpath(narrationAssetRoot),
+  ]).then(([stat, realPath]) => {
+    if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('Narration edition asset directory is not a regular directory.')
+    return realPath
+  })
+  return verifiedNarrationAssetRoot
 }
 
 async function verifyFileLightweight(entry: NarrationManifestEntry) {
   const filePath = resolveAudioPath(entry)
+  const [fileStat, realAssetRoot, realFilePath] = await Promise.all([
+    fs.lstat(filePath),
+    requireRegularNarrationAssetRoot(),
+    fs.realpath(filePath),
+  ])
+  if (
+    !fileStat.isFile()
+    || fileStat.isSymbolicLink()
+    || path.dirname(realFilePath) !== realAssetRoot
+  ) throw new Error(`${entry.id} is not a regular narration audio file inside the edition asset directory.`)
   const bytes = new Uint8Array(await fs.readFile(filePath))
   if (sha256(bytes) !== entry.sha256) throw new Error(`${entry.id} failed checksum verification.`)
 }
@@ -180,6 +250,49 @@ function boundarySilence(stderr: string, durationSeconds: number) {
     ? durationSeconds - penultimateEvent.time
     : 0
   return { leading: Math.max(0, leading), trailing: Math.max(0, trailing) }
+}
+
+interface NarrationFullMediaQcMeasurements {
+  integratedLoudnessLufs: number
+  loudnessRangeLu: number
+  truePeakDbtp: number
+  leadingSilenceSeconds: number
+  trailingSilenceSeconds: number
+  wordsPerMinute: number
+  charactersPerSecond: number
+  minimumCharactersPerSecond: number
+  maximumCharactersPerSecond: number
+  loudnessWithinBounds: boolean
+}
+
+export function narrationFullMediaQcProblems(
+  qc: NarrationManifestEntry['technicalQc'],
+  measured: NarrationFullMediaQcMeasurements,
+) {
+  const problems: string[] = []
+  const compare = (label: string, actual: number, recorded: number, tolerance: number) => {
+    if (!Number.isFinite(actual)) problems.push(`${label} measurement is not finite`)
+    else if (Math.abs(actual - recorded) > tolerance) {
+      problems.push(`${label} measured ${actual} but metadata records ${recorded}`)
+    }
+  }
+  compare('integrated loudness', measured.integratedLoudnessLufs, qc.integratedLoudnessLufs, 0.15)
+  compare('loudness range', measured.loudnessRangeLu, qc.loudnessRangeLu, 0.15)
+  compare('true peak', measured.truePeakDbtp, qc.truePeakDbtp, 0.15)
+  compare('leading silence', measured.leadingSilenceSeconds, qc.leadingSilenceSeconds, 0.06)
+  compare('trailing silence', measured.trailingSilenceSeconds, qc.trailingSilenceSeconds, 0.06)
+  compare('words per minute', measured.wordsPerMinute, qc.wordsPerMinute, 0.15)
+  if (
+    !Number.isFinite(measured.charactersPerSecond)
+    || measured.charactersPerSecond < measured.minimumCharactersPerSecond
+    || measured.charactersPerSecond > measured.maximumCharactersPerSecond
+  ) {
+    problems.push(
+      `character pace ${measured.charactersPerSecond} is outside ${measured.minimumCharactersPerSecond}–${measured.maximumCharactersPerSecond}`,
+    )
+  }
+  if (!measured.loudnessWithinBounds) problems.push('loudness is outside the configured bounds')
+  return problems
 }
 
 async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationPassage) {
@@ -222,26 +335,25 @@ async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationP
   const measuredCharactersPerSecond = narrationCharactersPerSecond(spokenText, recordedDurationSeconds)
   const { minimumCharactersPerSecond, maximumCharactersPerSecond } = narrationCharacterPacingBounds(spokenText)
   const qc = entry.technicalQc
-  if (
-    !Number.isFinite(measuredLoudness)
-    || Math.abs(measuredLoudness - qc.integratedLoudnessLufs) > 0.15
-    || Math.abs(measuredRange - qc.loudnessRangeLu) > 0.15
-    || Math.abs(measuredPeak - qc.truePeakDbtp) > 0.15
-    || Math.abs(silence.leading - qc.leadingSilenceSeconds) > 0.06
-    || Math.abs(silence.trailing - qc.trailingSilenceSeconds) > 0.06
-    || measuredWordsPerMinute !== qc.wordsPerMinute
-    || measuredCharactersPerSecond < minimumCharactersPerSecond
-    || measuredCharactersPerSecond > maximumCharactersPerSecond
-    || !narrationLoudnessIsWithinBounds({
+  const problems = narrationFullMediaQcProblems(qc, {
+    integratedLoudnessLufs: measuredLoudness,
+    loudnessRangeLu: measuredRange,
+    truePeakDbtp: measuredPeak,
+    leadingSilenceSeconds: silence.leading,
+    trailingSilenceSeconds: silence.trailing,
+    wordsPerMinute: measuredWordsPerMinute,
+    charactersPerSecond: measuredCharactersPerSecond,
+    minimumCharactersPerSecond,
+    maximumCharactersPerSecond,
+    loudnessWithinBounds: narrationLoudnessIsWithinBounds({
       durationSeconds: recordedDurationSeconds,
       integratedLoudnessLufs: reportedMeasuredLoudness,
       loudnessRangeLu: reportedMeasuredRange,
       truePeakDbtp: reportedMeasuredPeak,
       targetTruePeakDbtp: normalisation.truePeakDbtp,
-    })
-  ) {
-    throw new Error(`${entry.id} failed full media-QC verification.`)
-  }
+    }),
+  })
+  if (problems.length > 0) throw new Error(`${entry.id} failed full media-QC verification: ${problems.join('; ')}.`)
 }
 
 function assertEntrySequence(entries: readonly NarrationManifestEntry[], expected: ReturnType<typeof expectedManuscript>['passages']) {
@@ -365,11 +477,120 @@ function assertReleaseCore(manifest: CandidateManifest | NarrationManifest) {
   const { releaseId, releaseManifestUrl, approved, approval, ...identityFields } = manifest
   void approved
   void approval
-  const expectedReleaseId = narrationReleaseId(manifest.edition, sha256(narrationReleaseIdentityMaterial(identityFields)))
+  const expectedReleaseId = narrationReleaseId(manifest.edition, sha256(narrationReleaseIdentityMaterial(
+    identityFields as Omit<NarrationManifest, 'releaseId' | 'releaseManifestUrl' | 'approved' | 'approval'>,
+  )))
   if (releaseId !== expectedReleaseId || releaseManifestUrl !== narrationReleaseManifestUrl(expectedReleaseId)) {
     throw new Error('Narration release identity does not match its immutable content.')
   }
   return expected
+}
+
+function assertCandidateState(candidate: CandidateManifest): asserts candidate is VerifiedCandidateManifest {
+  if (
+    candidate.complete !== true
+    || candidate.generationScope.mode !== 'full'
+    || typeof candidate.releaseId !== 'string'
+    || typeof candidate.releaseManifestUrl !== 'string'
+    || candidate.approved !== false
+    || candidate.approval !== null
+  ) {
+    throw new Error('Narration candidate is not a complete, unapproved full-edition candidate.')
+  }
+}
+
+async function readCandidateCore() {
+  const candidate = await readJson<CandidateManifest>(candidatePath, 'Narration candidate')
+  const expected = assertReleaseCore(candidate)
+  assertCandidateState(candidate)
+  await requirePrivatePilotReceipt(candidate, expected)
+  return { candidate, expected }
+}
+
+export async function verifyCandidate() {
+  const verified = await readCandidateCore()
+  await verifyEntries(verified.candidate.passages, verified.expected.passages, false)
+  return verified
+}
+
+function expectedFullListenPackage(manifest: VerifiedCandidateManifest | NarrationManifestWithFullListen) {
+  return buildNarrationFullListenPackage(manifest)
+}
+
+function fullListenDirectory(releaseId: string) {
+  const directory = path.resolve(fullListenRoot, releaseId)
+  if (path.dirname(directory) !== fullListenRoot) throw new Error('Narration full-listen directory escapes its private root.')
+  return directory
+}
+
+async function assertFullListenPackage(manifest: VerifiedCandidateManifest | NarrationManifestWithFullListen) {
+  const reviewPackage = expectedFullListenPackage(manifest)
+  const directory = fullListenDirectory(reviewPackage.directoryName)
+  for (const [filename, expectedBytes] of Object.entries(reviewPackage.files)) {
+    const filePath = path.join(directory, filename)
+    let actualBytes: string
+    try {
+      actualBytes = await fs.readFile(filePath, 'utf8')
+    } catch {
+      throw new Error(`Full-listen review package is incomplete: ${path.relative(projectRoot, filePath)} is unavailable.`)
+    }
+    if (actualBytes !== expectedBytes) throw new Error(`Full-listen review package file ${filename} does not match candidate ${manifest.releaseId}.`)
+  }
+  return { reviewPackage, directory }
+}
+
+async function requireFullListenReceipt(manifest: VerifiedCandidateManifest) {
+  const { reviewPackage, directory } = await assertFullListenPackage(manifest)
+  const receipt = await readJson<unknown>(path.join(directory, 'receipt.json'), 'Full-listen receipt')
+  const problems = narrationFullListenReceiptProblems(receipt, reviewPackage.expectedReceipt)
+  if (problems.length > 0) throw new Error(`Full-listen receipt is invalid: ${problems.join('; ')}.`)
+  return receipt as NarrationFullListenReceipt
+}
+
+function assertReleaseFullListenEvidence(manifest: NarrationManifestWithFullListen) {
+  const reviewPackage = expectedFullListenPackage(manifest)
+  const evidence = manifest.approval?.fullListen
+  const problems = narrationFullListenApprovalEvidenceProblems(evidence, reviewPackage.expectedReceipt)
+  if (problems.length > 0) throw new Error(`Narration release failed its full-listen receipt contract: ${problems.join('; ')}.`)
+  return evidence as NarrationFullListenApprovalEvidence
+}
+
+async function prepareFullListen() {
+  const { candidate } = await verifyCandidate()
+  const reviewPackage = expectedFullListenPackage(candidate)
+  const directory = fullListenDirectory(reviewPackage.directoryName)
+  await fs.mkdir(directory, { recursive: true })
+  for (const [filename, bytes] of Object.entries(reviewPackage.files)) {
+    await immutableWrite(path.join(directory, filename), bytes, 'checksum-bound full-listen package file')
+  }
+  process.stdout.write(`Prepared checksum-bound full-listen package for ${candidate.releaseId}: ${path.relative(projectRoot, directory)} (${candidate.passageCount} passages).\n`)
+}
+
+function requestedListener() {
+  return process.argv.find((argument) => argument.startsWith('--listener='))?.slice('--listener='.length).trim()
+}
+
+async function recordFullListen() {
+  const { candidate, expected } = await readCandidateCore()
+  await verifyEntries(candidate.passages, expected.passages, true)
+  const { reviewPackage, directory } = await assertFullListenPackage(candidate)
+  const listener = requestedListener()
+  if (!listener || !process.argv.includes('--confirm-full-listen-complete')) {
+    throw new Error('Recording the full listen requires --listener=<name> and --confirm-full-listen-complete.')
+  }
+  const receiptPath = path.join(directory, 'receipt.json')
+  if (await pathExists(receiptPath)) {
+    const existing = await readJson<unknown>(receiptPath, 'Full-listen receipt')
+    const problems = narrationFullListenReceiptProblems(existing, reviewPackage.expectedReceipt)
+    if (problems.length > 0 || (existing as NarrationFullListenReceipt).completedBy !== listener) {
+      throw new Error(`Refusing to replace the immutable full-listen receipt${problems.length > 0 ? `: ${problems.join('; ')}` : ' with a different listener'}.`)
+    }
+    process.stdout.write(`Full-listen receipt for ${candidate.releaseId} is already recorded by ${listener}; no immutable file was changed.\n`)
+    return
+  }
+  const receipt = createNarrationFullListenReceipt(reviewPackage.expectedReceipt, listener)
+  await immutableWrite(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, 'immutable full-listen receipt')
+  process.stdout.write(`Recorded full-listen receipt for ${candidate.releaseId}: ${candidate.passageCount} passages listened to by ${receipt.completedBy}.\n`)
 }
 
 function requestedApprover() {
@@ -465,17 +686,54 @@ async function approvePilot() {
   process.stdout.write(`Approved voice pilot ${pilotProfileHash}: ${manifest.passageCount} technically verified samples.\n`)
 }
 
-async function approveRelease() {
-  const approver = requireApprovalFlags(narrationReleaseApprovalConfirmations)
-  const candidate = await readJson<CandidateManifest>(candidatePath, 'Narration candidate')
-  const expected = assertReleaseCore(candidate)
-  await requirePrivatePilotReceipt(candidate, expected)
-  await verifyEntries(candidate.passages, expected.passages, false)
-  if (!candidate.releaseId || !candidate.releaseManifestUrl) throw new Error('The complete candidate has no immutable release identity.')
+function versionedManifestPath(manifest: Pick<NarrationManifest, 'releaseId' | 'releaseManifestUrl'>) {
+  const expectedUrl = narrationReleaseManifestUrl(manifest.releaseId)
+  if (manifest.releaseManifestUrl !== expectedUrl) throw new Error('Narration release manifest URL does not match its release id.')
+  const versionedPath = path.resolve(publicRoot, expectedUrl.replace(/^\//, ''))
+  if (!versionedPath.startsWith(`${path.join(publicRoot, 'audio/narration/releases')}${path.sep}`)) {
+    throw new Error('Narration release manifest URL escapes the release directory.')
+  }
+  return versionedPath
+}
 
-  let existing: NarrationManifest | null = null
+function assertApprovedRelease(manifest: NarrationManifestWithFullListen) {
+  if (!manifest.approved) {
+    throw new Error('Narration files exist but this edition has not received the complete editorial listening approval.')
+  }
+  const evidence = assertReleaseFullListenEvidence(manifest)
+  if (!narrationReleaseApprovalIsComplete(manifest.approval, {
+    releaseId: manifest.releaseId,
+    passageCount: manifest.passageCount,
+    receiptSha256: sha256(narrationFullListenReceiptMaterial(evidence.receipt)),
+  })) {
+    throw new Error('Narration files exist but this edition has not received the complete editorial listening approval.')
+  }
+  const approvedAt = manifest.approval?.approvedAt
+  if (
+    typeof approvedAt !== 'string'
+    || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(approvedAt)
+    || !Number.isFinite(Date.parse(approvedAt))
+    || new Date(approvedAt).toISOString() !== approvedAt
+  ) throw new Error('Narration release approval time is invalid.')
+  if (Date.parse(evidence.receipt.completedAt) > Date.parse(approvedAt)) {
+    throw new Error('Narration release approval predates its full-listen receipt.')
+  }
+}
+
+async function assertVersionedTwin(manifest: NarrationManifestWithFullListen, pointerBytes: string) {
+  const versionedPath = versionedManifestPath(manifest)
+  const versionedBytes = await fs.readFile(versionedPath, 'utf8')
+  if (pointerBytes !== versionedBytes) throw new Error('The release pointer differs from its immutable versioned manifest.')
+}
+
+async function approveRelease() {
+  const { candidate } = await verifyCandidate()
+  const receipt = await requireFullListenReceipt(candidate)
+  const approver = requireApprovalFlags(narrationReleaseApprovalConfirmations)
+
+  let existing: NarrationManifestWithFullListen | null = null
   if (await pathExists(releasePath)) {
-    existing = await readJson<NarrationManifest>(releasePath, 'Existing narration release')
+    existing = await readJson<NarrationManifestWithFullListen>(releasePath, 'Existing narration release')
     if (existing.edition === candidate.edition && existing.releaseId !== candidate.releaseId) {
       throw new Error(`Edition ${candidate.edition} is already released as ${existing.releaseId}. Bump the edition before publishing different audio or manuscript content.`)
     }
@@ -483,13 +741,30 @@ async function approveRelease() {
 
   if (existing?.edition === candidate.edition && existing.releaseId === candidate.releaseId) {
     assertReleaseCore(existing)
-    if (!existing.approved || !narrationReleaseApprovalIsComplete(existing.approval)) throw new Error('The existing same-edition release is not valid and will not be overwritten.')
-    await verifyEntries(existing.passages, expected.passages, false)
+    assertApprovedRelease(existing)
+    if (!isDeepStrictEqual(existing.approval?.fullListen.receipt, receipt)) {
+      throw new Error('The existing same-edition release does not embed the current exact full-listen receipt.')
+    }
+    await assertVersionedTwin(existing, await fs.readFile(releasePath, 'utf8'))
     process.stdout.write(`Narration release ${existing.releaseId} is already approved; no immutable file was changed.\n`)
     return
   }
 
-  const release: NarrationManifest = {
+  const targetVersionedPath = versionedManifestPath(candidate)
+  if (await pathExists(targetVersionedPath)) {
+    const versionedBytes = await fs.readFile(targetVersionedPath, 'utf8')
+    const versioned = JSON.parse(versionedBytes) as NarrationManifestWithFullListen
+    assertReleaseCore(versioned)
+    assertApprovedRelease(versioned)
+    if (versioned.releaseId !== candidate.releaseId || !isDeepStrictEqual(versioned.approval?.fullListen.receipt, receipt)) {
+      throw new Error('The existing immutable versioned release does not match this candidate and full-listen receipt.')
+    }
+    await atomicWrite(releasePath, versionedBytes)
+    process.stdout.write(`Restored narration release pointer for already-approved immutable release ${versioned.releaseId}.\n`)
+    return
+  }
+
+  const release: NarrationManifestWithFullListen = {
     ...candidate,
     releaseId: candidate.releaseId,
     releaseManifestUrl: candidate.releaseManifestUrl,
@@ -500,51 +775,52 @@ async function approveRelease() {
       approvedBy: approver,
       checklistVersion: narrationApprovalChecklistVersion,
       confirmations: narrationReleaseApprovalConfirmations.map(({ label }) => label),
+      fullListen: narrationFullListenApprovalEvidence(receipt),
     },
   }
-  if (!narrationReleaseApprovalIsComplete(release.approval)) throw new Error('Narration release approval checklist is incomplete.')
   assertReleaseCore(release)
+  assertApprovedRelease(release)
 
-  const versionedPath = path.join(publicRoot, release.releaseManifestUrl.replace(/^\//, ''))
   const releaseBytes = `${JSON.stringify(release, null, 2)}\n`
-  if (await pathExists(versionedPath)) {
-    const existingBytes = await fs.readFile(versionedPath, 'utf8')
-    if (existingBytes !== releaseBytes) throw new Error(`Refusing to overwrite immutable release manifest ${path.relative(projectRoot, versionedPath)}.`)
-  } else {
-    await atomicWrite(versionedPath, releaseBytes)
-  }
+  await immutableWrite(targetVersionedPath, releaseBytes, 'immutable release manifest')
   await atomicWrite(releasePath, releaseBytes)
   process.stdout.write(`Approved narration release ${release.releaseId}: ${release.passageCount} immutable audio files.\n`)
 }
 
-async function verifyRelease(lightweight: boolean) {
-  const manifest = await readJson<NarrationManifest>(releasePath, 'Narration release')
+export async function verifyRelease(lightweight: boolean) {
+  const manifest = await readJson<NarrationManifestWithFullListen>(releasePath, 'Narration release')
   const expected = assertReleaseCore(manifest)
-  if (!manifest.approved || !narrationReleaseApprovalIsComplete(manifest.approval)) {
-    throw new Error('Narration files exist but this edition has not received the complete editorial listening approval.')
-  }
+  assertApprovedRelease(manifest)
   await verifyEntries(manifest.passages, expected.passages, lightweight)
-  const versionedPath = path.join(publicRoot, manifest.releaseManifestUrl.replace(/^\//, ''))
-  if (!versionedPath.startsWith(`${publicRoot}${path.sep}`)) throw new Error('Narration release manifest URL escapes the public directory.')
-  const [pointerBytes, versionedBytes] = await Promise.all([
-    fs.readFile(releasePath, 'utf8'),
-    fs.readFile(versionedPath, 'utf8'),
-  ])
-  if (pointerBytes !== versionedBytes) throw new Error('The release pointer differs from its immutable versioned manifest.')
+  const pointerBytes = await fs.readFile(releasePath, 'utf8')
+  await assertVersionedTwin(manifest, pointerBytes)
   process.stdout.write(`Verified approved narration release ${manifest.releaseId}: ${manifest.passageCount} immutable files (${lightweight ? 'deployment' : 'full media'} checks).\n`)
+  return { manifest, pointerBytes }
 }
 
 async function main() {
   const approve = process.argv.includes('--approve')
   const approvePilotMode = process.argv.includes('--approve-pilot')
   const verifyPilotMode = process.argv.includes('--verify-pilot')
+  const verifyCandidateMode = process.argv.includes('--verify-candidate')
+  const prepareFullListenMode = process.argv.includes('--prepare-full-listen')
+  const recordFullListenMode = process.argv.includes('--record-full-listen')
   const lightweight = process.argv.includes('--lightweight')
-  if (Number(approve) + Number(approvePilotMode) + Number(verifyPilotMode) > 1) throw new Error('Choose one of --approve, --approve-pilot or --verify-pilot.')
-  if (lightweight && (approve || approvePilotMode || verifyPilotMode)) throw new Error('Pilot and approval checks require full local FFmpeg verification; remove --lightweight.')
+  const exclusiveModes = [approve, approvePilotMode, verifyPilotMode, verifyCandidateMode, prepareFullListenMode, recordFullListenMode]
+  if (exclusiveModes.filter(Boolean).length > 1) throw new Error('Choose one narration verification, review or approval mode.')
+  if (lightweight && exclusiveModes.some(Boolean)) throw new Error('Candidate, pilot, review and approval modes select their required verification level; remove --lightweight.')
   if (verifyPilotMode) return verifyPilot()
   if (approvePilotMode) return approvePilot()
+  if (verifyCandidateMode) {
+    const { candidate } = await verifyCandidate()
+    process.stdout.write(`Verified unapproved narration candidate ${candidate.releaseId}: ${candidate.passageCount} immutable files (full media checks).\n`)
+    return
+  }
+  if (prepareFullListenMode) return prepareFullListen()
+  if (recordFullListenMode) return recordFullListen()
   if (approve) return approveRelease()
   return verifyRelease(lightweight)
 }
 
-await main()
+const entryPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : ''
+if (import.meta.url === entryPath) await main()

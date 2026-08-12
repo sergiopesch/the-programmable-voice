@@ -17,6 +17,7 @@ interface ChapterViewProps {
   narrationStatus: NarrationStatus
   catalogueStatus: NarrationCatalogueStatus
   catalogueError: string | null
+  reviewMode: boolean
   narrationActive: boolean
   evidenceOpen: boolean
   onStartNarration: () => void
@@ -122,6 +123,7 @@ export function ChapterView({
   narrationStatus,
   catalogueStatus,
   catalogueError,
+  reviewMode,
   narrationActive,
   evidenceOpen,
   onStartNarration,
@@ -158,6 +160,7 @@ export function ChapterView({
               status={narrationStatus}
               catalogueStatus={catalogueStatus}
               catalogueError={catalogueError}
+              reviewMode={reviewMode}
               active={narrationActive}
               onStart={onStartNarration}
               onPause={onPauseNarration}
