@@ -11,5 +11,3 @@ test-results
 tests
 tools
 public/audio/narration
-public/narration-export
-vercel.static-hotfix.json

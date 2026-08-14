@@ -188,31 +188,8 @@ export const narrationVoiceSelectionReceipt = {
   ],
 } as const
 
-/**
- * A deliberately small, equal-text listening comparison. The public narration
- * remains locked until a human listener confirms that one candidate actually
- * sounds like the requested British woman; voice names and prompt text alone
- * cannot establish accent or gender presentation.
- */
-export const narrationBritishVoiceComparison = {
-  passageId: narrationVoiceSelectionReceipt.passageId,
-  candidates: [
-    { label: 'A', voice: 'bf_emma' },
-  ],
-} as const
-
 export const narrationDisclosure = 'This recorded narration is AI-generated, not a human voice. It was generated once for this edition and is never recreated during playback.'
 export const narrationApprovalChecklistVersion = '2026.2'
-export const narrationComparisonApprovalChecklistVersion = '2026.1'
-
-export const narrationComparisonApprovalConfirmations = [
-  { flag: '--confirm-listened', label: 'all equal-text comparison candidates listened to in full' },
-  { flag: '--confirm-device-check', label: 'all candidates compared on both headphones and a phone speaker' },
-  { flag: '--confirm-british-accent', label: 'the selected candidate is consistently natural contemporary Southern British English' },
-  { flag: '--confirm-adult-woman', label: 'the selected candidate presents as one mature adult woman' },
-  { flag: '--confirm-warmth', label: 'the selected candidate is warm, intimate and suitable for literary documentary narration' },
-  { flag: '--confirm-cadence', label: 'the selected candidate has a measured, lucid and non-theatrical cadence' },
-] as const
 
 export const narrationEditionAssetDirectory = `edition-${narrationEditionConfiguration.edition.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')}`
 
