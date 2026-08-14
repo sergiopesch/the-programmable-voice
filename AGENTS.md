@@ -4,6 +4,20 @@ This repository is an evidence-led interactive book, not a product landing page.
 
 Before changing the book, inspect the relevant manuscript, source entries, design contract, tests and narration configuration. Preserve unrelated work and the unreleased audio under `public/audio/`.
 
+## Supported architecture and recovery boundary
+
+- `main` is the source of truth. The shipped reader is the static React 19/Vite implementation: hash-routed section state in `src/App.tsx`, content and evidence contracts in `src/data/`, semantic reader components in `src/components/`, CSS-owned cover and section motion in `src/styles.css`, and a generated no-JavaScript manuscript at `/manuscript.html`.
+- Narration playback consumes checksum-addressed static files. Generation and editorial review are local-only workflows in `scripts/` with the isolated runtime under `tools/narration/`; there is no live speech or application API.
+- The 2026-08-14 recovery intentionally kept this DOM/CSS architecture unchanged. The uncommitted physical-book/WebGL experiment is preserved only in the host recovery archive at `~/.codex/archives/Voice-dirty-before-recovery-2026-08-14-e4b3/`. It is not a repository worktree, build input or supported alternative. Never delete that archive or import from it without explicit owner approval for a new product and motion direction.
+- Do not create a long-lived development branch as an alternate product line. Use a short-lived worktree when isolation is needed, verify against current `origin/main`, then fast-forward and remove it after delivery.
+
+## Development workflow
+
+- Install the root application with `npm ci`. Use `npm install` only for an intentional dependency change that updates `package-lock.json`. Install `tools/narration/` separately only when producing narration.
+- There is no hosted CI workflow. Run the required gates locally and retain browser evidence for changes affecting layout, navigation, motion, narration controls or accessibility.
+- `vercel.json` has an edition-specific immutable cache path. Update it whenever the narration edition directory changes. Source deployment excludes `public/audio/narration/`; the approved prebuilt release workflow in `README.md` is the delivery path for audio.
+- Treat `public/audio/`, `.narration-work/` and narration receipts as identity-bearing material, not duplicate assets. Do not deduplicate or delete them by file hash alone.
+
 ## Four-team editorial loop
 
 Treat substantial work as four linked reviews. Delegate recursively when parallel capacity is available, then bring every finding back through the same gates.
@@ -58,7 +72,8 @@ Use the narrowest check while editing, then finish substantial application work 
 ```bash
 npm run check:app
 npm run test:e2e
+npm audit
 git diff --check
 ```
 
-`npm run check:app` is the pre-narration application gate. `npm run check` is the release gate and is expected to fail until a complete human-approved narration manifest exists. A manuscript or narration-configuration change invalidates narration identity and requires fresh comparison or approval artefacts as appropriate.
+`npm run check:app` is the pre-narration application gate. `npm run check` is the release gate and is expected to fail until a complete human-approved narration manifest exists. Do not relax that boundary. A manuscript or narration-configuration change invalidates narration identity and requires fresh selection, pilot, full-listen or approval artefacts as appropriate.

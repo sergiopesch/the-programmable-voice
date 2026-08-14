@@ -12,6 +12,14 @@ An interactive, evidence-led digital book about the material history of sound, m
 - A code-drawn artefact atlas and scientific figures with text alternatives; generated concept art is never used as historical evidence.
 - A hardback-inspired cover, warm-paper reading spreads, keyboard page turns, contents, search, adjustable text, reduced motion and a complete no-JavaScript manuscript.
 
+## Architecture
+
+The supported application is a static React 19/Vite book. `src/data/` contains the manuscript, source catalogue and narration-edition contract; `src/App.tsx` owns hash-routed section state; `src/components/` renders the semantic cover, reading section, dialogs, evidence and Sound Laboratory; and `src/styles.css` owns the present cover and section-transition motion. Vite also emits the complete no-JavaScript edition at `/manuscript.html`.
+
+The reader has no application server and does not synthesise speech. Narration is loaded from an immutable static manifest by `useNarrationPlayer`; the local Kokoro generation and review tools remain isolated under `scripts/` and `tools/narration/`.
+
+`main` is the only supported product line. A 2026-08-14 uncommitted physical-book/WebGL experiment was preserved outside the repository for recovery, but it is not a build input, an alternate architecture or a feature branch. Reintroducing any part of it requires a fresh product and motion decision plus browser evidence.
+
 ## Recorded narration
 
 Narration is a fixed AI-generated audio edition, not a live voice session. Each settled manuscript passage is synthesised once on the production machine, trimmed only at its outer boundaries, normalised to the pinned loudness target and written as a checksum-addressed static MP3. Generation and verification measure pacing, loudness, true peak, boundary silence and full decoding. Playback never runs a speech model.
@@ -25,11 +33,11 @@ The model runs locally and needs no API credential. Its exact model, tokenizer a
 Requirements: Node.js `^20.19.0` or `>=22.12.0`.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-The static manuscript is available at `/manuscript.html`.
+The static manuscript is available at `/manuscript.html`. Use `npm install` only when deliberately changing dependencies and refreshing `package-lock.json`.
 
 ## Produce the narration once
 
@@ -75,13 +83,16 @@ Passage-sized files preserve exact paragraph highlighting and fine-grained saved
 ## Verify
 
 ```bash
-npm run check:app
-npm run check
 npx playwright install chromium
+npm run check:app
 npm run test:e2e
+npm audit
+git diff --check
 ```
 
-`npm run check:app` is the complete pre-narration gate: linting, unit and job tests, TypeScript and the application build. `npm run check` adds full local FFmpeg verification of a complete human-approved recorded edition and is therefore the release gate. Vercel’s ordinary `npm run build` uses `narration:verify-build`, which rechecks the approved release identity and every static-file checksum without assuming FFmpeg exists in the remote build image. `npm run build:app` remains available for a faster application-only build. The browser suite covers the cover and page flow, static narration lifecycle, responsive layouts, accessibility, themes, evidence dialogs, laboratory controls and the no-JavaScript edition.
+`npm run check:app` is the complete pre-narration gate: linting, unit and job tests, TypeScript and the application build. The browser suite covers the cover and page flow, static narration lifecycle, responsive layouts, accessibility, themes, evidence dialogs, laboratory controls and the no-JavaScript edition. This repository has no hosted CI workflow, so contributors run these gates locally before delivery.
+
+`npm run check` adds full local FFmpeg verification of a complete human-approved recorded edition and is therefore the narration release gate. It is expected to fail while the tracked manifest is incomplete or unapproved; do not weaken that failure to make a code change pass. Vercel’s ordinary `npm run build` uses `narration:verify-build`, which rechecks the approved release identity and every static-file checksum without assuming FFmpeg exists in the remote build image. `npm run build:app` remains available for a faster application-only build.
 
 ## Deploy to Vercel
 
