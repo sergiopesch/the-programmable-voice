@@ -1,8 +1,11 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
+import type { Theme } from '../hooks/usePreferences'
 import type { NarrationCatalogueStatus, NarrationStatus } from '../hooks/useNarrationPlayer'
+import { shouldUsePhysicalBook } from '../lib/book3d/shouldUsePhysicalBook'
 import { narrationTargetId } from '../lib/narration'
 import type { BookSection } from '../types'
 import { ArrowIcon } from './Icons'
+import { Book3DStage } from './Book3DStage'
 import { SectionListenButton } from './NarrationControls'
 import { WaveformHero } from './WaveformHero'
 
@@ -10,6 +13,8 @@ interface OpeningProps {
   section: BookSection
   total: number
   onBegin: () => void
+  reduceMotion: boolean
+  theme: Theme
   activeNarrationTargetId: string | null
   narrationStatus: NarrationStatus
   catalogueStatus: NarrationCatalogueStatus
@@ -26,6 +31,8 @@ export function Opening({
   section,
   total,
   onBegin,
+  reduceMotion,
+  theme,
   activeNarrationTargetId,
   narrationStatus,
   catalogueStatus,
@@ -39,6 +46,9 @@ export function Opening({
 }: OpeningProps) {
   const [open, setOpen] = useState(false)
   const [coverSettled, setCoverSettled] = useState(false)
+  const [physicalHandoffReady, setPhysicalHandoffReady] = useState(false)
+  const [threeReady, setThreeReady] = useState(false)
+  const [physicalBook] = useState(() => shouldUsePhysicalBook(reduceMotion))
   const targetId = narrationTargetId(section.id)
   const titleWords = section.title.split(' ')
   const prologueHeading = section.blocks.find((block) => block.type === 'heading')
@@ -48,34 +58,53 @@ export function Opening({
     const blockTargetId = narrationTargetId(section.id, index)
     return [{ id: blockTargetId, text: block.text }]
   })
+  const visualOpen = open && (reduceMotion || coverSettled || physicalHandoffReady)
+  const physicalOpening = open && threeReady && !coverSettled && !reduceMotion
+  const openingPending = open && !coverSettled && !reduceMotion
 
   const openBook = () => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      || document.documentElement.dataset.motion === 'reduced'
-    setCoverSettled(reducedMotion)
     setOpen(true)
+    if (reduceMotion || !physicalBook) setCoverSettled(true)
+  }
+
+  useEffect(() => {
+    if (!open || !coverSettled) return
     requestAnimationFrame(() => {
       const prologue = document.getElementById('opening-prologue')
       prologue?.focus({ preventScroll: true })
       window.scrollTo({ top: 0, behavior: 'auto' })
     })
-  }
+  }, [coverSettled, open])
 
   return (
-    <section className={`opening opening--${open ? 'open' : 'closed'}`} aria-labelledby={open ? 'opening-spread-title' : 'opening-title'}>
+    <section
+      className={`opening opening--${visualOpen ? 'open' : 'closed'}${threeReady ? ' opening--three-ready' : ''}${physicalOpening ? ' opening--opening' : ''}`}
+      aria-labelledby={openingPending ? undefined : visualOpen ? 'opening-spread-title' : 'opening-title'}
+      aria-label={openingPending ? `${section.title}. Preparing and opening the book.` : undefined}
+      aria-busy={openingPending || undefined}
+    >
       <div className="opening__object">
         <div className="opening__endpaper" aria-hidden="true" />
-        {!coverSettled ? (
+        {physicalBook && !coverSettled ? (
+          <Book3DStage
+            deck={section.deck}
+            openingParagraphs={prologueParagraphs.map(({ text }) => text)}
+            openingPart={section.part}
+            openingTitle={prologueHeading?.text ?? section.title}
+            open={open}
+            reduceMotion={reduceMotion}
+            theme={theme}
+            onReadyChange={setThreeReady}
+            onOpenAnimationComplete={() => setCoverSettled(true)}
+            onOpenHandoffReady={() => setPhysicalHandoffReady(true)}
+          />
+        ) : null}
+        {!coverSettled && !physicalOpening ? (
           <div
-            id={open ? undefined : targetId}
+            id={visualOpen ? undefined : targetId}
             className={`opening__cover narration-target${activeNarrationTargetId === targetId ? ' narration-target--active' : ''}`}
-            aria-hidden={open}
+            aria-hidden={visualOpen}
             inert={open}
-            onTransitionEnd={(event) => {
-              if (open && event.currentTarget === event.target && event.propertyName === 'transform') {
-                setCoverSettled(true)
-              }
-            }}
           >
             <div className="opening__cover-inner">
               <h1 id="opening-title">
@@ -87,16 +116,16 @@ export function Opening({
               </h1>
               <WaveformHero />
               <p>{section.deck}</p>
-              <button className="primary-action" type="button" onClick={openBook} aria-expanded={open} aria-controls="opening-pages">
+              <button className="primary-action" type="button" onClick={openBook} disabled={open} aria-expanded={open} aria-controls="opening-pages">
                 <span>Open the book</span>
                 <ArrowIcon />
               </button>
             </div>
           </div>
         ) : null}
-        <div id="opening-pages" className="opening__pages" hidden={!open}>
+        <div id="opening-pages" className="opening__pages" hidden={!visualOpen}>
           <article
-            id={open ? targetId : undefined}
+            id={visualOpen ? targetId : undefined}
             className={`opening__title-page narration-target${activeNarrationTargetId === targetId ? ' narration-target--active' : ''}`}
             aria-label="Title page"
           >
@@ -147,7 +176,6 @@ export function Opening({
             </button>
           </article>
         </div>
-
       </div>
     </section>
   )

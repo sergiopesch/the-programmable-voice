@@ -7,6 +7,7 @@ import {
   type NarrationPassageNormalisationOverride,
 } from '../src/data/narrationEdition'
 import { bookNarrationPassages } from '../src/lib/narration'
+import { isExactIsoTimestamp } from '../src/lib/exactIsoTimestamp'
 import {
   narrationFullListenConfirmations,
   narrationFullListenReceiptMaterial,
@@ -602,20 +603,13 @@ export function buildNarrationFullListenPackage(
   }
 }
 
-function exactIsoTimestamp(value: unknown) {
-  return typeof value === 'string'
-    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-    && Number.isFinite(Date.parse(value))
-    && new Date(value).toISOString() === value
-}
-
 export function createNarrationFullListenReceipt(
   expected: Omit<NarrationFullListenReceipt, 'completedAt' | 'completedBy'>,
   completedBy: string,
   completedAt = new Date().toISOString(),
 ): NarrationFullListenReceipt {
   if (!completedBy.trim()) throw new Error('A non-empty full-listen listener name is required.')
-  if (!exactIsoTimestamp(completedAt)) throw new Error('The full-listen completion time is invalid.')
+  if (!isExactIsoTimestamp(completedAt)) throw new Error('The full-listen completion time is invalid.')
   return { ...expected, completedAt, completedBy: completedBy.trim() }
 }
 
@@ -642,7 +636,7 @@ export function narrationFullListenReceiptProblems(
   for (const key of ['schemaVersion', 'kind', 'releaseId', 'reviewManifestSha256', 'packageChecksumsSha256', 'orderedPassageProfileSha256', 'passageCount'] as const) {
     if (candidate[key] !== expected[key]) problems.push(`full-listen receipt ${key} does not match the exact review package`)
   }
-  if (!exactIsoTimestamp(candidate.completedAt)) problems.push('full-listen receipt completion time is invalid')
+  if (!isExactIsoTimestamp(candidate.completedAt)) problems.push('full-listen receipt completion time is invalid')
   if (typeof candidate.completedBy !== 'string' || !candidate.completedBy.trim()) problems.push('full-listen receipt listener is missing')
   if (
     !Array.isArray(candidate.confirmations)

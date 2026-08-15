@@ -6,6 +6,7 @@ import {
   type NarrationPilotManifest,
   type NarrationPilotReceipt,
 } from '../src/lib/narrationRelease'
+import { isExactIsoTimestamp } from '../src/lib/exactIsoTimestamp'
 
 export interface CurrentNarrationPilotIdentity {
   configurationHash: string
@@ -31,13 +32,6 @@ function sha256(value: string) {
 
 function isSha256(value: unknown): value is string {
   return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value)
-}
-
-function isIsoTimestamp(value: unknown): value is string {
-  return typeof value === 'string'
-    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-    && Number.isFinite(Date.parse(value))
-    && new Date(value).toISOString() === value
 }
 
 /**
@@ -90,7 +84,7 @@ export function narrationPilotApprovalProblems(
   const pilotProfileHash = sha256(narrationPilotProfileMaterial(manifest))
   const expectedIds = current.passages.map(({ id }) => id)
 
-  if (approval.schemaVersion !== 1 || !isIsoTimestamp(approval.approvedAt)) problems.push('pilot approval schema or timestamp is invalid')
+  if (approval.schemaVersion !== 1 || !isExactIsoTimestamp(approval.approvedAt)) problems.push('pilot approval schema or timestamp is invalid')
   if (approval.configurationHash !== current.configurationHash) problems.push('pilot approval configuration does not match this workspace')
   if (approval.manuscriptHash !== manifest.manuscriptHash) problems.push('pilot approval does not retain the historical manuscript snapshot')
   if (approval.pilotProfileHash !== pilotProfileHash) problems.push('pilot approval digest does not match the pilot manifest')

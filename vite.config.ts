@@ -101,5 +101,9 @@ export default defineConfig({
   build: {
     target: 'es2022',
     cssCodeSplit: false,
+    // The initial chunk contains the offline manuscript; the other large chunk
+    // is the separately loaded Three.js renderer. Keep a narrow growth budget
+    // without splitting either coherent experience into extra requests.
+    chunkSizeWarningLimit: 700,
   },
 })
