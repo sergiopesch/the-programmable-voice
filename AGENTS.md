@@ -7,8 +7,9 @@ Before changing the book, inspect the relevant manuscript, source entries, desig
 ## Supported architecture and recovery boundary
 
 - `main` is the source of truth. The shipped reader is the static React 19/Vite implementation: hash-routed section state in `src/App.tsx`, content and evidence contracts in `src/data/`, semantic reader components in `src/components/`, CSS-owned cover and section motion in `src/styles.css`, and a generated no-JavaScript manuscript at `/manuscript.html`.
+- Capable browsers also inspect a native-4K Three.js hardback (`src/lib/book3d/`, `src/components/Book3DStage.tsx`) and a paired-face CSS page-turn overlay (`src/components/PageTurnOverlay.tsx`). Semantic HTML remains the manuscript; WebGL is enhancement with reduced-motion, forced-colors and context-loss fallbacks.
 - Narration playback consumes checksum-addressed static files. Generation and editorial review are local-only workflows in `scripts/` with the isolated runtime under `tools/narration/`; there is no live speech or application API.
-- The 2026-08-14 recovery intentionally kept this DOM/CSS architecture unchanged. The uncommitted physical-book/WebGL experiment is preserved only in the host recovery archive at `~/.codex/archives/Voice-dirty-before-recovery-2026-08-14-e4b3/`. It is not a repository worktree, build input or supported alternative. Never delete that archive or import from it without explicit owner approval for a new product and motion direction.
+- The 2026-08-14 recovery archive at `~/.codex/archives/Voice-dirty-before-recovery-2026-08-14-e4b3/` remains the recovery source for the earlier uncommitted experiment. Do not delete it. Re-imports require a fresh product and motion decision.
 - Do not create a long-lived development branch as an alternate product line. Use a short-lived worktree when isolation is needed, verify against current `origin/main`, then fast-forward and remove it after delivery.
 
 ## Development workflow

@@ -7,6 +7,10 @@ The production build bundles the following fonts through Fontsource packages:
 
 Both are distributed under the SIL Open Font License 1.1. Their copyright notices and licence text are included in [`public/third-party-font-licenses.txt`](public/third-party-font-licenses.txt), which Vite copies into the deployed site.
 
+The progressively enhanced physical cover uses **Three.js 0.185.1**, including its bundled OrbitControls, RoundedBoxGeometry, HDRLoader and RoomEnvironment fallback addons. Three.js is distributed under the MIT License. Source and licence: [three.js](https://github.com/mrdoob/three.js/tree/r185), [MIT licence](https://github.com/mrdoob/three.js/blob/r185/LICENSE).
+
+The physical materials bundle CC0 photography from **Poly Haven** and **ambientCG**: Denim Fabric 05 for the cover weave, Paper 001 for the leaves, and Studio Small 04 for image-based lighting. The production tier preserves the official native-4K JPEG/HDR sources, while a 2K WebP/HDR tier remains available for constrained devices, data-saving mode and recovery. Exact source assets, authorship, resolutions, map channels, direct download URLs and checksums are recorded in [`public/assets/book3d/ASSETS.md`](public/assets/book3d/ASSETS.md). Sources and licences: [Poly Haven licence](https://polyhaven.com/license), [ambientCG licence](https://ambientcg.com/license), [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+
 ## Recorded-edition generation
 
 The fixed narration is generated locally; none of the following model or runtime binaries is bundled into the browser application.

@@ -1,4 +1,4 @@
-@layer legacy, editorial;
+@layer legacy, editorial, physical;
 
 @layer legacy {
 
@@ -4783,6 +4783,396 @@ input[type='range'] {
     min-height: 0;
     max-height: none;
     overflow: visible;
+  }
+}
+
+}
+
+@layer physical {
+
+/* Native 4K physical book -------------------------------------------------
+   WebGL owns the closed volume; CSS owns the paired page-turn overlay. The
+   semantic cover and manuscript remain the readable source of truth. */
+
+.reader {
+  position: relative;
+}
+
+.opening--three-ready .opening__object {
+  width: min(100%, var(--book-max-width));
+  height: clamp(32rem, calc(100svh - var(--header-height) - 4rem), 52rem);
+  min-height: 32rem;
+  isolation: isolate;
+}
+
+.opening--three-ready.opening--open .opening__object {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.book3d-stage {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  overflow: clip;
+  border: 1px solid rgba(244, 239, 229, .14);
+  background:
+    radial-gradient(ellipse at 50% 43%, rgba(255, 255, 255, .055), transparent 45%),
+    linear-gradient(150deg, rgba(255, 255, 255, .022), transparent 42%, rgba(0, 0, 0, .12));
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, .035),
+    0 26px 76px -48px rgba(0, 0, 0, .9);
+  color: var(--stage-ink);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.book3d-stage--ready {
+  opacity: 1;
+}
+
+.book3d-stage--open {
+  pointer-events: none;
+}
+
+.book3d-stage:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 72%, white);
+  outline-offset: -3px;
+}
+
+.book3d-stage__viewport {
+  position: absolute;
+  inset: 0 0 5rem;
+  min-width: 0;
+  min-height: 0;
+}
+
+.book3d-stage__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.book3d-stage__canvas:active {
+  cursor: grabbing;
+}
+
+.book3d-stage__toolbar {
+  position: absolute;
+  z-index: 4;
+  right: calc(min(22rem, 35%) + 1.3rem);
+  bottom: .65rem;
+  left: .65rem;
+  display: flex;
+  min-width: 0;
+  min-height: 3.5rem;
+  padding: .35rem .42rem .35rem .85rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  border: 1px solid rgba(244, 239, 229, .19);
+  background: rgba(17, 16, 15, .78);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(16px);
+}
+
+.book3d-stage__hint {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  color: rgba(244, 239, 229, .7);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: .64rem;
+  letter-spacing: .075em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.book3d-stage__controls {
+  display: flex;
+  flex: 0 0 auto;
+  gap: .25rem;
+}
+
+.book3d-stage__controls button {
+  display: inline-grid;
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(244, 239, 229, .2);
+  background: rgba(244, 239, 229, .035);
+  color: rgba(244, 239, 229, .88);
+  cursor: pointer;
+}
+
+.book3d-stage__controls button:hover {
+  border-color: rgba(244, 239, 229, .62);
+  background: rgba(244, 239, 229, .09);
+}
+
+.book3d-stage__controls button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 72%, white);
+  outline-offset: 2px;
+}
+
+.book3d-stage__controls svg {
+  width: 20px;
+  height: 20px;
+}
+
+.opening--three-ready .opening__cover,
+.opening--three-ready.opening--open .opening__cover {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  backface-visibility: visible;
+  pointer-events: none;
+}
+
+.opening--three-ready.opening--closed .opening__cover:hover,
+.opening--three-ready.opening--closed .opening__cover:focus-within {
+  transform: none;
+}
+
+.opening--three-ready.opening--open .opening__cover,
+.opening--three-ready.opening--opening .opening__cover {
+  visibility: hidden;
+}
+
+.opening--three-ready .opening__cover::after,
+.opening--three-ready .opening__cover-inner::before {
+  display: none;
+}
+
+.opening--three-ready .opening__cover-inner {
+  inset: 0;
+  display: block;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.opening--three-ready .opening__cover h1,
+.opening--three-ready.opening--open .opening__cover h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.opening--three-ready .opening__cover h1 br {
+  display: none;
+}
+
+.opening--three-ready .opening__cover .hero-wave,
+.opening--three-ready .opening__cover-inner > p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.opening--three-ready .opening__cover .primary-action {
+  position: absolute;
+  z-index: 10;
+  right: .65rem;
+  bottom: .65rem;
+  width: min(22rem, calc(35% - 1.3rem));
+  min-width: 17rem;
+  min-height: 3.5rem;
+  margin: 0;
+  border-color: rgba(244, 239, 229, .52);
+  background: color-mix(in srgb, var(--accent) 78%, #24191a);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+  color: #fff9ee;
+  pointer-events: auto;
+}
+
+.opening--three-ready .opening__cover .primary-action:hover {
+  border-color: #f4efe5;
+  background: #f4efe5;
+  color: #181614;
+}
+
+.page-turn--forward,
+.page-turn--backward {
+  animation: none;
+}
+
+.page-turn-overlay {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 2200px;
+}
+
+.page-turn-overlay__leaf {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  animation: physical-leaf-forward 780ms cubic-bezier(.22, .72, .18, 1) both;
+}
+
+.page-turn-overlay--backward .page-turn-overlay__leaf {
+  right: auto;
+  left: 0;
+  transform-origin: right center;
+  animation-name: physical-leaf-backward;
+}
+
+.page-turn-overlay__face {
+  position: absolute;
+  inset: 0;
+  padding: clamp(1.6rem, 3vw, 3rem);
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(70, 50, 35, .08), transparent 16%, transparent 84%, rgba(255, 253, 245, .16)),
+    var(--paper);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .22);
+  color: var(--ink);
+  backface-visibility: hidden;
+}
+
+.page-turn-overlay__face[data-page-turn-face='back'] {
+  transform: rotateY(180deg);
+}
+
+.page-turn-overlay--backward .page-turn-overlay__face[data-page-turn-face='back'] {
+  transform: rotateY(-180deg);
+}
+
+.page-turn-overlay__face span {
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.page-turn-overlay__face strong {
+  display: block;
+  max-width: 12ch;
+  font-family: 'Newsreader Variable', Georgia, serif;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  font-weight: 510;
+  line-height: .9;
+  letter-spacing: -.045em;
+}
+
+.page-turn-overlay__face p {
+  display: -webkit-box;
+  max-width: 34rem;
+  margin: 1.4rem 0 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  font-family: 'Newsreader Variable', Georgia, serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+@keyframes physical-leaf-forward {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-180deg); }
+}
+
+@keyframes physical-leaf-backward {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(180deg); }
+}
+
+@media (max-width: 900px) {
+  .book3d-stage__hint {
+    display: none;
+  }
+
+  .book3d-stage__toolbar {
+    padding-left: .42rem;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .opening--three-ready .opening__object {
+    height: clamp(29rem, calc(100svh - var(--header-height) - 1.5rem), 44rem);
+    min-height: 29rem;
+  }
+
+  .book3d-stage__viewport {
+    bottom: 7.4rem;
+  }
+
+  .book3d-stage__toolbar {
+    right: .45rem;
+    bottom: 4.15rem;
+    left: .45rem;
+    min-height: 3rem;
+    padding: .25rem;
+  }
+
+  .book3d-stage__controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .book3d-stage__controls button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .opening--three-ready .opening__cover h1,
+  .opening--three-ready.opening--open .opening__cover h1 {
+    top: .6rem;
+    left: .65rem;
+    font-size: .62rem;
+  }
+
+  .opening--three-ready .opening__cover .primary-action {
+    right: .45rem;
+    bottom: .45rem;
+    left: .45rem;
+    width: auto;
+    min-width: 0;
+    min-height: 3.35rem;
+  }
+}
+
+@media (forced-colors: active), print {
+  .book3d-stage,
+  .page-turn-overlay {
+    display: none;
   }
 }
 

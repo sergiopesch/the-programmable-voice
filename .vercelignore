@@ -11,3 +11,5 @@ test-results
 tests
 tools
 public/audio/narration
+public/assets/book3d/*-4k.jpg
+public/assets/book3d/*-4k.hdr

@@ -3,6 +3,7 @@ import {
   narrationPilotApprovalConfirmations,
   narrationReleaseApprovalConfirmations,
 } from '../data/narrationEdition'
+import { isExactIsoTimestamp } from './exactIsoTimestamp'
 
 export interface NarrationTechnicalQc {
   durationExpectedSeconds: number
@@ -219,13 +220,6 @@ export function narrationReleaseManifestUrl(releaseId: string) {
   return `/audio/narration/releases/${releaseId}.json`
 }
 
-function exactIsoTimestamp(value: unknown) {
-  return typeof value === 'string'
-    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-    && Number.isFinite(Date.parse(value))
-    && new Date(value).toISOString() === value
-}
-
 function hasExactKeys(value: object, expectedKeys: readonly string[]) {
   return JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expectedKeys].sort())
 }
@@ -287,7 +281,7 @@ export function narrationFullListenApprovalEvidenceIsComplete(
     || !Number.isSafeInteger(verification.passageCount)
     || verification.passageCount < 1
     || receipt.passageCount !== verification.passageCount
-    || !exactIsoTimestamp(receipt.completedAt)
+    || !isExactIsoTimestamp(receipt.completedAt)
     || !safeHumanName(receipt.completedBy)
     || !Array.isArray(receipt.confirmations)
     || receipt.confirmations.length !== narrationFullListenConfirmations.length
@@ -304,7 +298,7 @@ export function narrationReleaseApprovalIsComplete(
     approval
     && typeof approval === 'object'
     && hasExactKeys(approval, ['approvedAt', 'approvedBy', 'checklistVersion', 'confirmations', 'fullListen'])
-    && exactIsoTimestamp(approval.approvedAt)
+    && isExactIsoTimestamp(approval.approvedAt)
     && safeHumanName(approval.approvedBy)
     && Array.isArray(approval.confirmations)
     && approval.checklistVersion === narrationApprovalChecklistVersion

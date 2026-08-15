@@ -10,6 +10,7 @@ The interface is a warm, hardback-inspired reading instrument: part literary his
 - A contained cover and a single two-page spread keep prose, figures and evidence legible. The settled interface never shows a third cover panel, translucent page copy or an inner reading scrollbar. Scientific figures use deterministic SVG and Canvas. Generated concept art may guide composition but is never presented as historical or scientific evidence.
 - Oxblood labels distinguish evidence states, active narration and physical joins without turning the book into a dashboard.
 - Motion reveals causality, including the opening cover and directional page turns, and stops when the reader changes section. Reduced-motion is a first-class state.
+- Capable browsers inspect a native-4K Three.js hardback with charcoal cloth and an oxblood spine, while a paired-face CSS leaf explains section changes. The semantic manuscript remains the readable source of truth; WebGL is enhancement, never the only copy of the words.
 
 ## Core states
 

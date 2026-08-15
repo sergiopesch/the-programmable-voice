@@ -99,3 +99,31 @@ export function PlayIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function ResetViewIcon(props: IconProps) {
+  return (
+    <svg {...defaults} {...props}>
+      <path d="M5.2 8.2A8 8 0 1 1 4 14" />
+      <path d="M5.2 3.8v4.4H9.6" />
+      <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+export function ZoomInIcon(props: IconProps) {
+  return (
+    <svg {...defaults} {...props}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="M10.5 7.5v6M7.5 10.5h6m2.8 4.8 4.2 4.2" />
+    </svg>
+  )
+}
+
+export function ZoomOutIcon(props: IconProps) {
+  return (
+    <svg {...defaults} {...props}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="M7.5 10.5h6m2.8 4.8 4.2 4.2" />
+    </svg>
+  )
+}

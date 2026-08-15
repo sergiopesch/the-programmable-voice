@@ -5,6 +5,8 @@ import { EvidenceDrawer } from './components/EvidenceRail'
 import { Header } from './components/Header'
 import { NarrationDock } from './components/NarrationControls'
 import { Opening } from './components/Opening'
+import { PageTurnOverlay } from './components/PageTurnOverlay'
+import { shouldUsePhysicalBook } from './lib/book3d/shouldUsePhysicalBook'
 import { SectionNavigation } from './components/SectionNavigation'
 import { SoundLab } from './components/SoundLab'
 import { sections, sectionById } from './data/book'
@@ -29,6 +31,12 @@ export default function App() {
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null)
   const [turnDirection, setTurnDirection] = useState<'forward' | 'backward'>('forward')
   const [hasNavigated, setHasNavigated] = useState(false)
+  const [pageTurn, setPageTurn] = useState<{
+    direction: 'forward' | 'backward'
+    source: (typeof sections)[number]
+    target: (typeof sections)[number]
+    key: number
+  } | null>(null)
   const readerRef = useRef<HTMLElement>(null)
 
   const activeIndex = sections.findIndex((section) => section.id === activeId)
@@ -102,8 +110,27 @@ export default function App() {
   const navigate = useCallback((id: string, replace = false) => {
     if (!sectionById.has(id)) return
     const targetIndex = sections.findIndex((section) => section.id === id)
-    setTurnDirection(targetIndex < activeIndex ? 'backward' : 'forward')
+    const direction = targetIndex < activeIndex ? 'backward' : 'forward'
+    const targetSection = sections[targetIndex]
+    setTurnDirection(direction)
     setHasNavigated(true)
+    if (
+      !replace
+      && shouldUsePhysicalBook(preferences.reduceMotion)
+      && targetSection
+      && activeSection.kind !== 'opening'
+      && targetSection.kind !== 'opening'
+      && targetSection.id !== activeSection.id
+    ) {
+      setPageTurn((current) => ({
+        direction,
+        source: activeSection,
+        target: targetSection,
+        key: (current?.key ?? 0) + 1,
+      }))
+    } else {
+      setPageTurn(null)
+    }
     window.dispatchEvent(new Event('pv:stop-media'))
     setSelectedSourceId(null)
     setContentsOpen(false)
@@ -114,7 +141,7 @@ export default function App() {
     if (replace) window.history.replaceState({ section: id }, '', url)
     else if (window.location.hash !== `#${id}`) window.history.pushState({ section: id }, '', url)
     focusReader()
-  }, [activeIndex, focusReader])
+  }, [activeIndex, activeSection, focusReader, preferences.reduceMotion])
 
   useEffect(() => {
     if (!sectionById.has(window.location.hash.slice(1))) {
@@ -209,6 +236,8 @@ export default function App() {
         section={activeSection}
         total={chapterCount}
         onBegin={() => navigate(sections[1]!.id)}
+        reduceMotion={preferences.reduceMotion}
+        theme={preferences.theme}
         {...narrationActions}
       />
     )
@@ -274,6 +303,17 @@ export default function App() {
             {mainContent}
             {activeSection.kind !== 'opening' ? <SectionNavigation previous={previous} next={next} onNavigate={navigate} /> : null}
           </div>
+          {pageTurn ? (
+            <PageTurnOverlay
+              key={pageTurn.key}
+              direction={pageTurn.direction}
+              theme={preferences.theme}
+              reduceMotion={preferences.reduceMotion}
+              source={pageTurn.source}
+              target={pageTurn.target}
+              onComplete={() => setPageTurn(null)}
+            />
+          ) : null}
         </main>
       </div>
 

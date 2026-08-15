@@ -16,9 +16,11 @@ An interactive, evidence-led digital book about the material history of sound, m
 
 The supported application is a static React 19/Vite book. `src/data/` contains the manuscript, source catalogue and narration-edition contract; `src/App.tsx` owns hash-routed section state; `src/components/` renders the semantic cover, reading section, dialogs, evidence and Sound Laboratory; and `src/styles.css` owns the present cover and section-transition motion. Vite also emits the complete no-JavaScript edition at `/manuscript.html`.
 
+Capable browsers inspect a native-4K Three.js hardback, while a paired-face CSS page-turn overlay explains section changes. The semantic manuscript remains the readable source of truth. Reduced-motion, forced-colors and missing-WebGL states keep the same words without the physical object. Photographed 4K materials live under `public/assets/book3d/`; source Vercel uploads keep the complete 2K surface and lighting fallback so the Hobby payload stays inside the documented ceiling.
+
 The reader has no application server and does not synthesise speech. Narration is loaded from an immutable static manifest by `useNarrationPlayer`; the local Kokoro generation and review tools remain isolated under `scripts/` and `tools/narration/`.
 
-`main` is the only supported product line. A 2026-08-14 uncommitted physical-book/WebGL experiment was preserved outside the repository for recovery, but it is not a build input, an alternate architecture or a feature branch. Reintroducing any part of it requires a fresh product and motion decision plus browser evidence.
+`main` is the only supported product line.
 
 ## Recorded narration
 
@@ -30,7 +32,9 @@ The model runs locally and needs no API credential. Its exact model, tokenizer a
 
 ## Run locally
 
-Requirements: Node.js `^20.19.0` or `>=22.12.0`.
+Requirements: Node.js `^20.19.0` or `>=22.13.0`.
+
+The root package explicitly permits the checksum-locked `esbuild@0.28.1` post-install step through npm's project-level `allowScripts` policy. Keep that approval pinned to the reviewed lockfile version when dependencies change; do not replace it with a blanket install-script allowance.
 
 ```bash
 npm ci
@@ -90,7 +94,7 @@ npm audit
 git diff --check
 ```
 
-`npm run check:app` is the complete pre-narration gate: linting, unit and job tests, TypeScript and the application build. The browser suite covers the cover and page flow, static narration lifecycle, responsive layouts, accessibility, themes, evidence dialogs, laboratory controls and the no-JavaScript edition. This repository has no hosted CI workflow, so contributors run these gates locally before delivery.
+`npm run check:app` is the complete pre-narration gate: linting, unit and job tests, TypeScript and the application build. The browser suite covers the forced physical-book path and semantic handoff as well as the ordinary cover and page flow, static narration lifecycle, responsive layouts, accessibility, themes, evidence dialogs, laboratory controls and the no-JavaScript edition. This repository has no hosted CI workflow, so contributors run these gates locally before delivery.
 
 `npm run check` adds full local FFmpeg verification of a complete human-approved recorded edition and is therefore the narration release gate. It is expected to fail while the tracked manifest is incomplete or unapproved; do not weaken that failure to make a code change pass. Vercel’s ordinary `npm run build` uses `narration:verify-build`, which rechecks the approved release identity and every static-file checksum without assuming FFmpeg exists in the remote build image. `npm run build:app` remains available for a faster application-only build.
 
