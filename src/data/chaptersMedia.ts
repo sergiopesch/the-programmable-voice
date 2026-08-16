@@ -221,7 +221,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'figure',
-        figure: 'architecture',
+        figure: 'telephone-network',
         title: 'Subscriber → local loop → exchange → trunk → exchange → subscriber',
         caption: 'Switching makes a temporary path through shared infrastructure. The voice signal and the information used to establish its route are related, but they are not the same thing.',
         label: 'Synthesis',
@@ -593,7 +593,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'figure',
-        figure: 'trace',
+        figure: 'magnetic-tape',
         title: 'Erase → record → replay',
         caption: 'Tape speed turns time into distance. Separate magnetic heads can remove an old pattern, write a new one and read it back while the flexible carrier keeps moving.',
         label: 'Synthesis',
@@ -1118,7 +1118,7 @@ export const mediaSections: BookSection[] = [
       },
       {
         type: 'figure',
-        figure: 'duplex',
+        figure: 'packet-voice',
         title: 'Capture → frame → encode → packetise → route → buffer → decode → play',
         caption: 'Both directions can operate at once. Each block contributes delay, and the network can vary the arrival time or lose packets entirely.',
         label: 'Synthesis',

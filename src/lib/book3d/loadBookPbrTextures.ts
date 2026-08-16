@@ -21,6 +21,14 @@ export interface BookSurfaceTextures {
   paperRoughness: Texture
 }
 
+export interface PageSurfaceTextures {
+  paperColor: Texture
+  paperNormal: Texture
+  paperRoughness: Texture
+}
+
+export type PageDetailTextures = Pick<PageSurfaceTextures, 'paperNormal' | 'paperRoughness'>
+
 export interface LoadBookSurfaceTextureOptions {
   anisotropy: number
   tier?: BookTextureTier
@@ -113,6 +121,45 @@ export async function loadBookSurfaceTextures({
   }
 }
 
+export async function loadPageDetailTextures({
+  anisotropy,
+  tier = '2k',
+}: LoadBookSurfaceTextureOptions): Promise<PageDetailTextures> {
+  const loader = new TextureLoader()
+  const maxAnisotropy = Math.max(1, Math.floor(anisotropy))
+  const results = await Promise.allSettled([
+    loader.loadAsync(bookSurfaceAssetPath('page-paper-normal-gl', tier)),
+    loader.loadAsync(bookSurfaceAssetPath('page-paper-roughness', tier)),
+  ])
+  const failed = results.find((result) => result.status === 'rejected')
+  if (failed) {
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') result.value.dispose()
+    })
+    throw failed.reason
+  }
+  const [paperNormal, paperRoughness] = results.map((result) => (
+    result as PromiseFulfilledResult<Texture>
+  ).value) as [Texture, Texture]
+
+  if (tier === '4k') {
+    const undersized = [paperNormal, paperRoughness].find((texture) => {
+      const { height, width } = sourceDimensions(texture)
+      return Math.max(width, height) < 4_096
+    })
+    if (undersized) {
+      paperNormal.dispose()
+      paperRoughness.dispose()
+      throw new Error('A decoded 4K page material did not contain a 4096-pixel source edge')
+    }
+  }
+
+  const paperRepeat = [1.35, 2.35] as const
+  configureTexture(paperNormal, { anisotropy: maxAnisotropy, colour: false, repeat: paperRepeat })
+  configureTexture(paperRoughness, { anisotropy: maxAnisotropy, colour: false, repeat: paperRepeat })
+  return { paperNormal, paperRoughness }
+}
+
 function singlePixelTexture(
   rgba: readonly [number, number, number, number],
   colour = false,
@@ -124,10 +171,17 @@ function singlePixelTexture(
 }
 
 export function createFallbackBookSurfaceTextures(): BookSurfaceTextures {
+  const page = createFallbackPageSurfaceTextures()
   return {
     clothColor: singlePixelTexture([255, 255, 255, 255], true),
     clothNormal: singlePixelTexture([128, 128, 255, 255]),
     clothArm: singlePixelTexture([255, 235, 0, 255]),
+    ...page,
+  }
+}
+
+export function createFallbackPageSurfaceTextures(): PageSurfaceTextures {
+  return {
     paperColor: singlePixelTexture([255, 255, 255, 255], true),
     paperNormal: singlePixelTexture([128, 128, 255, 255]),
     paperRoughness: singlePixelTexture([242, 242, 242, 255]),

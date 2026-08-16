@@ -1,6 +1,6 @@
 import type { MouseEvent as ReactMouseEvent } from 'react'
 import type { Theme } from '../hooks/usePreferences'
-import { MenuIcon, MoonIcon, SearchIcon, SpeakerIcon, SunIcon } from './Icons'
+import { MenuIcon, MoonIcon, SearchIcon, SunIcon } from './Icons'
 
 interface HeaderProps {
   theme: Theme
@@ -8,10 +8,9 @@ interface HeaderProps {
   onOpenContents: () => void
   onOpenSearch: () => void
   onHome: () => void
-  onLab: () => void
 }
 
-export function Header({ theme, onToggleTheme, onOpenContents, onOpenSearch, onHome, onLab }: HeaderProps) {
+export function Header({ theme, onToggleTheme, onOpenContents, onOpenSearch, onHome }: HeaderProps) {
   const followSection = (event: ReactMouseEvent<HTMLAnchorElement>, navigate: () => void) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
     event.preventDefault()
@@ -29,17 +28,13 @@ export function Header({ theme, onToggleTheme, onOpenContents, onOpenSearch, onH
           <MenuIcon />
           <span>Contents</span>
         </button>
-        <button className="header-control header-control--search" type="button" onClick={onOpenSearch} aria-label="Search">
+        <button className="header-control header-control--icon header-control--search" type="button" onClick={onOpenSearch} aria-label="Search">
           <SearchIcon />
-          <span>Search</span>
+          <span className="sr-only">Search</span>
         </button>
-        <a className="header-control header-control--lab" href="#sound-laboratory" onClick={(event) => followSection(event, onLab)} aria-label="Sound laboratory">
-          <SpeakerIcon />
-          <span>Sound laboratory</span>
-        </a>
-        <button className="header-control" type="button" onClick={onToggleTheme} aria-label={theme === 'dark' ? 'Light' : 'Dark'}>
+        <button className="header-control header-control--icon" type="button" onClick={onToggleTheme} aria-label={theme === 'dark' ? 'Light' : 'Dark'}>
           {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          <span className="sr-only">{theme === 'dark' ? 'Light' : 'Dark'}</span>
         </button>
       </nav>
     </header>

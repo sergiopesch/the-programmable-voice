@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { WebGLRenderer } from 'three'
-import { resolveBookOutputPixelRatio, selectBookRenderQuality } from './bookQuality'
+import {
+  resolveBookInteractionPixelRatio,
+  resolveBookOutputPixelRatio,
+  selectBookRenderQuality,
+} from './bookQuality'
 import { installBookBrowserTestEnvironment, type BookBrowserTestEnvironment } from './browserTestEnvironment'
 
 function rendererWithLimits(maxTextureSize: number, maxRenderbufferSize: number) {
@@ -59,6 +63,27 @@ describe('book 4K capability selection', () => {
     expect(Math.floor(720 * constrained.pixelRatio)).toBeLessThan(4096)
   })
 
+  it('reserves automatic 8K for very large, high-capacity desktop output', () => {
+    const ordinaryDesktop = selectBookRenderQuality(
+      rendererWithLimits(16384, 16384),
+      sizedHost(2000, 1200),
+    )
+    expect(ordinaryDesktop.textureTier).toBe('4k')
+    expect(ordinaryDesktop.outputTier).toBe('4k')
+
+    const largeDesktop = selectBookRenderQuality(
+      rendererWithLimits(16384, 16384),
+      sizedHost(4000, 2200),
+    )
+    expect(largeDesktop.outputTier).toBe('8k')
+
+    browser.navigator.deviceMemory = 8
+    expect(selectBookRenderQuality(
+      rendererWithLimits(16384, 16384),
+      sizedHost(4000, 2200),
+    ).outputTier).toBe('4k')
+  })
+
   it('allocates the requested long edge without a fixed pixel-ratio ceiling', () => {
     browser.setSearch('?bookQuality=4k')
     const quality = selectBookRenderQuality(rendererWithLimits(8192, 8192), sizedHost(768, 512))
@@ -94,5 +119,11 @@ describe('book 4K capability selection', () => {
     expect(quality.outputTier).toBe('2k')
     expect(Math.floor(width * quality.pixelRatio)).toBeGreaterThanOrEqual(2048)
     expect(quality.shadowMapSize).toBeLessThan(4096)
+  })
+
+  it('temporarily caps interaction near 2K without upscaling a lighter settled tier', () => {
+    expect(resolveBookInteractionPixelRatio(6, 1280, 720)).toBeCloseTo(1.6)
+    expect(Math.round(1280 * resolveBookInteractionPixelRatio(6, 1280, 720))).toBe(2048)
+    expect(resolveBookInteractionPixelRatio(1.25, 1280, 720)).toBe(1.25)
   })
 })

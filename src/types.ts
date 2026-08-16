@@ -53,6 +53,11 @@ export type FigureKind =
   | 'duplex'
   | 'stack'
   | 'architecture'
+  | 'telephone-network'
+  | 'magnetic-tape'
+  | 'packet-voice'
+  | 'training-corpus'
+  | 'consent-provenance'
   | 'clocks'
 
 export interface ParagraphBlock {

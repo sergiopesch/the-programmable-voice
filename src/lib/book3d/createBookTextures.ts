@@ -4,6 +4,7 @@ import {
   SRGBColorSpace,
   type Texture,
 } from 'three'
+import type { Theme } from '../../hooks/usePreferences'
 import type { BookTextureTier } from './bookAssets'
 import {
   BOOK_CLOSED_ASPECT,
@@ -25,11 +26,14 @@ export interface CreateBookTextureOptions {
   openingTitle: string
   openingParagraphs: string[]
   openingPart: string
+  theme: Theme
   anisotropy: number
   tier?: BookTextureTier
   /** Compatibility hint for callers that have not selected an explicit tier. */
   highDetail?: boolean
 }
+
+export type OpeningPageTextures = Pick<BookTextures, 'openingLeft' | 'openingRight'>
 
 const TEXTURE_LONG_EDGE: Record<BookTextureTier, number> = {
   '2k': 2048,
@@ -63,6 +67,12 @@ function finishTexture(element: HTMLCanvasElement, anisotropy: number, colour = 
   return texture
 }
 
+function envelopeAt(x: number) {
+  const centerA = Math.exp(-(((x - 0.47) / 0.18) ** 2))
+  const centerB = 0.66 * Math.exp(-(((x - 0.76) / 0.24) ** 2))
+  return Math.min(1, centerA + centerB)
+}
+
 function drawWaveform(
   context: CanvasRenderingContext2D,
   x: number,
@@ -71,20 +81,34 @@ function drawWaveform(
   height: number,
   colour: string,
 ) {
-  const bars = 41
+  context.save()
   context.strokeStyle = colour
-  context.lineWidth = Math.max(1.2, width / 310)
-  context.beginPath()
-  for (let index = 0; index < bars; index += 1) {
-    const progress = index / (bars - 1)
-    const envelope = Math.sin(progress * Math.PI) ** 0.72
-    const signal = 0.24 + Math.abs(Math.sin(index * 1.93) * Math.cos(index * 0.47)) * 0.76
-    const barHeight = height * envelope * signal
-    const barX = x + progress * width
-    context.moveTo(barX, y - barHeight / 2)
-    context.lineTo(barX, y + barHeight / 2)
+  context.lineCap = 'round'
+  context.lineJoin = 'round'
+  const layers = 16
+  for (let layer = 0; layer < layers; layer += 1) {
+    const scale = (layer + 2) / 18
+    context.globalAlpha = 0.1 + layer * 0.035
+    context.lineWidth = Math.max(0.8, width / 520)
+    context.beginPath()
+    for (let step = 0; step <= 180; step += 1) {
+      const progress = step / 180
+      const carrier = Math.sin(progress * Math.PI * 2 * (4.8 + layer * 0.055))
+      const formant = 0.45 * Math.sin(progress * Math.PI * 2 * 11.3 + layer * 0.2)
+      const px = x + progress * width
+      const py = y + (carrier + formant) * (height / 2) * envelopeAt(progress) * scale
+      if (step === 0) context.moveTo(px, py)
+      else context.lineTo(px, py)
+    }
+    context.stroke()
   }
+  context.globalAlpha = 0.42
+  context.lineWidth = Math.max(1, width / 420)
+  context.beginPath()
+  context.moveTo(x, y)
+  context.lineTo(x + width, y)
   context.stroke()
+  context.restore()
 }
 
 function drawWrappedText(
@@ -138,22 +162,26 @@ function paintOpeningPaper(
   width: number,
   height: number,
   seed: number,
+  theme: Theme,
 ) {
-  context.fillStyle = '#e7dece'
+  const dark = theme === 'dark'
+  // The printed face is colour-managed independently of the studio lighting,
+  // so these values match the semantic reader's paper tokens exactly.
+  context.fillStyle = dark ? '#1c1a18' : '#f4efe5'
   context.fillRect(0, 0, width, height)
   const random = seededRandom(seed)
   for (let index = 0; index < Math.round(width * height / 2200); index += 1) {
     const light = random() > 0.48
     context.fillStyle = light
-      ? `rgba(255, 252, 241, ${0.025 + random() * 0.04})`
-      : `rgba(83, 62, 43, ${0.012 + random() * 0.022})`
+      ? `rgba(255, 252, 241, ${dark ? 0.008 + random() * 0.015 : 0.025 + random() * 0.04})`
+      : `rgba(0, 0, 0, ${dark ? 0.03 + random() * 0.045 : 0.012 + random() * 0.022})`
     context.fillRect(random() * width, random() * height, 0.6 + random() * 1.3, 0.6 + random() * 1.3)
   }
   const gutter = context.createLinearGradient(0, 0, width, 0)
-  gutter.addColorStop(0, 'rgba(54, 38, 25, .12)')
-  gutter.addColorStop(0.08, 'rgba(54, 38, 25, 0)')
+  gutter.addColorStop(0, dark ? 'rgba(0, 0, 0, .46)' : 'rgba(54, 38, 25, .12)')
+  gutter.addColorStop(0.08, dark ? 'rgba(0, 0, 0, 0)' : 'rgba(54, 38, 25, 0)')
   gutter.addColorStop(0.92, 'rgba(255, 253, 245, 0)')
-  gutter.addColorStop(1, 'rgba(255, 253, 245, .12)')
+  gutter.addColorStop(1, dark ? 'rgba(255, 253, 245, .04)' : 'rgba(255, 253, 245, .12)')
   context.fillStyle = gutter
   context.fillRect(0, 0, width, height)
 }
@@ -166,64 +194,75 @@ function createOpeningPage(
   deck: string,
   paragraphs: string[],
   part: string,
+  theme: Theme,
 ) {
   const height = size
   const width = Math.round(size * BOOK_PAGE_WIDTH / BOOK_PAGE_HEIGHT)
   const { element, context } = canvas(width, height)
-  paintOpeningPaper(context, width, height, side === 'left' ? 521 : 733)
+  paintOpeningPaper(context, width, height, side === 'left' ? 521 : 733, theme)
+  const dark = theme === 'dark'
   const insetX = width * 0.115
   const usableWidth = width - insetX * 2
   context.textBaseline = 'alphabetic'
   context.textAlign = 'left'
-  context.fillStyle = 'rgba(48, 42, 36, .64)'
+  context.fillStyle = dark ? 'rgba(244, 239, 229, .64)' : 'rgba(48, 42, 36, .64)'
   context.font = `500 ${Math.round(width * 0.018)}px "IBM Plex Mono", ui-monospace, monospace`
   context.fillText(side === 'left' ? 'THE PROGRAMMABLE VOICE' : `${part.toUpperCase()} · READ`, insetX, height * 0.09)
 
   if (side === 'left') {
-    context.fillStyle = '#27221e'
-    context.font = `510 ${Math.round(width * 0.092)}px "Newsreader Variable", Newsreader, Georgia, serif`
-    const titleLines = wrappedLines(context, title, usableWidth * 0.8)
-    const titleLineHeight = width * 0.087
-    titleLines.forEach((line, index) => context.fillText(line, insetX, height * 0.27 + index * titleLineHeight))
-    const titleBottom = height * 0.27 + Math.max(0, titleLines.length - 1) * titleLineHeight
-    context.fillStyle = '#7b2328'
+    context.fillStyle = dark ? '#f4efe5' : '#27221e'
+    context.font = `510 ${Math.round(width * 0.084)}px "Newsreader Variable", Newsreader, Georgia, serif`
+    const titleLines = wrappedLines(context, title, usableWidth * 0.55)
+    const titleLineHeight = width * 0.074
+    titleLines.forEach((line, index) => context.fillText(line, insetX, height * 0.22 + index * titleLineHeight))
+    const titleBottom = height * 0.22 + Math.max(0, titleLines.length - 1) * titleLineHeight
+    context.fillStyle = dark ? '#d06a73' : '#7b2328'
     context.fillRect(insetX, titleBottom + width * 0.052, width * 0.075, Math.max(3, width * 0.003))
-    context.fillStyle = '#39322c'
+    context.fillStyle = dark ? '#e8dfd1' : '#39322c'
     context.font = `400 ${Math.round(width * 0.035)}px "Newsreader Variable", Newsreader, Georgia, serif`
     wrappedLines(context, deck, usableWidth).forEach((line, index) => {
       context.fillText(line, insetX, titleBottom + width * 0.12 + index * width * 0.05)
     })
-    context.strokeStyle = 'rgba(45, 38, 32, .42)'
+    const openingParagraph = paragraphs[0]
+    if (openingParagraph) {
+      context.fillStyle = dark ? '#e8dfd1' : '#39322c'
+      context.font = `400 ${Math.round(width * 0.026)}px "Newsreader Variable", Newsreader, Georgia, serif`
+      const paragraphLineHeight = width * 0.039
+      wrappedLines(context, openingParagraph, usableWidth, 11).forEach((line, index) => {
+        context.fillText(line, insetX, height * 0.59 + index * paragraphLineHeight)
+      })
+    }
+    context.strokeStyle = dark ? 'rgba(244, 239, 229, .34)' : 'rgba(45, 38, 32, .42)'
     context.lineWidth = Math.max(2, width * 0.0014)
     context.beginPath()
     context.moveTo(insetX, height * 0.79)
     context.lineTo(width - insetX, height * 0.79)
     context.stroke()
-    context.fillStyle = 'rgba(48, 42, 36, .64)'
+    context.fillStyle = dark ? 'rgba(244, 239, 229, .64)' : 'rgba(48, 42, 36, .64)'
     context.font = `500 ${Math.round(width * 0.016)}px "IBM Plex Mono", ui-monospace, monospace`
     context.fillText('PROLOGUE · 1 MIN · 30 CHAPTERS', insetX, height * 0.91)
   } else {
-    context.fillStyle = 'rgba(48, 42, 36, .62)'
+    context.fillStyle = dark ? 'rgba(244, 239, 229, .62)' : 'rgba(48, 42, 36, .62)'
     context.font = `400 ${Math.round(width * 0.018)}px "IBM Plex Mono", ui-monospace, monospace`
     context.fillText('NARRATION · RECORDED EDITION', insetX, height * 0.15)
-    context.fillStyle = '#302a25'
+    context.fillStyle = dark ? '#e8dfd1' : '#302a25'
     context.font = `400 ${Math.round(width * 0.034)}px "Newsreader Variable", Newsreader, Georgia, serif`
     const lineHeight = width * 0.049
     let y = height * 0.25
-    for (const paragraph of paragraphs) {
+    const continuation = paragraphs.length > 1 ? paragraphs.slice(1) : paragraphs
+    for (const paragraph of continuation) {
       for (const line of wrappedLines(context, paragraph, usableWidth)) {
         context.fillText(line, insetX, y)
         y += lineHeight
       }
       y += lineHeight * 0.72
     }
-    context.strokeStyle = 'rgba(45, 38, 32, .58)'
+    context.strokeStyle = dark ? 'rgba(244, 239, 229, .48)' : 'rgba(45, 38, 32, .58)'
     context.lineWidth = Math.max(2, width * 0.0014)
     context.strokeRect(insetX, height * 0.86, usableWidth, height * 0.065)
     context.font = `500 ${Math.round(width * 0.018)}px "IBM Plex Mono", ui-monospace, monospace`
     context.fillText('BEGIN CHAPTER ONE', insetX + width * 0.04, height * 0.9)
   }
-
   return finishTexture(element, anisotropy)
 }
 
@@ -244,24 +283,21 @@ function createCoverFront(size: number, deck: string, anisotropy: number) {
   context.textAlign = 'left'
   context.textBaseline = 'alphabetic'
   context.fillStyle = 'rgba(244, 236, 220, 0.96)'
-  context.shadowColor = 'rgba(0, 0, 0, 0.55)'
-  context.shadowBlur = width * 0.004
-  context.shadowOffsetY = width * 0.002
-  context.font = `560 ${Math.round(width * 0.128)}px "Newsreader Variable", Newsreader, Georgia, serif`
-  context.fillText('The', inset, height * 0.205)
-  context.fillText('Programmable', inset, height * 0.31, width - inset * 1.55)
-  context.fillText('Voice', inset, height * 0.415)
+  context.shadowColor = 'rgba(0, 0, 0, 0.38)'
+  context.shadowBlur = width * 0.003
+  context.shadowOffsetY = width * 0.0015
+  context.font = `510 ${Math.round(width * 0.142)}px "Newsreader Variable", Newsreader, Georgia, serif`
+  context.fillText('The', inset, height * 0.2)
+  context.fillText('Programmable', inset, height * 0.318, width - inset * 1.2)
+  context.fillText('Voice', inset, height * 0.436)
 
   context.shadowBlur = 0
   context.shadowOffsetY = 0
-  drawWaveform(context, inset, height * 0.555, width - inset * 2, height * 0.115, 'rgba(133, 50, 54, 0.92)')
+  drawWaveform(context, inset, height * 0.62, width - inset * 2, height * 0.16, 'rgba(236, 228, 212, 0.88)')
 
-  context.fillStyle = 'rgba(219, 211, 194, 0.64)'
-  context.font = `400 ${Math.round(width * 0.028)}px "IBM Plex Mono", ui-monospace, monospace`
-  drawWrappedText(context, deck, inset, height * 0.745, width - inset * 2, width * 0.045, 4)
-
-  context.fillStyle = 'rgba(133, 50, 54, 0.78)'
-  context.fillRect(inset, height * 0.89, width * 0.14, Math.max(2, width * 0.004))
+  context.fillStyle = 'rgba(228, 220, 204, 0.78)'
+  context.font = `400 ${Math.round(width * 0.032)}px "Newsreader Variable", Newsreader, Georgia, serif`
+  drawWrappedText(context, deck, inset, height * 0.8, width - inset * 2, width * 0.046, 3)
   return finishTexture(element, anisotropy)
 }
 
@@ -276,7 +312,7 @@ function createCoverBack(size: number, deck: string, anisotropy: number) {
   context.font = `400 ${Math.round(width * 0.031)}px "IBM Plex Mono", ui-monospace, monospace`
   context.textAlign = 'left'
   drawWrappedText(context, deck, inset, height * 0.37, width - inset * 2, width * 0.05, 6)
-  drawWaveform(context, inset, height * 0.69, width - inset * 2, height * 0.095, 'rgba(107, 36, 40, 0.62)')
+  drawWaveform(context, inset, height * 0.69, width - inset * 2, height * 0.11, 'rgba(228, 220, 204, 0.55)')
 
   context.strokeStyle = 'rgba(7, 7, 6, 0.36)'
   context.lineWidth = Math.max(2, width * 0.003)
@@ -351,24 +387,21 @@ function createPageEdges(size: number, anisotropy: number, fullWidth: boolean) {
   return finishTexture(element, anisotropy)
 }
 
-export function createBookTextures({
+export function createOpeningPageTextures({
   deck,
   openingParagraphs,
   openingPart,
   openingTitle,
+  theme,
   highDetail = false,
   anisotropy,
   tier,
-}: CreateBookTextureOptions): BookTextures {
+}: CreateBookTextureOptions): OpeningPageTextures {
   const resolvedTier = tier ?? (highDetail ? '2k' : undefined)
   const size = resolvedTier ? TEXTURE_LONG_EDGE[resolvedTier] : FALLBACK_TEXTURE_WIDTH
   const maxAnisotropy = Math.max(1, Math.floor(anisotropy))
-  const fullWidth = resolvedTier !== undefined
 
   return {
-    coverFront: createCoverFront(size, deck, maxAnisotropy),
-    coverBack: createCoverBack(size, deck, maxAnisotropy),
-    coverSpine: createSpine(size, maxAnisotropy, fullWidth),
     openingLeft: createOpeningPage(
       size,
       maxAnisotropy,
@@ -377,6 +410,7 @@ export function createBookTextures({
       deck,
       openingParagraphs,
       openingPart,
+      theme,
     ),
     openingRight: createOpeningPage(
       size,
@@ -386,7 +420,28 @@ export function createBookTextures({
       deck,
       openingParagraphs,
       openingPart,
+      theme,
     ),
+  }
+}
+
+export function createBookTextures(options: CreateBookTextureOptions): BookTextures {
+  const {
+    deck,
+    highDetail = false,
+    anisotropy,
+    tier,
+  } = options
+  const resolvedTier = tier ?? (highDetail ? '2k' : undefined)
+  const size = resolvedTier ? TEXTURE_LONG_EDGE[resolvedTier] : FALLBACK_TEXTURE_WIDTH
+  const maxAnisotropy = Math.max(1, Math.floor(anisotropy))
+  const fullWidth = resolvedTier !== undefined
+
+  return {
+    coverFront: createCoverFront(size, deck, maxAnisotropy),
+    coverBack: createCoverBack(size, deck, maxAnisotropy),
+    coverSpine: createSpine(size, maxAnisotropy, fullWidth),
+    ...createOpeningPageTextures(options),
     pageEdges: createPageEdges(size, maxAnisotropy, fullWidth),
   }
 }

@@ -12,7 +12,7 @@ test('search matches unaccented input, reports a count, shows context and reveal
   await result.click()
 
   await expect(page).toHaveURL(/#fdn-memory-without-recording$/)
-  await expect(page.locator('.chapter-body p', { hasText: 'Yorùbá' })).toBeInViewport()
+  await expect(page.locator('.chapter-article--flow p', { hasText: 'Yorùbá' })).toBeInViewport()
 })
 
 test('Contents scrolls its active entry into view without taking focus from the dialog', async ({ page }) => {

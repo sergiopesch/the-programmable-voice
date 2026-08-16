@@ -6,7 +6,7 @@ interface ScientificFigureProps {
   title: string
 }
 
-const figureDescriptions: Record<FigureKind, string> = {
+const scientificFigureDescriptions: Record<FigureKind, string> = {
   pressure: 'A sine-like pressure curve runs above a row of particles that bunch together at compressions and spread apart at rarefactions.',
   harmonics: 'Four horizontal curves compare a fundamental, its second and third harmonics, and the more complex waveform formed by their sum.',
   chladni: 'A vibrating rectangular plate is crossed by symmetrical nodal lines, with grains gathering along the places that remain still.',
@@ -24,6 +24,11 @@ const figureDescriptions: Record<FigureKind, string> = {
   duplex: 'Separate human-to-model and model-to-human paths remain open at once, allowing a person to interrupt the model mid-turn.',
   stack: 'Six stacked layers connect room air, microphones, signal processing, a neural model, tools and memory, and a loudspeaker in listening and speaking paths.',
   architecture: 'A continuous listening and speaking loop connects to frontier reasoning, tools and memory through documented and asynchronous paths.',
+  'telephone-network': 'Two subscribers connect through local loops to exchanges joined by a shared trunk; call setup selects a temporary end-to-end route.',
+  'magnetic-tape': 'A moving magnetic tape passes erase, record and replay heads in order, allowing an old pattern to be removed, a new one written and the result read back.',
+  'packet-voice': 'A speech signal passes through capture, framing, encoding, packetisation, routing, a jitter buffer, decoding and playback; transit may vary and packets may be lost.',
+  'training-corpus': 'People and recording settings lead to recordings, consent and metadata, segmentation and labels, sampling and training, a metric and deployment; bias can enter at every transition.',
+  'consent-provenance': 'Enrolment evidence and scoped consent lead through a protected voice model, authorised generation, signed provenance and channel disclosure to recipient verification.',
   clocks: 'Four timelines show audio, interaction, reasoning and memory operating at progressively slower intervals inside one experience.',
 }
 
@@ -106,6 +111,40 @@ function DiagramDefs({ markerId }: { markerId: string }) {
         <circle cx="2" cy="2" r="1.25" fill="currentColor" stroke="none" />
       </pattern>
     </defs>
+  )
+}
+
+interface FlowNodeProps {
+  x: number
+  y: number
+  lines: readonly string[]
+  width?: number
+  height?: number
+}
+
+function FlowNode({ x, y, lines, width = 92, height = 64 }: FlowNodeProps) {
+  const lineHeight = 16
+  const firstBaseline = y + (height / 2) - (((lines.length - 1) * lineHeight) / 2) + 5
+
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} rx="4" />
+      <text x={x + (width / 2)} y={firstBaseline} textAnchor="middle">
+        {lines.map((line, index) => (
+          <tspan key={line} x={x + (width / 2)} dy={index === 0 ? 0 : lineHeight}>{line}</tspan>
+        ))}
+      </text>
+    </g>
+  )
+}
+
+function FlowConnector({ from, to, y, markerId, dashed = false }: { from: number; to: number; y: number; markerId: string; dashed?: boolean }) {
+  return (
+    <path
+      d={`M${from} ${y}H${to}`}
+      markerEnd={`url(#${markerId})`}
+      className={dashed ? 'diagram-dashed' : undefined}
+    />
   )
 }
 
@@ -356,6 +395,148 @@ function ArchitectureFigure({ markerId }: { markerId: string }) {
   )
 }
 
+function TelephoneNetworkFigure({ markerId }: { markerId: string }) {
+  const nodes = [
+    ['subscriber'],
+    ['local', 'loop'],
+    ['exchange'],
+    ['shared', 'trunk'],
+    ['exchange'],
+    ['subscriber'],
+  ] as const
+
+  return (
+    <>
+      <text x="18" y="28">call setup selects a temporary route</text>
+      {nodes.map((lines, index) => {
+        const x = 17 + (index * 116)
+        return <FlowNode key={`${lines.join('-')}-${index}`} x={x} y={82} width={100} height={64} lines={lines} />
+      })}
+      {Array.from({ length: nodes.length - 1 }, (_, index) => (
+        <FlowConnector key={index} from={117 + (index * 116)} to={131 + (index * 116)} y={114} markerId={markerId} />
+      ))}
+      <path d="M17 180H703" className="diagram-faint" />
+      <text x="18" y="207">voice crosses infrastructure shared with other calls</text>
+    </>
+  )
+}
+
+function MagneticTapeFigure({ markerId }: { markerId: string }) {
+  const heads = [
+    { x: 166, lines: ['ERASE', 'HEAD'] },
+    { x: 306, lines: ['RECORD', 'HEAD'] },
+    { x: 446, lines: ['REPLAY', 'HEAD'] },
+  ] as const
+
+  return (
+    <>
+      <text x="18" y="28">moving carrier</text>
+      <circle cx="62" cy="130" r="36" />
+      <circle cx="658" cy="130" r="36" />
+      <circle cx="62" cy="130" r="9" /><circle cx="658" cy="130" r="9" />
+      <path d="M98 130H622" markerEnd={`url(#${markerId})`} className="diagram-heavy" />
+      {heads.map(({ x, lines }) => (
+        <g key={lines[0]}>
+          <FlowNode x={x} y={58} width={108} height={50} lines={lines} />
+          <path d={`M${x + 54} 108V130`} />
+        </g>
+      ))}
+      {Array.from({ length: 12 }, (_, index) => (
+        <path key={index} d={`M${126 + (index * 40)} 154v${index % 3 === 0 ? 24 : 14}`} className={index < 4 ? 'diagram-faint' : undefined} />
+      ))}
+      <text x="124" y="205">old pattern removed</text>
+      <text x="300" y="205">new pattern written</text>
+      <text x="500" y="205">pattern read back</text>
+    </>
+  )
+}
+
+function PacketVoiceFigure({ markerId }: { markerId: string }) {
+  const stages = [
+    ['capture'],
+    ['frame'],
+    ['encode'],
+    ['packetise'],
+    ['route'],
+    ['jitter', 'buffer'],
+    ['decode'],
+    ['play'],
+  ] as const
+
+  return (
+    <>
+      <text x="18" y="28">variable transit time · packets may arrive late or not at all</text>
+      {stages.map((lines, index) => (
+        <FlowNode key={lines[0]} x={13 + (index * 88)} y={82} width={76} height={64} lines={lines} />
+      ))}
+      {Array.from({ length: stages.length - 1 }, (_, index) => (
+        <FlowConnector key={index} from={89 + (index * 88)} to={99 + (index * 88)} y={114} markerId={markerId} dashed={index === 3 || index === 4} />
+      ))}
+      <g transform="translate(356 52)">
+        <rect width="18" height="12" /><rect x="23" width="18" height="12" /><rect x="46" width="18" height="12" />
+      </g>
+      <text x="18" y="207">framing, coding and buffering each contribute delay</text>
+    </>
+  )
+}
+
+function TrainingCorpusFigure({ markerId }: { markerId: string }) {
+  const stages = [
+    ['people +', 'settings'],
+    ['recordings'],
+    ['consent +', 'metadata'],
+    ['segments +', 'labels'],
+    ['sampling +', 'training'],
+    ['metric'],
+    ['deployment'],
+  ] as const
+
+  return (
+    <>
+      <text x="18" y="28">the corpus is shaped before training begins</text>
+      {stages.map((lines, index) => (
+        <FlowNode key={lines[0]} x={11 + (index * 101)} y={78} width={92} height={70} lines={lines} />
+      ))}
+      {Array.from({ length: stages.length - 1 }, (_, index) => (
+        <FlowConnector key={index} from={103 + (index * 101)} to={112 + (index * 101)} y={113} markerId={markerId} />
+      ))}
+      {Array.from({ length: stages.length - 1 }, (_, index) => (
+        <circle key={index} cx={107.5 + (index * 101)} cy="184" r="3" fill="currentColor" stroke="none" />
+      ))}
+      <path d="M107.5 184H612.5" className="diagram-dashed" />
+      <text x="18" y="215">selection and bias can enter at every transition</text>
+    </>
+  )
+}
+
+function ConsentProvenanceFigure({ markerId }: { markerId: string }) {
+  const stages = [
+    ['enrolment', 'evidence'],
+    ['scoped', 'consent'],
+    ['protected', 'voice model'],
+    ['authorised', 'generation'],
+    ['signed', 'provenance'],
+    ['channel', 'disclosure'],
+    ['recipient', 'verification'],
+  ] as const
+
+  return (
+    <>
+      <text x="18" y="28">permission and provenance remain distinct controls</text>
+      {stages.map((lines, index) => (
+        <FlowNode key={lines[0]} x={11 + (index * 101)} y={78} width={92} height={70} lines={lines} />
+      ))}
+      {Array.from({ length: stages.length - 1 }, (_, index) => (
+        <FlowConnector key={index} from={103 + (index * 101)} to={112 + (index * 101)} y={113} markerId={markerId} />
+      ))}
+      {Array.from({ length: stages.length - 1 }, (_, index) => (
+        <path key={index} d={`M${107.5 + (index * 101)} 174l6 6-6 6-6-6Z`} />
+      ))}
+      <text x="18" y="215">a broken control narrows what the system may do</text>
+    </>
+  )
+}
+
 function ClocksFigure() {
   const rows = [
     ['audio', 1],
@@ -394,6 +575,11 @@ export function ScientificFigure({ kind, title }: ScientificFigureProps) {
       case 'duplex': return <DuplexFigure markerId={markerId} />
       case 'stack': return <StackFigure markerId={markerId} />
       case 'architecture': return <ArchitectureFigure markerId={markerId} />
+      case 'telephone-network': return <TelephoneNetworkFigure markerId={markerId} />
+      case 'magnetic-tape': return <MagneticTapeFigure markerId={markerId} />
+      case 'packet-voice': return <PacketVoiceFigure markerId={markerId} />
+      case 'training-corpus': return <TrainingCorpusFigure markerId={markerId} />
+      case 'consent-provenance': return <ConsentProvenanceFigure markerId={markerId} />
       case 'clocks': return <ClocksFigure />
     }
   })()
@@ -421,7 +607,7 @@ export function ScientificFigure({ kind, title }: ScientificFigureProps) {
       <span id={`${markerId}-scroll-help`} className="sr-only">Use the Left and Right Arrow keys to pan when this diagram is wider than the page.</span>
       <svg className="scientific-figure__svg" viewBox="0 0 720 240" role="img" aria-labelledby={`${markerId}-title ${markerId}-desc`}>
         <title id={`${markerId}-title`}>{title}</title>
-        <desc id={`${markerId}-desc`}>{figureDescriptions[kind]}</desc>
+        <desc id={`${markerId}-desc`}>{scientificFigureDescriptions[kind]}</desc>
         <DiagramDefs markerId={markerId} />
         {content}
       </svg>

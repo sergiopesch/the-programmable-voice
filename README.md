@@ -16,7 +16,9 @@ An interactive, evidence-led digital book about the material history of sound, m
 
 The supported application is a static React 19/Vite book. `src/data/` contains the manuscript, source catalogue and narration-edition contract; `src/App.tsx` owns hash-routed section state; `src/components/` renders the semantic cover, reading section, dialogs, evidence and Sound Laboratory; and `src/styles.css` owns the present cover and section-transition motion. Vite also emits the complete no-JavaScript edition at `/manuscript.html`.
 
-Capable browsers inspect a native-4K Three.js hardback, while a paired-face CSS page-turn overlay explains section changes. The semantic manuscript remains the readable source of truth. Reduced-motion, forced-colors and missing-WebGL states keep the same words without the physical object. Photographed 4K materials live under `public/assets/book3d/`; source Vercel uploads keep the complete 2K surface and lighting fallback so the Hobby payload stays inside the documented ceiling.
+Capable desktop browsers may open a native-4K Three.js hardback, supersampled to 8K when the GPU allows. Before opening it, readers can rotate and move closer to the cover directly; rendering drops to an interaction-safe resolution while the object is moving and restores the selected settled resolution after it comes to rest. The cover opens as a physical artefact, and a developable travelling leaf explains section changes. Phones keep the paper cover. Reduced-motion, forced-colors and missing-WebGL states keep the same words without the physical object. Photographed 4K materials live under `public/assets/book3d/`; source Vercel uploads keep the complete 2K surface and lighting fallback so the Hobby payload stays inside the documented ceiling.
+
+The semantic manuscript is laid into viewport-bound page fragments: paired leaves on wide screens and one leaf on narrow screens. Page-edge controls and the Left/Right Arrow keys advance through those fragments without document scrolling, then cross a section boundary only when the reader reaches the end. Each manuscript passage, citation and narration target remains one ordered DOM node, so pagination never duplicates or truncates the source text.
 
 The reader has no application server and does not synthesise speech. Narration is loaded from an immutable static manifest by `useNarrationPlayer`; the local Kokoro generation and review tools remain isolated under `scripts/` and `tools/narration/`.
 
@@ -59,7 +61,7 @@ Generate the representative voice pilot locally:
 npm run narration:pilot
 ```
 
-The command writes 14 checksum-addressed 24 kHz / 48 kbps files under `public/audio/narration/edition-2026-2/` and a private `.narration-work/pilot-manifest.json`. Technical QC is not editorial approval. Listen to every listed file in full. If—and only if—the set sounds like the same warm British woman with suitable cadence, level and pronunciations, record that decision explicitly:
+The command writes 14 checksum-addressed 24 kHz / 48 kbps files under `public/audio/narration/edition-2026-2/` and a deployment-private, Git-tracked review manifest at `.narration-work/pilot-manifest.json`. Technical QC is not editorial approval. Listen to every listed file in full. If—and only if—the set sounds like the same warm British woman with suitable cadence, level and pronunciations, record that decision explicitly:
 
 ```bash
 npm run narration:approve-pilot -- --approver="Editor name" --confirm-pilot-listened --confirm-same-woman --confirm-british-accent --confirm-warmth --confirm-cadence --confirm-level --confirm-pronunciations
@@ -71,7 +73,7 @@ Only then will complete generation run. It refuses to start unless the pilot man
 npm run narration:generate
 ```
 
-Generation is resumable: verified content-addressed files are reused and private state is persisted after each passage. Passage-specific pronunciation notes participate only in that passage’s digest. Diagnostic `--section=<id>` and `--limit=<number>` subsets are permanently marked incomplete and cannot become a release. The former OpenAI/Vercel generation path is retired; `bf_emma` is not an OpenAI voice and no OpenAI key is used or exported.
+Generation is resumable: verified content-addressed files are reused and deployment-private state is persisted after each passage; selected review artefacts under `.narration-work/` are intentionally tracked for provenance, while model caches and temporary output remain ignored. Passage-specific pronunciation notes participate only in that passage’s digest. Diagnostic `--section=<id>` and `--limit=<number>` subsets are permanently marked incomplete and cannot become a release. The former OpenAI/Vercel generation path is retired; `bf_emma` is not an OpenAI voice and no OpenAI key is used or exported.
 
 After a complete human listening and pronunciation pass, publish the release manifest explicitly:
 

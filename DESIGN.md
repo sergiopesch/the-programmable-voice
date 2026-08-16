@@ -10,16 +10,16 @@ The interface is a warm, hardback-inspired reading instrument: part literary his
 - A contained cover and a single two-page spread keep prose, figures and evidence legible. The settled interface never shows a third cover panel, translucent page copy or an inner reading scrollbar. Scientific figures use deterministic SVG and Canvas. Generated concept art may guide composition but is never presented as historical or scientific evidence.
 - Oxblood labels distinguish evidence states, active narration and physical joins without turning the book into a dashboard.
 - Motion reveals causality, including the opening cover and directional page turns, and stops when the reader changes section. Reduced-motion is a first-class state.
-- Capable browsers inspect a native-4K Three.js hardback with charcoal cloth and an oxblood spine, while a paired-face CSS leaf explains section changes. The semantic manuscript remains the readable source of truth; WebGL is enhancement, never the only copy of the words.
+- Capable desktop browsers may open a native-4K Three.js hardback, supersampled to 8K when the GPU allows. The closed object is directly inspectable through bounded rotation and zoom; movement temporarily lowers render density, then restores the selected settled resolution. The physical object arrives, opens and turns as its own artefact; the manuscript and narration never drive its materials. A developable travelling leaf explains section changes. The semantic manuscript remains the readable source of truth; WebGL is enhancement, never the only copy of the words.
 
 ## Core states
 
 - Opening: one fully contained cloth cover opens onto one title/prologue spread; the cover leaves the settled composition and the animated waveform remains an atmospheric, code-drawn motif.
-- Reader: a calm two-page warm-paper spread with the chapter threshold on the left and a continuous, readable measure on the right. Navigation and evidence stay available without stealing page width.
+- Reader: a calm two-page warm-paper spread whose continuous semantic manuscript fragments across both leaves. Page-edge controls move through viewport-bound spreads without document scrolling; section changes happen only at a chapter boundary. Navigation and evidence stay available without stealing page width.
 - Laboratory: an open oscilloscope-like spread with exact controls, locally generated Web Audio, truthful A/B comparison and explicit demonstration limits.
 - Recorded edition: pre-generated, checksum-addressed static narration with one persistent player, visible active passages and an unambiguous AI-generated disclosure. Playback never regenerates the voice.
 - Companion leaves: A–D provide chronology, representation atlas, evidence method and the practical trust contract without being mistaken for numbered chapters.
-- Mobile: safe-area aware, 44px targets, contents/evidence as modal sheets, no page-level overflow; the hardcover becomes a single paper page with document scrolling and persistent section navigation.
+- Mobile: safe-area aware, 44px targets, contents/evidence as modal sheets and no page-level overflow; the hardcover becomes a single viewport-bound paper leaf advanced by the same quiet page-edge controls.
 - Accessibility: keyboard page turns never steal keys from controls, text size and theme persist, figures carry text alternatives, narration is optional, and the complete manuscript remains available without JavaScript.
 
 The concept references live in [`design/`](design/).

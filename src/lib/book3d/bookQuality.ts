@@ -40,12 +40,9 @@ function outputPixelRatio({
 }) {
   width = Math.max(1, width)
   height = Math.max(1, height)
-  // WebGLRenderer floors CSS-size * pixel-ratio. A sub-pixel epsilon avoids
-  // 4095/7679 buffers caused by binary rounding without changing layout.
-  // Leave a whole backing pixel of headroom. WebGLRenderer floors the
-  // multiplication after its own size bookkeeping; fractional CSS pixels can
-  // otherwise still produce 4095 even when a tiny floating epsilon was added.
-  const targetRatio = (renderLongEdge + 1) / Math.max(width, height)
+  // WebGLRenderer floors CSS-size * pixel-ratio. A quarter backing pixel keeps
+  // binary rounding on the requested side without allocating a 4097/7681 edge.
+  const targetRatio = (renderLongEdge + 0.25) / Math.max(width, height)
   const hardwareRatio = Math.min(maxRenderbufferSize / width, maxRenderbufferSize / height)
   return Math.max(0.5, Math.min(hardwareRatio, Math.max(baselinePixelRatio, targetRatio)))
 }
@@ -69,6 +66,16 @@ export function resolveBookOutputPixelRatio(
     renderLongEdge: quality.renderLongEdge,
     width,
   })
+}
+
+export function resolveBookInteractionPixelRatio(
+  settledPixelRatio: number,
+  width: number,
+  height: number,
+  interactionLongEdge = 2_048,
+) {
+  const longEdge = Math.max(1, width, height)
+  return Math.max(0.5, Math.min(settledPixelRatio, interactionLongEdge / longEdge))
 }
 
 /**
@@ -126,7 +133,7 @@ export function selectBookRenderQuality(
     ? '2k'
     : forcedTier === '8k' && textureTier === '4k' && supports8kOutput
       && memoryAllows8k && cpuAllows8k && !dataSaver && !mobile && navigator.webdriver !== true
-      ? '8k'
+        ? '8k'
       : forcedTier === '4k' && textureTier === '4k' && supports4kOutput
         ? '4k'
         : textureTier === '4k' && supports8kOutput && physicalLongEdge >= 3_840
@@ -151,7 +158,7 @@ export function selectBookRenderQuality(
     width: host.clientWidth,
   })
 
-  const shadowMapSize = textureTier === '4k' && maxRenderbufferSize >= 4096
+  const shadowMapSize = (outputTier === '8k' || textureTier === '4k') && maxRenderbufferSize >= 4096
     ? 4096
     : matchMedia('(max-width: 1199px)').matches
       ? 1024

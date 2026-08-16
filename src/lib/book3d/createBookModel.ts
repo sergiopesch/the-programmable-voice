@@ -7,6 +7,7 @@ import {
   InstancedMesh,
   Matrix4,
   Mesh,
+  MeshBasicMaterial,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
   PlaneGeometry,
@@ -31,6 +32,8 @@ export interface BookModel {
   frontCoverPivot: Group
   frontArtwork: Mesh
   backArtwork: Mesh
+  openingLeftPaper: MeshBasicMaterial
+  openingRightPaper: MeshBasicMaterial
   openingPageBlockPivot: Group
   openingLeaves: OpeningLeaf[]
 }
@@ -54,10 +57,10 @@ export function createBookModel(textures: BookTextures, initialSurfaces: BookSur
     // The photographed cloth albedo is already charcoal. Keep the tint
     // neutral enough that ACES lighting can reveal its weave and debossing
     // instead of multiplying the surface down to near-black.
-    color: '#7a7f82',
+    color: '#2c2b29',
     map: initialSurfaces.clothColor,
-    emissive: '#2a2c2e',
-    emissiveIntensity: 0.42,
+    emissive: '#121110',
+    emissiveIntensity: 0.16,
     normalMap: initialSurfaces.clothNormal,
     normalScale: new Vector2(1.18, 1.18),
     aoMap: initialSurfaces.clothArm,
@@ -73,16 +76,16 @@ export function createBookModel(textures: BookTextures, initialSurfaces: BookSur
   // view. A separately calibrated tint preserves the same charcoal identity
   // instead of letting that face wash out to slate grey.
   const rearCloth = cloth.clone()
-  rearCloth.color.set('#5c5550')
-  rearCloth.emissive.set('#1a1614')
-  rearCloth.emissiveIntensity = 0.22
+  rearCloth.color.set('#1f1d1b')
+  rearCloth.emissive.set('#0c0b0a')
+  rearCloth.emissiveIntensity = 0.1
   rearCloth.roughness = 0.93
   rearCloth.sheen = 0.15
   rearCloth.sheenColor.set('#817d75')
   const spineCloth = new MeshPhysicalMaterial({
-    color: '#6b2430',
-    emissive: '#3a1218',
-    emissiveIntensity: 0.32,
+    color: '#5a1d26',
+    emissive: '#2a1014',
+    emissiveIntensity: 0.18,
     map: initialSurfaces.clothColor,
     normalMap: initialSurfaces.clothNormal,
     normalScale: new Vector2(0.92, 0.92),
@@ -107,9 +110,9 @@ export function createBookModel(textures: BookTextures, initialSurfaces: BookSur
   })
   const coverFrontArtwork = new MeshPhysicalMaterial({
     map: textures.coverFront,
-    emissive: '#ffffff',
-    emissiveMap: textures.coverFront,
-    emissiveIntensity: 0.28,
+    emissive: '#000000',
+    emissiveMap: null,
+    emissiveIntensity: 0,
     normalMap: initialSurfaces.clothNormal,
     normalScale: new Vector2(0.72, 0.72),
     roughnessMap: initialSurfaces.clothArm,
@@ -126,9 +129,9 @@ export function createBookModel(textures: BookTextures, initialSurfaces: BookSur
   })
   const coverBackArtwork = new MeshPhysicalMaterial({
     map: textures.coverBack,
-    emissive: '#f0e7d7',
-    emissiveMap: textures.coverBack,
-    emissiveIntensity: 0.2,
+    emissive: '#000000',
+    emissiveMap: null,
+    emissiveIntensity: 0,
     normalMap: initialSurfaces.clothNormal,
     normalScale: new Vector2(0.72, 0.72),
     roughnessMap: initialSurfaces.clothArm,
@@ -152,15 +155,13 @@ export function createBookModel(textures: BookTextures, initialSurfaces: BookSur
     roughness: 0.94,
     metalness: 0,
   })
-  const openingLeftPaper = new MeshStandardMaterial({
-    color: '#fffdf7',
+  // Printed opening faces are the exact semantic handoff artwork. Their paper
+  // colour must not change under studio exposure; the physical casing, page
+  // edges and painted gutter still carry the depth and contact cues.
+  const openingLeftPaper = new MeshBasicMaterial({
     map: textures.openingLeft,
-    normalMap: initialSurfaces.paperNormal,
-    normalScale: new Vector2(0.16, 0.16),
-    roughnessMap: initialSurfaces.paperRoughness,
-    roughness: 0.94,
-    metalness: 0,
     side: FrontSide,
+    toneMapped: false,
   })
   const openingRightPaper = openingLeftPaper.clone()
   openingRightPaper.map = textures.openingRight
@@ -430,7 +431,7 @@ export function createBookModel(textures: BookTextures, initialSurfaces: BookSur
   root.add(headTailSlivers)
 
   const openingLeaves: OpeningLeaf[] = []
-  for (let index = 0; index < 3; index += 1) {
+  for (let index = 0; index < 1; index += 1) {
     const pivot = new Group()
     pivot.name = `opening-leaf-${index + 1}`
     pivot.position.set(-pageWidth / 2 + 0.055, 0, PAGE_DEPTH / 2 + 0.018 - index * 0.004)
@@ -485,6 +486,8 @@ export function createBookModel(textures: BookTextures, initialSurfaces: BookSur
     frontCoverPivot,
     frontArtwork,
     backArtwork,
+    openingLeftPaper,
+    openingRightPaper,
     openingPageBlockPivot,
     openingLeaves,
   }

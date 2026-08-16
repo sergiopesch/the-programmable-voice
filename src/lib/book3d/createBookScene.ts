@@ -29,9 +29,9 @@ import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
 import type { Theme } from '../../hooks/usePreferences'
 import { bookEnvironmentCandidates } from './bookAssets'
 import { bookFaceFromAzimuth, cameraAzimuthDegrees, shortestAngleDelta, type BookFace } from './bookView'
-import { resolveBookOutputPixelRatio, selectBookRenderQuality } from './bookQuality'
+import { resolveBookInteractionPixelRatio, resolveBookOutputPixelRatio, selectBookRenderQuality } from './bookQuality'
 import { createBookModel } from './createBookModel'
-import { createBookTextures } from './createBookTextures'
+import { createBookTextures, createOpeningPageTextures } from './createBookTextures'
 import {
   createFallbackBookSurfaceTextures,
   loadBookSurfaceTextures,
@@ -42,6 +42,7 @@ import {
   BOOK_GEOMETRY,
   BOOK_PAGE_WIDTH,
 } from './bookGeometry'
+import { shouldInspectPhysicalBook } from './shouldUsePhysicalBook'
 
 export interface BookSceneController {
   open: () => Promise<void>
@@ -225,7 +226,10 @@ export async function createBookScene({
   renderer.domElement.tabIndex = -1
 
   const quality = selectBookRenderQuality(renderer, host)
-  renderer.setPixelRatio(quality.pixelRatio)
+  let allowSettledOutput = quality.outputTier !== '8k'
+  renderer.setPixelRatio(allowSettledOutput
+    ? quality.pixelRatio
+    : resolveBookInteractionPixelRatio(quality.pixelRatio, host.clientWidth, host.clientHeight))
   const stageElement = host.closest<HTMLElement>('.book3d-stage')
   stageElement?.setAttribute('data-output-tier', quality.outputTier)
   stageElement?.setAttribute('data-render-target-long-edge', `${quality.renderLongEdge}`)
@@ -354,6 +358,7 @@ export async function createBookScene({
     openingParagraphs,
     openingPart,
     openingTitle,
+    theme,
     tier: quality.textureTier,
     anisotropy: renderer.capabilities.getMaxAnisotropy(),
   })
@@ -364,15 +369,37 @@ export async function createBookScene({
   const surfaceTextures = surfaceResult.textures
   stageElement?.setAttribute('data-texture-tier', surfaceResult.tier)
   const model = createBookModel(textures, surfaceTextures)
+  let openingTextureTheme = theme
+  stageElement?.setAttribute('data-opening-page-theme', openingTextureTheme)
   scene.add(model.root)
 
-  // The reference gesture begins with a hardback standing on its tail and
-  // finishes with the spread supported by the table. Keeping the volume at a
-  // permanently near-horizontal tilt made the cover rise toward the lens as a
-  // white triangular slab. Articulate the whole sewn volume through that
-  // change of posture and preserve one physical contact line throughout.
-  const CLOSED_VOLUME_TILT = -0.22
-  const OPEN_VOLUME_TILT = -1.38
+  const applyOpeningTextureTheme = (nextTheme: Theme) => {
+    if (openingTextureTheme === nextTheme) return
+    const replacements = createOpeningPageTextures({
+      anisotropy: renderer.capabilities.getMaxAnisotropy(),
+      deck,
+      openingParagraphs,
+      openingPart,
+      openingTitle,
+      theme: nextTheme,
+      tier: quality.textureTier,
+    })
+    const previousLeft = model.openingLeftPaper.map
+    const previousRight = model.openingRightPaper.map
+    model.openingLeftPaper.map = replacements.openingLeft
+    model.openingRightPaper.map = replacements.openingRight
+    model.openingLeftPaper.needsUpdate = true
+    model.openingRightPaper.needsUpdate = true
+    previousLeft?.dispose()
+    previousRight?.dispose()
+    openingTextureTheme = nextTheme
+    stageElement?.setAttribute('data-opening-page-theme', openingTextureTheme)
+  }
+
+  // The closed object arrives upright enough to read as a hardback, then its
+  // sewn volume settles onto the table as the cover crosses the gutter.
+  const CLOSED_VOLUME_TILT = -0.18
+  const OPEN_VOLUME_TILT = -1.34
   const supportSurfaceY = -BOOK_HEIGHT / 2 - 0.16
   const shadowReceiver = model.root.getObjectByName('contact-shadow-receiver')
   if (shadowReceiver) shadowReceiver.position.y = supportSurfaceY
@@ -388,28 +415,43 @@ export async function createBookScene({
     model.volume.position.y = supportSurfaceY + 0.045 - bounds.min.y
     model.root.updateMatrixWorld(true)
   }
+  const applyEntrancePose = (progress: number) => {
+    setVolumePosture(0)
+    const remain = 1 - progress
+    model.volume.rotation.y = remain * 0.24
+    model.volume.rotation.x += remain * 0.07
+    model.volume.position.y += remain * -0.38
+    model.root.updateMatrixWorld(true)
+  }
   setVolumePosture(0)
 
+  const inspect = shouldInspectPhysicalBook()
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.target.copy(target)
-  controls.enableDamping = true
+  controls.enableDamping = inspect
   controls.dampingFactor = 0.075
   controls.enablePan = false
-  controls.enableZoom = false
-  controls.enableRotate = true
+  controls.enableZoom = inspect
+  controls.enableRotate = inspect
   controls.rotateSpeed = 0.78
+  controls.zoomSpeed = 0.72
   controls.autoRotate = false
   controls.minPolarAngle = 0.34
-  controls.maxPolarAngle = Math.PI - 0.34
+  controls.maxPolarAngle = Math.PI / 2 - 0.06
   controls.minAzimuthAngle = -Infinity
   controls.maxAzimuthAngle = Infinity
-  renderer.domElement.style.touchAction = 'pan-y'
+  renderer.domElement.style.touchAction = 'pan-y pinch-zoom'
 
   let disposed = false
   let frame = 0
+  let entranceAnimation: { startedAt: number; duration: number } | null = null
   let openingAnimation: OpeningAnimation | null = null
   let openingPromise: Promise<void> | null = null
   let openingDeadlineTimer = 0
+  let initialPromotionTimer = 0
+  let settledOutputRatio = quality.pixelRatio
+  let resolutionRestoreTimer = 0
+  let interactionResolutionActive = false
   let lastFace: BookFace | null = null
   let handoffReady = false
   const animatedTarget = new Vector3()
@@ -588,7 +630,26 @@ export async function createBookScene({
     frame = 0
     if (disposed || document.hidden) return
 
+    if (entranceAnimation && !openingAnimation) {
+      const progress = clamp01((now - entranceAnimation.startedAt) / entranceAnimation.duration)
+      const eased = 1 - ((1 - progress) ** 3)
+      applyEntrancePose(eased)
+      stageElement?.setAttribute('data-entrance-progress', eased.toFixed(3))
+      if (progress >= 1) {
+        applyEntrancePose(1)
+        entranceAnimation = null
+        stageElement?.setAttribute('data-entrance-phase', 'settled')
+      } else {
+        stageElement?.setAttribute('data-entrance-phase', 'arrive')
+      }
+    }
+
     if (openingAnimation) {
+      if (entranceAnimation) {
+        applyEntrancePose(1)
+        entranceAnimation = null
+        stageElement?.setAttribute('data-entrance-phase', 'settled')
+      }
       // Opening duration is wall-clock deterministic. Capping each frame's
       // contribution made a nominal two-second gesture remain in its peel
       // phase for five seconds on a 4K drawing buffer.
@@ -604,14 +665,14 @@ export async function createBookScene({
           : progress < 0.82
             ? 'cross'
             : 'settle')
-      // Once the physical leaves have flattened, replace only their printed
-      // faces with the native semantic spread. The Three casing remains below
-      // it, so the final 8% is a matched-material handoff instead of an
-      // unavoidable canvas-font-to-DOM hard cut.
-      if (progress >= 0.92 && !handoffReady) {
+      if (progress >= 1 && !handoffReady) {
         handoffReady = true
         onHandoffReady()
       }
+      // Keep the physical spread fully present until React swaps in the
+      // semantic spread. Fading first exposed the dark stage at the end of an
+      // otherwise coherent opening gesture.
+      renderer.domElement.style.opacity = '1'
       // The fore edge cracks free immediately, then the board's inertia takes
       // over. A small early angle makes the causality legible without making
       // the heavy cover spring up unrealistically.
@@ -619,13 +680,6 @@ export async function createBookScene({
       const coverProgress = clamp01(
         foreEdgeRelease + (1 - foreEdgeRelease) * dampedLanding((progress - 0.14) / 0.7),
       )
-      // Reframe late: the cover swing should remain spatially legible before
-      // the view settles into the front-on reading projection. Rotating toward
-      // plan view too early made the flyleaves read as full-height white slabs.
-      // Begin the move toward the final plan view as the flyleaves release.
-      // Holding the inspection camera until late made the cascade read as a
-      // tiny oblique fan; the storyboard calls for broad leaves presented
-      // frontally while the cover remains spatially legible.
       const cameraProgress = smoothstep((progress - 0.3) / 0.55)
       animatedTarget.lerpVectors(openingAnimation.fromTarget, openingAnimation.toTarget, cameraProgress)
       animatedSpherical.set(
@@ -645,16 +699,11 @@ export async function createBookScene({
       // already approaching the final plan-view reading surface.
       const volumeProgress = smoothstep((progress - 0.16) / 0.44)
       setVolumePosture(volumeProgress)
-      // A few degrees of joint compression give the fore edge room to release
-      // while the weight of the page block remains supported on the rear board.
       const compression = Math.sin(Math.PI * clamp01((progress - 0.24) / 0.52))
-      model.openingPageBlockPivot.rotation.y = -MathUtils.degToRad(4.5) * compression
+      model.openingPageBlockPivot.rotation.y = -MathUtils.degToRad(2.4) * compression
 
-      // Flyleaves release from the fore-edge in a short cascade while their
-      // gutter edge remains bound. Each leaf bends independently so the stack
-      // never becomes the intersecting white fan produced by rigid planes.
-      const leafReleases = [0.3, 0.35, 0.4]
-      const leafDurations = [0.58, 0.6, 0.62]
+      const leafReleases = [0.28]
+      const leafDurations = [0.5]
       model.openingLeaves.forEach(({ pivot, geometry, sourcePositions }, index) => {
         // Geometry applies its own smooth rotation profile. Feeding it the raw
         // staggered release (instead of another cubic ease) keeps all three
@@ -668,7 +717,7 @@ export async function createBookScene({
         // beneath the printed title face. Removing it from the transient draw
         // before the terminal beat prevents a blank flyleaf masking the exact
         // content-bearing handoff page.
-        pivot.visible = progress < 0.92 && leafProgress < 0.985
+        pivot.visible = progress < 0.9 && leafProgress < 0.98
       })
 
       // Fit the evolving physical bounds after applying the cover and leaf
@@ -677,8 +726,8 @@ export async function createBookScene({
       // the doubled open silhouette contained without crossing to its underside.
       model.root.updateMatrixWorld(true)
       const viewDirection = animatedOffset.clone().normalize()
-      const transientPadding = 1.16 + Math.sin(Math.PI * progress) * 0.045
-      const fitPadding = MathUtils.lerp(transientPadding, 1.025, smoothstep((progress - 0.8) / 0.18))
+      const transientPadding = 1.12 + Math.sin(Math.PI * progress) * 0.035
+      const fitPadding = MathUtils.lerp(transientPadding, 1.04, smoothstep((progress - 0.8) / 0.18))
       const animatedFit = fitDistanceForObject(model.volume, viewDirection, animatedUp, fitPadding)
       const containmentProgress = smoothstep(progress / 0.2)
       animatedTarget.lerpVectors(openingAnimation.fromTarget, animatedFit.centre, containmentProgress)
@@ -701,7 +750,7 @@ export async function createBookScene({
     const controlsChanged = controls.update()
     updateCoverArtworkVisibility(camera.position.clone().sub(controls.target))
     renderer.render(scene, camera)
-    if ((openingAnimation && openingAnimation.seekProgress === undefined || controlsChanged) && !frame) {
+    if ((openingAnimation && openingAnimation.seekProgress === undefined || entranceAnimation || controlsChanged) && !frame) {
       frame = requestAnimationFrame(renderFrame)
     }
   }
@@ -716,11 +765,14 @@ export async function createBookScene({
     const aspect = width / height
     camera.aspect = aspect
     camera.updateProjectionMatrix()
-    let outputRatio = resolveBookOutputPixelRatio(quality, width, height)
+    const requestedSettledRatio = resolveBookOutputPixelRatio(quality, width, height)
+    let outputRatio = allowSettledOutput
+      ? requestedSettledRatio
+      : resolveBookInteractionPixelRatio(requestedSettledRatio, width, height)
     renderer.setPixelRatio(outputRatio)
     renderer.setSize(width, height, false)
     const drawingBuffer = renderer.getDrawingBufferSize(new Vector2())
-    if (quality.outputTier !== 'adaptive') {
+    if (allowSettledOutput && quality.outputTier !== 'adaptive') {
       // Fractional CSS boxes and Three's internal integer size bookkeeping can
       // still leave a nominal 4K surface at 4095 pixels. Measure the actual
       // allocation and make one bounded correction instead of trusting the
@@ -729,23 +781,25 @@ export async function createBookScene({
       const maxRenderbufferSize = Number(renderer.getContext().getParameter(
         renderer.getContext().MAX_RENDERBUFFER_SIZE,
       ))
-      if (actualLongEdge < quality.renderLongEdge && actualLongEdge < maxRenderbufferSize) {
-        outputRatio *= (quality.renderLongEdge + 1) / Math.max(1, actualLongEdge)
+      if (actualLongEdge !== quality.renderLongEdge && quality.renderLongEdge <= maxRenderbufferSize) {
+        // Recompute from the logical long edge instead of scaling the rounded
+        // result. Scaling a 7679 buffer by 7681/7679 can overshoot to 7682.
+        outputRatio = (quality.renderLongEdge + 0.25) / Math.max(width, height)
         renderer.setPixelRatio(outputRatio)
         renderer.setSize(width, height, false)
         renderer.getDrawingBufferSize(drawingBuffer)
       }
     }
+    settledOutputRatio = allowSettledOutput ? outputRatio : requestedSettledRatio
     const stage = host.closest<HTMLElement>('.book3d-stage')
+    stage?.setAttribute('data-render-mode', allowSettledOutput ? 'settled' : 'interactive')
     stage?.setAttribute('data-render-width', `${Math.round(drawingBuffer.x)}`)
     stage?.setAttribute('data-render-height', `${Math.round(drawingBuffer.y)}`)
 
-    // The desktop inspection controls occupy a separate rail below this
-    // canvas. Orbiting a corner-on volume increases its projected height, so
-    // keep enough radial reserve for every azimuth rather than fitting only
-    // the front three-quarter pose and letting the spine/fore-edge touch the
-    // rail. The opened-state fit is derived independently and is unchanged.
-    const closedFit = fitDistanceForObject(model.volume, defaultDirection, camera.up, 1.34)
+    // Orbiting a corner-on volume increases its projected height, so keep
+    // enough radial reserve for every azimuth. The opened-state fit is derived
+    // independently and is unchanged.
+    const closedFit = fitDistanceForObject(model.volume, defaultDirection, camera.up, 1.12)
     target.copy(closedFit.centre)
     fittedDistance = closedFit.distance
     controls.minDistance = fittedDistance * 0.8
@@ -764,11 +818,49 @@ export async function createBookScene({
   const resizeObserver = new ResizeObserver(updateFit)
   resizeObserver.observe(host)
 
+  const applyInteractionResolution = () => {
+    const width = Math.max(1, host.clientWidth)
+    const height = Math.max(1, host.clientHeight)
+    const interactiveRatio = resolveBookInteractionPixelRatio(settledOutputRatio, width, height)
+    renderer.setPixelRatio(interactiveRatio)
+    renderer.setSize(width, height, false)
+    const drawingBuffer = renderer.getDrawingBufferSize(new Vector2())
+    const stage = host.closest<HTMLElement>('.book3d-stage')
+    stage?.setAttribute('data-render-mode', 'interactive')
+    stage?.setAttribute('data-render-width', `${Math.round(drawingBuffer.x)}`)
+    stage?.setAttribute('data-render-height', `${Math.round(drawingBuffer.y)}`)
+    requestRender()
+  }
+
+  const handleControlsStart = () => {
+    window.clearTimeout(initialPromotionTimer)
+    initialPromotionTimer = 0
+    window.clearTimeout(resolutionRestoreTimer)
+    resolutionRestoreTimer = 0
+    interactionResolutionActive = true
+    applyInteractionResolution()
+  }
+
+  const scheduleSettledResolution = () => {
+    if (!interactionResolutionActive) return
+    window.clearTimeout(resolutionRestoreTimer)
+    resolutionRestoreTimer = window.setTimeout(() => {
+      interactionResolutionActive = false
+      allowSettledOutput = true
+      updateFit()
+    }, 220)
+  }
+
   const handleControlsChange = () => {
     reportFace()
     requestRender()
+    scheduleSettledResolution()
   }
-  const handleControlsEnd = () => reportFace()
+  const handleControlsEnd = () => {
+    reportFace()
+    scheduleSettledResolution()
+  }
+  controls.addEventListener('start', handleControlsStart)
   controls.addEventListener('change', handleControlsChange)
   controls.addEventListener('end', handleControlsEnd)
 
@@ -792,6 +884,7 @@ export async function createBookScene({
 
   const setCameraSpherical = (mutate: (spherical: Spherical) => void) => {
     if (disposed || openingAnimation) return
+    handleControlsStart()
     settlePendingDamping()
     const offset = camera.position.clone().sub(controls.target)
     const spherical = new Spherical().setFromVector3(offset)
@@ -807,6 +900,7 @@ export async function createBookScene({
 
   const reset = () => {
     if (disposed || openingAnimation) return
+    handleControlsStart()
     settlePendingDamping()
     setVolumePosture(0)
     camera.position.copy(defaultDirection).multiplyScalar(fittedDistance).add(target)
@@ -824,7 +918,10 @@ export async function createBookScene({
   // Compile eagerly, then force the submitted frame below. `compileAsync()`
   // can wait indefinitely on saturated CI GPUs, which is worse than retaining
   // the semantic cover while one synchronous first frame is completed.
-  if (!skipClosedFirstFrame) renderer.compile(scene, camera)
+  if (!skipClosedFirstFrame) {
+    applyEntrancePose(0)
+    renderer.compile(scene, camera)
+  }
   // Prime one lighting pass before revealing UHD. A synchronous `gl.finish()`
   // at a 4096/7680-pixel backing size can block software and low-power GPUs
   // for longer than the entire interaction budget. The two presentation
@@ -850,7 +947,22 @@ export async function createBookScene({
         stageElement?.setAttribute('data-textures-ready', surfaceResult.loaded ? 'true' : 'fallback')
         stageElement?.setAttribute('data-initial-frame-status', 'visible')
         stageElement?.setAttribute('data-initial-frame-ready', 'true')
+        const skipEntrance = new URLSearchParams(window.location.search).has('bookOpeningSeek')
+        if (!skipEntrance) {
+          applyEntrancePose(0)
+          entranceAnimation = { startedAt: performance.now(), duration: 1_480 }
+          stageElement?.setAttribute('data-entrance-phase', 'arrive')
+          requestRender()
+        } else {
+          stageElement?.setAttribute('data-entrance-phase', 'settled')
+        }
         onReady()
+        if (!allowSettledOutput) {
+          initialPromotionTimer = window.setTimeout(() => {
+            allowSettledOutput = true
+            updateFit()
+          }, 420)
+        }
         resolve()
       })
     })
@@ -858,6 +970,12 @@ export async function createBookScene({
   else {
     stageElement?.setAttribute('data-textures-ready', surfaceResult.loaded ? 'true' : 'fallback')
     onReady()
+    if (!allowSettledOutput) {
+      initialPromotionTimer = window.setTimeout(() => {
+        allowSettledOutput = true
+        updateFit()
+      }, 420)
+    }
   }
 
   const controller: BookSceneController = {
@@ -884,7 +1002,7 @@ export async function createBookScene({
         const seekProgress = Number.isFinite(requestedSeek) && requestedSeek >= 0 && requestedSeek < 1
           ? clamp01(requestedSeek)
           : undefined
-        const openingDuration = debugSlowMotion ? 20_500 : 2_050
+        const openingDuration = debugSlowMotion ? 20_500 : 1_780
         stageElement?.setAttribute('data-opening-duration', `${openingDuration}`)
         openingAnimation = {
           duration: openingDuration,
@@ -923,6 +1041,7 @@ export async function createBookScene({
     },
     setTheme: (nextTheme) => {
       applyTheme(nextTheme)
+      applyOpeningTextureTheme(nextTheme)
       requestRender()
     },
     dispose: () => {
@@ -930,8 +1049,11 @@ export async function createBookScene({
       disposed = true
       if (frame) cancelAnimationFrame(frame)
       window.clearTimeout(openingDeadlineTimer)
+      window.clearTimeout(initialPromotionTimer)
+      window.clearTimeout(resolutionRestoreTimer)
       resizeObserver.disconnect()
       document.removeEventListener('visibilitychange', handleVisibility)
+      controls.removeEventListener('start', handleControlsStart)
       controls.removeEventListener('change', handleControlsChange)
       controls.removeEventListener('end', handleControlsEnd)
       controls.dispose()

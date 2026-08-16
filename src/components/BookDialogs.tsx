@@ -77,7 +77,7 @@ interface SearchDialogProps {
   open: boolean
   sections: BookSection[]
   onClose: () => void
-  onNavigate: (id: string) => void
+  onNavigate: (id: string, revealTargetId: string) => void
 }
 
 export function SearchDialog({ open, sections, onClose, onNavigate }: SearchDialogProps) {
@@ -103,27 +103,12 @@ export function SearchDialog({ open, sections, onClose, onNavigate }: SearchDial
 
   const navigateToResult = (result: SectionSearchResult) => {
     onClose()
-    onNavigate(result.section.id)
-
     const requestedTargetId = narrationTargetId(
       result.section.id,
       result.blockIndex,
       result.itemIndex,
     )
-    const fallbackTargetId = narrationTargetId(result.section.id)
-    let attemptsRemaining = 4
-    const revealMatch = () => {
-      const requestedTarget = document.getElementById(requestedTargetId)
-      const visibleTarget = requestedTarget?.getClientRects().length ? requestedTarget : null
-      const target = visibleTarget ?? document.getElementById(fallbackTargetId)
-      if (target) {
-        target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' })
-        return
-      }
-      attemptsRemaining -= 1
-      if (attemptsRemaining > 0) requestAnimationFrame(revealMatch)
-    }
-    requestAnimationFrame(revealMatch)
+    onNavigate(result.section.id, requestedTargetId)
   }
 
   return (

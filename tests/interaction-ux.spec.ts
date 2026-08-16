@@ -29,7 +29,7 @@ test('sound-affecting lab changes stop playback before the plot changes', async 
   await expectControlChangeStopsPlayback(page, page.getByRole('slider', { name: /Response delay/ }))
 })
 
-test('mobile plots and diagrams expose keyboard-reachable horizontal viewports', async ({ page }) => {
+test('mobile plots and diagrams either fit their leaf or remain keyboard-pannable', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 })
   await page.goto('/#sound-laboratory')
 
@@ -46,10 +46,11 @@ test('mobile plots and diagrams expose keyboard-reachable horizontal viewports',
   const diagram = page.locator('.scientific-figure__viewport').first()
   await expect(diagram).toHaveClass(/horizontal-scroll-region/)
   await expect(diagram).toHaveAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight')
-  expect(await diagram.evaluate((element) => element.scrollWidth)).toBeGreaterThan(await diagram.evaluate((element) => element.clientWidth))
-  await diagram.focus()
-  await page.keyboard.press('ArrowRight')
-  await expect.poll(() => diagram.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0)
+  const diagramGeometry = await diagram.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }))
+  expect(diagramGeometry.scrollWidth).toBeLessThanOrEqual(diagramGeometry.clientWidth)
   await expect(page).toHaveURL(/#media-broadcast-voice$/)
 })
 
@@ -94,36 +95,19 @@ test('the representation rail uses concise names, roving focus, and linked detai
   await expect(scrubber).toHaveAttribute('aria-describedby', detailId!)
 })
 
-test('genuine section navigation retains native link behaviour and SPA focus', async ({ page }) => {
+test('the quiet utility strip keeps the laboratory discoverable and page navigation focused', async ({ page }) => {
   await page.goto('/#media-before-hello')
 
   const wordmark = page.getByRole('link', { name: 'The Programmable Voice' })
-  const laboratory = page.getByRole('link', { name: 'Sound laboratory' })
   await expect(wordmark).toHaveAttribute('href', '#opening')
-  await expect(laboratory).toHaveAttribute('href', '#sound-laboratory')
   await expect(page.getByRole('button', { name: 'Contents' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Search' })).toBeVisible()
   await expect(page.getByRole('button', { name: /^(Dark|Light)$/ })).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Page navigation' })).toBeVisible()
 
-  const navigation = page.getByRole('navigation', { name: 'Section navigation' })
-  const previous = navigation.getByRole('link', { name: /Previous/ })
-  const next = navigation.getByRole('link', { name: /Next/ })
-  await expect(previous).toHaveAttribute('href', /^#\S+$/)
-  await expect(next).toHaveAttribute('href', /^#\S+$/)
-
-  const newTabPromise = page.context().waitForEvent('page')
-  await laboratory.click({ button: 'middle' })
-  const newTab = await newTabPromise
-  await expect.poll(() => newTab.url()).toMatch(/#sound-laboratory$/)
-  await newTab.close()
-  await expect(page).toHaveURL(/#media-before-hello$/)
-
-  const nextHash = await next.getAttribute('href')
-  await next.click()
-  await expect(page).toHaveURL(new RegExp(`${nextHash!}$`))
-  await expect(page.locator('#reader')).toBeFocused()
-
-  await laboratory.click()
+  await page.getByRole('button', { name: 'Contents' }).click()
+  const contents = page.getByRole('dialog', { name: 'Contents' })
+  await contents.getByRole('button', { name: /Sound Laboratory/ }).click()
   await expect(page).toHaveURL(/#sound-laboratory$/)
   await expect(page.locator('#reader')).toBeFocused()
 })
@@ -162,11 +146,11 @@ test('diagram labels retain a legible canvas at spread breakpoint edges', async 
     clientWidth: element.clientWidth,
     scrollWidth: element.scrollWidth,
     svgWidth: element.querySelector('svg')!.getBoundingClientRect().width,
-    cue: getComputedStyle(element, '::after').content,
+    cueDisplay: getComputedStyle(element, '::after').display,
   }))
-  expect(chapterGeometry.scrollWidth).toBeGreaterThan(chapterGeometry.clientWidth)
-  expect(chapterGeometry.svgWidth).toBeGreaterThanOrEqual(672)
-  expect(chapterGeometry.cue).toContain('Swipe')
+  expect(chapterGeometry.scrollWidth).toBeLessThanOrEqual(chapterGeometry.clientWidth)
+  expect(chapterGeometry.svgWidth).toBeCloseTo(chapterGeometry.clientWidth, 0)
+  expect(chapterGeometry.cueDisplay).toBe('none')
 
   await page.setViewportSize({ width: 768, height: 1024 })
   await page.goto('/#sound-laboratory')

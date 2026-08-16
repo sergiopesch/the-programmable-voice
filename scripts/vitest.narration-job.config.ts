@@ -6,6 +6,7 @@ export default defineConfig({
     include: [
       'scripts/narration-local-engine.test.ts',
       'scripts/narration-loudness.test.ts',
+      'scripts/narration-media.test.ts',
       'scripts/narration-pacing.test.ts',
       'scripts/narration-pilot-contract.test.ts',
       'scripts/narration-review-contract.test.ts',

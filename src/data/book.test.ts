@@ -75,4 +75,22 @@ describe('editorial data contract', () => {
     )
     expect(labels).toEqual(new Set(['Synthesis', 'Established science', 'Research preprint', 'Vendor disclosure', 'Our thesis']))
   })
+
+  it('binds each specialised process figure to its matching manuscript title', () => {
+    const expectedFigures = [
+      ['Subscriber → local loop → exchange → trunk → exchange → subscriber', 'telephone-network'],
+      ['Erase → record → replay', 'magnetic-tape'],
+      ['Capture → frame → encode → packetise → route → buffer → decode → play', 'packet-voice'],
+      ['Signal path — the corpus is part of the model', 'training-corpus'],
+      ['Signal path — from permission to playback', 'consent-provenance'],
+    ] as const
+
+    const figures = sections.flatMap((section) => section.blocks.filter((block) => block.type === 'figure'))
+
+    for (const [title, kind] of expectedFigures) {
+      const matches = figures.filter((figure) => figure.title === title)
+      expect(matches, title).toHaveLength(1)
+      expect(matches[0]?.figure, title).toBe(kind)
+    }
+  })
 })

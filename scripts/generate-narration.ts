@@ -37,10 +37,10 @@ import {
   narrationReportedWordsPerMinute,
 } from './narration-pacing'
 import { narrationLoudnessIsWithinBounds } from './narration-loudness'
+import { decodedAudioDurationSeconds } from './narration-media'
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
-const ffprobeBinary = process.env.FFPROBE_PATH?.trim() || 'ffprobe'
 const projectRoot = path.resolve(import.meta.dirname, '..')
 const outputRoot = path.join(projectRoot, 'public/audio/narration')
 const assetRoot = path.join(outputRoot, narrationEditionAssetDirectory)
@@ -245,13 +245,10 @@ export function narrationNormalisationFilterForPassage(
 }
 
 async function technicalQc(filePath: string, text: string, passageId: string): Promise<NarrationTechnicalQc> {
-  const { stdout } = await execFileAsync(ffprobeBinary, [
-    '-v', 'error',
-    '-show_entries', 'format=duration',
-    '-of', 'default=noprint_wrappers=1:nokey=1',
+  const durationMeasuredSeconds = await decodedAudioDurationSeconds(
     filePath,
-  ])
-  const durationMeasuredSeconds = Number(stdout.trim())
+    configuration.normalisation.sampleRateHz,
+  )
   if (!Number.isFinite(durationMeasuredSeconds) || durationMeasuredSeconds < 0.35) {
     throw new Error(`Pacing QC failed for ${path.basename(filePath)}: invalid media duration.`)
   }

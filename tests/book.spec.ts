@@ -765,14 +765,21 @@ test('released narration rejects missing or tampered full-listen evidence', asyn
   ).__narrationTestAudio.instances.length)).toBe(0)
 })
 
-test('mobile section navigation follows the manuscript instead of covering it', async ({ page }) => {
+test('mobile uses a contained single leaf with reachable page navigation', async ({ page }) => {
   await page.setViewportSize({ width: 568, height: 320 })
   await page.goto('/#media-tape-editable-time')
-  const navigation = page.getByRole('navigation', { name: 'Section navigation' })
-  await expect(navigation).toHaveCSS('position', 'static')
+  const navigation = page.getByRole('navigation', { name: 'Page navigation' })
   const bounds = await navigation.boundingBox()
   expect(bounds).not.toBeNull()
-  expect(bounds!.y).toBeGreaterThanOrEqual(320)
+  expect(bounds!.y).toBeGreaterThanOrEqual(0)
+  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(320)
+  const geometry = await page.evaluate(() => ({
+    columns: getComputedStyle(document.querySelector<HTMLElement>('.chapter-article--flow')!).columnCount,
+    documentHeight: document.documentElement.scrollHeight,
+    viewportHeight: document.documentElement.clientHeight,
+  }))
+  expect(geometry.columns).toBe('1')
+  expect(geometry.documentHeight).toBeLessThanOrEqual(geometry.viewportHeight)
 })
 
 test('recorded narration fails closed with a friendly message when no approved release exists', async ({ page }) => {

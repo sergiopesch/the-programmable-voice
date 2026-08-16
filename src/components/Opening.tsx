@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import type { Theme } from '../hooks/usePreferences'
 import type { NarrationCatalogueStatus, NarrationStatus } from '../hooks/useNarrationPlayer'
-import { shouldUsePhysicalBook } from '../lib/book3d/shouldUsePhysicalBook'
+import { shouldUsePhysicalOpening } from '../lib/book3d/shouldUsePhysicalBook'
 import { narrationTargetId } from '../lib/narration'
 import type { BookSection } from '../types'
 import { ArrowIcon } from './Icons'
@@ -46,9 +46,9 @@ export function Opening({
 }: OpeningProps) {
   const [open, setOpen] = useState(false)
   const [coverSettled, setCoverSettled] = useState(false)
-  const [physicalHandoffReady, setPhysicalHandoffReady] = useState(false)
   const [threeReady, setThreeReady] = useState(false)
-  const [physicalBook] = useState(() => shouldUsePhysicalBook(reduceMotion))
+  const [physicalHandoff, setPhysicalHandoff] = useState(false)
+  const [physicalBook] = useState(() => shouldUsePhysicalOpening(reduceMotion))
   const targetId = narrationTargetId(section.id)
   const titleWords = section.title.split(' ')
   const prologueHeading = section.blocks.find((block) => block.type === 'heading')
@@ -58,7 +58,10 @@ export function Opening({
     const blockTargetId = narrationTargetId(section.id, index)
     return [{ id: blockTargetId, text: block.text }]
   })
-  const visualOpen = open && (reduceMotion || coverSettled || physicalHandoffReady)
+  const [openingLeftParagraph, ...openingRightParagraphs] = prologueParagraphs
+  // The semantic spread appears only after the physical cover has finished.
+  // An early handoff stacked two books at different scales.
+  const visualOpen = open && (reduceMotion || coverSettled)
   const physicalOpening = open && threeReady && !coverSettled && !reduceMotion
   const openingPending = open && !coverSettled && !reduceMotion
 
@@ -78,7 +81,7 @@ export function Opening({
 
   return (
     <section
-      className={`opening opening--${visualOpen ? 'open' : 'closed'}${threeReady ? ' opening--three-ready' : ''}${physicalOpening ? ' opening--opening' : ''}`}
+      className={`opening opening--${visualOpen ? 'open' : 'closed'}${threeReady ? ' opening--three-ready' : ''}${physicalHandoff ? ' opening--physical-handoff' : ''}${physicalOpening ? ' opening--opening' : ''}`}
       aria-labelledby={openingPending ? undefined : visualOpen ? 'opening-spread-title' : 'opening-title'}
       aria-label={openingPending ? `${section.title}. Preparing and opening the book.` : undefined}
       aria-busy={openingPending || undefined}
@@ -94,9 +97,12 @@ export function Opening({
             open={open}
             reduceMotion={reduceMotion}
             theme={theme}
-            onReadyChange={setThreeReady}
+            onReadyChange={(ready) => {
+              setThreeReady(ready)
+              if (ready) setPhysicalHandoff(true)
+            }}
             onOpenAnimationComplete={() => setCoverSettled(true)}
-            onOpenHandoffReady={() => setPhysicalHandoffReady(true)}
+            onOpenHandoffReady={() => {}}
           />
         ) : null}
         {!coverSettled && !physicalOpening ? (
@@ -143,7 +149,14 @@ export function Opening({
               <div className="short-rule" aria-hidden="true" />
               <span className="opening__title-deck">{section.deck}</span>
             </div>
-            <div className="opening__mini-wave" aria-hidden="true"><WaveformHero /></div>
+            {openingLeftParagraph ? (
+              <p
+                id={openingLeftParagraph.id}
+                className={`opening__page-copy narration-target${activeNarrationTargetId === openingLeftParagraph.id ? ' narration-target--active' : ''}`}
+              >
+                {openingLeftParagraph.text}
+              </p>
+            ) : null}
             <span className="opening__folio">{section.part} · {section.readingMinutes ?? 1} min · {total} chapters</span>
           </article>
           <article id="opening-prologue" className="opening__prologue" aria-label="Prologue" tabIndex={-1}>
@@ -161,7 +174,7 @@ export function Opening({
               onResume={onResumeNarration}
               onRetry={onRetryNarration}
             />
-            {prologueParagraphs.map((paragraph) => (
+            {openingRightParagraphs.map((paragraph) => (
               <p
                 id={paragraph.id}
                 key={paragraph.id}

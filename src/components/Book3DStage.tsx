@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKe
 import type { Theme } from '../hooks/usePreferences'
 import type { BookFace } from '../lib/book3d/bookView'
 import type { BookSceneController } from '../lib/book3d/createBookScene'
-import { ArrowIcon, ResetViewIcon, ZoomInIcon, ZoomOutIcon } from './Icons'
+import { shouldInspectPhysicalBook } from '../lib/book3d/shouldUsePhysicalBook'
 
 interface Book3DStageProps {
   deck: string
@@ -55,6 +55,7 @@ export function Book3DStage({
   const openingCopy = openingParagraphs.join('\n\n')
   const [phase, setPhase] = useState<Book3DPhase>(reduceMotion ? 'fallback' : 'loading')
   const [face, setFace] = useState<BookFace>('Front cover')
+  const [inspect] = useState(() => shouldInspectPhysicalBook())
 
   openRef.current = open
   onCompleteRef.current = onOpenAnimationComplete
@@ -224,14 +225,14 @@ export function Book3DStage({
 
   const interact = (action: (controller: BookSceneController) => void) => {
     const controller = controllerRef.current
-    if (!controller || open) return
+    if (!controller || open || !inspect) return
     action(controller)
   }
 
   const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.target instanceof HTMLButtonElement) return
     const controller = controllerRef.current
-    if (!controller || open) return
+    if (!controller || open || !inspect) return
 
     switch (event.key) {
       case 'ArrowLeft':
@@ -272,10 +273,10 @@ export function Book3DStage({
       data-page-keys="ignore"
       role="group"
       aria-hidden={phase === 'ready' && !open ? undefined : true}
-      aria-label="Interactive three-dimensional book preview"
-      aria-describedby="book3d-description book3d-help"
-      aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home + -"
-      tabIndex={phase === 'ready' && !open ? 0 : -1}
+      aria-label="Interactive 3D hardback"
+      aria-describedby={inspect ? 'book3d-description book3d-help' : 'book3d-description'}
+      aria-keyshortcuts={inspect ? 'ArrowLeft ArrowRight ArrowUp ArrowDown Home + -' : undefined}
+      tabIndex={inspect && phase === 'ready' && !open ? 0 : -1}
       onKeyDown={onKeyDown}
       onDoubleClick={(event) => {
         if (event.target instanceof HTMLCanvasElement) interact((controller) => controller.reset())
@@ -284,55 +285,15 @@ export function Book3DStage({
       <span id="book3d-description" className="sr-only">
         Closed charcoal woven-cloth hardback with an oxblood spine and warm ivory page edges.
       </span>
-      <span id="book3d-help" className="sr-only">
-        Drag horizontally to inspect all sides. Use the arrow keys to rotate and tilt, Home to return to the front, and plus or minus to change distance.
-      </span>
+      {inspect ? (
+        <span id="book3d-help" className="sr-only">
+          Drag horizontally to inspect all sides. Use the arrow keys to rotate and tilt, Home to return to the front, and plus or minus to change distance.
+        </span>
+      ) : null}
       <div ref={hostRef} className="book3d-stage__viewport" aria-hidden="true" />
-      {phase === 'ready' && !open ? (
-        <div className="book3d-stage__toolbar">
-          <span className="book3d-stage__hint">Drag to inspect <span aria-hidden="true">·</span> cover, edges and underside</span>
-          <div className="book3d-stage__controls" role="group" aria-label="Book view controls">
-            <button
-              type="button"
-              onClick={() => interact((controller) => controller.rotateBy(-15))}
-              aria-label="Rotate book left"
-              title="Rotate left"
-            >
-              <ArrowIcon direction="left" />
-            </button>
-            <button
-              type="button"
-              onClick={() => interact((controller) => controller.rotateBy(15))}
-              aria-label="Rotate book right"
-              title="Rotate right"
-            >
-              <ArrowIcon />
-            </button>
-            <button
-              type="button"
-              onClick={() => interact((controller) => controller.reset())}
-              aria-label="Return book to front view"
-              title="Front view"
-            >
-              <ResetViewIcon />
-            </button>
-            <button
-              type="button"
-              onClick={() => interact((controller) => controller.zoomBy(0.9))}
-              aria-label="Move closer to book"
-              title="Move closer"
-            >
-              <ZoomInIcon />
-            </button>
-            <button
-              type="button"
-              onClick={() => interact((controller) => controller.zoomBy(1.1))}
-              aria-label="Move farther from book"
-              title="Move farther"
-            >
-              <ZoomOutIcon />
-            </button>
-          </div>
+      {inspect && phase === 'ready' && !open ? (
+        <div className="book3d-stage__toolbar" aria-hidden="true">
+          <span className="book3d-stage__hint">Drag to turn <span>·</span> scroll to move closer <span>·</span> double-click to reset</span>
         </div>
       ) : null}
       <span className="sr-only" aria-live="polite" aria-atomic="true">{face}</span>

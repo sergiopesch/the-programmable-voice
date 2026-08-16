@@ -30,8 +30,9 @@ export const BOOK_CAMERA = Object.freeze({
   fov: 30,
   /** Empty image-space margin around the fitted physical bounds. */
   fitPadding: 1.1,
-  /** Editorially neutral three-quarter inspection direction. */
-  closedDirection: Object.freeze({ x: 0.48, y: 0.48, z: 0.74 }),
+  /** A near-frontal reading pose: the cover faces the reader, with only enough
+   *  yaw to reveal the oxblood spine and the thickness of the page block. */
+  closedDirection: Object.freeze({ x: 0.22, y: 0.16, z: 0.96 }),
 })
 
 export interface PhysicalStageFit {

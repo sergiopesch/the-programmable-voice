@@ -45,6 +45,7 @@ import {
   narrationReportedWordsPerMinute,
 } from './narration-pacing'
 import { narrationLoudnessIsWithinBounds } from './narration-loudness'
+import { decodedAudioDurationSeconds } from './narration-media'
 import {
   buildNarrationFullListenPackage,
   createNarrationFullListenReceipt,
@@ -57,7 +58,6 @@ import {
 
 const execFileAsync = promisify(execFile)
 const ffmpegBinary = process.env.FFMPEG_PATH?.trim() || 'ffmpeg'
-const ffprobeBinary = process.env.FFPROBE_PATH?.trim() || 'ffprobe'
 const projectRoot = path.resolve(import.meta.dirname, '..')
 const publicRoot = path.join(projectRoot, 'public')
 const narrationAssetRoot = path.join(publicRoot, 'audio/narration', narrationEditionAssetDirectory)
@@ -298,11 +298,10 @@ export function narrationFullMediaQcProblems(
 async function verifyFileFull(entry: NarrationManifestEntry, passage: NarrationPassage) {
   await verifyFileLightweight(entry)
   const filePath = resolveAudioPath(entry)
-  const { stdout } = await execFileAsync(ffprobeBinary, [
-    '-v', 'error', '-show_entries', 'format=duration',
-    '-of', 'default=noprint_wrappers=1:nokey=1', filePath,
-  ])
-  const duration = Number(stdout.trim())
+  const duration = await decodedAudioDurationSeconds(
+    filePath,
+    narrationEditionConfiguration.normalisation.sampleRateHz,
+  )
   if (!Number.isFinite(duration) || Math.abs(duration - entry.durationSeconds) > 0.02) {
     throw new Error(`${entry.id} failed duration verification.`)
   }

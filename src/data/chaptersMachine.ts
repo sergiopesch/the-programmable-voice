@@ -266,7 +266,7 @@ export const machineSections: BookSection[] = [
       },
       {
         type: 'figure',
-        figure: 'stack',
+        figure: 'training-corpus',
         title: 'Signal path — the corpus is part of the model',
         caption: 'People and settings → recordings → consent and metadata → segmentation and labels → sampling and training → metric → deployment. Bias can enter at every arrow, and later scale does not automatically cancel an earlier omission.',
         label: 'Synthesis',
@@ -617,7 +617,7 @@ export const machineSections: BookSection[] = [
       },
       {
         type: 'figure',
-        figure: 'stack',
+        figure: 'consent-provenance',
         title: 'Signal path — from permission to playback',
         caption: 'Enrolment evidence → scoped consent → protected voice model → authorised generation → signed provenance → channel disclosure → recipient verification. A break in one layer should narrow what the system permits, not be covered by greater acoustic realism.',
         label: 'Our thesis',
