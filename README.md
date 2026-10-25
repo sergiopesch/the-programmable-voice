@@ -100,6 +100,8 @@ git diff --check
 
 `npm run check` adds full local FFmpeg verification of a complete human-approved recorded edition and is therefore the narration release gate. It is expected to fail while the tracked manifest is incomplete or unapproved; do not weaken that failure to make a code change pass. Vercel’s ordinary `npm run build` uses `narration:verify-build`, which rechecks the approved release identity and every static-file checksum without assuming FFmpeg exists in the remote build image. `npm run build:app` remains available for a faster application-only build.
 
+`vercel.json` pins the deployment build command to `npm run build`, overriding the dashboard Build Command so an application-only setting cannot publish a release without its approved narration. Missing, unapproved, stale or checksum-invalid release assets fail before application compilation, regardless of `CI` or Vercel environment-variable exposure. A failed build cannot replace the current production deployment. Keep `build:app` for local application checks; the approved prebuilt workflow below uses the same release verification before building.
+
 ## Deploy to Vercel
 
 Deploy the approved static release with the application. `vercel.json` provides SPA routing, security headers and immutable caching for edition `2026.2`; narration needs no runtime API function or credential. The 24 kHz / 48 kbps encoding is projected to fit the Hobby plan’s upload ceiling, but the final output must be measured rather than assumed.
