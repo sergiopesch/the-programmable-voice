@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: [
+      'scripts/release-build.test.ts',
       'scripts/narration-local-engine.test.ts',
       'scripts/narration-loudness.test.ts',
       'scripts/narration-media.test.ts',
